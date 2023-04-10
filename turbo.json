@@ -1,0 +1,37 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"],
+      "cache": false
+    },
+    "lint": {
+      "outputs": [],
+      "cache": false
+    },
+    "dev": {
+      "cache": false
+    },
+    "test": {
+      "outputs": [],
+      "cache": false
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:push": {
+      "cache": false
+    }
+  },
+  "globalEnv": [
+    "NODE_ENV",
+    "PORT",
+    "ZUPOLL_SERVER_URL",
+    "NEXT_PUBLIC_ZUPOLL_SERVER_URL",
+    "SEMAPHORE_GROUP_URL",
+    "PASSPORT_SERVER",
+    "NEXT_PUBLIC_SEMAPHORE_GROUP_URL",
+    "ACCESS_TOKEN_SECRET"
+  ]
+}

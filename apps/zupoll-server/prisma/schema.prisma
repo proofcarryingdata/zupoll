@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// If user type is ANON, the PCD is a Semaphore Group PCD which signs the signal. We just check for membership.
+// If user type is NONANON, the PCD is a Semaphore Signature PCD which signs the signal. We extract the commitment
+//    from the verified PCD and then we check that it is part of a valid group.
+
+model Poll {
+  id String @id
+  createdAt DateTime @default(now())
+  pollsterType UserType
+  pollsterNullifier String @unique
+
+  // ANON
+  pollsterSemaphoreGroupUrl String?
+
+  // NONANON
+  pollsterName String?
+  pollsterUuid String?
+  pollsterCommitment String?
+
+  pollType PollType
+  body String
+  expiry DateTime
+  options String[]
+  voterSemaphoreGroupUrls String[]
+
+  proof Json
+  votes Vote[]
+}
+
+// changed id here to be uuid, no reason it should be a signal hash.
+model Vote {
+  id String @id @default(uuid())
+  poll Poll @relation(fields: [pollId], references: [id])
+  pollId String
+  voterType UserType
+  voterNullifier String @unique
+
+  // ANON
+  voterSemaphoreGroupUrl String?
+
+  // NONANON
+  voterName String?
+  voterUuid String?
+  voterCommitment String?
+
+  voteIdx Int
+  proof Json
+}
+
+enum UserType {
+  ANON
+  NONANON
+}
+
+enum PollType {
+  REFERENDUM
+}
