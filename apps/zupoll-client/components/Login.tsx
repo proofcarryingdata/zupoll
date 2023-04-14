@@ -17,8 +17,12 @@ import { login } from "../src/api";
  */
 export function Login({
   onLoggedIn,
+  requestedGroup,
+  prompt
 }: {
-  onLoggedIn: (_: string) => void;
+  onLoggedIn: (token: string, group: string) => void;
+  requestedGroup: string;
+  prompt: string;
 }) {
   const [error, setError] = useState<ConfessionsError>();
   const [loggingIn, setLoggingIn] = useState(false);
@@ -26,7 +30,7 @@ export function Login({
   const [pcdStr] = usePassportResponse();
 
   const { proof, valid, error: proofError } = useSemaphorePassportProof(
-    SEMAPHORE_GROUP_URL!,
+    requestedGroup,
     pcdStr
   )
 
@@ -55,7 +59,7 @@ export function Login({
     }
 
     (async () => {
-      const res = await login(SEMAPHORE_GROUP_URL!, pcdStr);
+      const res = await login(requestedGroup, pcdStr);
       if (!res.ok) {
         const resErr = await res.text();
         console.error("error login to the server: ", resErr);
@@ -71,9 +75,9 @@ export function Login({
       return token.accessToken;
     })().then((accessToken) => {
       setLoggingIn(false);
-      onLoggedIn(accessToken);
+      onLoggedIn(accessToken, requestedGroup);
     })
-  }, [proof, valid, proofError, pcdStr, onLoggedIn]);
+  }, [proof, valid, proofError, pcdStr, onLoggedIn, requestedGroup]);
 
   return (
     <>
@@ -86,7 +90,7 @@ export function Login({
         }
         disabled={loggingIn}
       >
-        Login
+        { prompt }
       </button>
       {error && <ErrorOverlay error={error} onClose={() => setError(undefined)}/> }
       <br />

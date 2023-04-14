@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from "express";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { ApplicationContext } from "../../types";
-import { SEMAPHORE_GROUP_URL } from "../../util/auth";
+import { SEMAPHORE_ADMIN_GROUP_URL } from "../../util/auth";
 import { prisma } from "../../util/prisma";
 import { fetchAndVerifyName } from "../../util/util";
 import { verifyGroupProof, verifySignatureProof } from "../../util/verify";
@@ -37,7 +37,7 @@ export function initPCDRoutes(
           const nullifier = await verifyGroupProof(
             request.pollsterSemaphoreGroupUrl!,
             request.proof,
-            {signal: signalHash, allowedGroups: [SEMAPHORE_GROUP_URL!], claimedExtNullifier: signalHash}
+            {signal: signalHash, allowedGroups: [SEMAPHORE_ADMIN_GROUP_URL!], claimedExtNullifier: signalHash}
           );
 
           const newPoll = await prisma.poll.create({
@@ -64,7 +64,7 @@ export function initPCDRoutes(
             request.pollsterCommitment!,
             request.proof,
             signalHash,
-            [SEMAPHORE_GROUP_URL!]
+            [SEMAPHORE_ADMIN_GROUP_URL!]
           );
           const pollsterName = await fetchAndVerifyName(
             request.pollsterCommitment!,

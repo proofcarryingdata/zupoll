@@ -18,6 +18,7 @@ import {
   PASSPORT_URL,
   requestProofFromPassport,
   SEMAPHORE_GROUP_URL,
+  SEMAPHORE_ADMIN_GROUP_URL
 } from "../src/util";
 import { ConfessionsError } from "./shared/ErrorOverlay";
 
@@ -38,7 +39,7 @@ export function CreatePoll({
     proof,
     valid,
     error: proofError,
-  } = useSemaphorePassportProof(SEMAPHORE_GROUP_URL, pcdStr);
+  } = useSemaphorePassportProof(SEMAPHORE_ADMIN_GROUP_URL, pcdStr);
 
   const handleSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -57,7 +58,7 @@ export function CreatePoll({
     const proofUrl = requestZuzaluMembershipUrl(
       PASSPORT_URL,
       window.location.origin + "/popup",
-      SEMAPHORE_GROUP_URL,
+      SEMAPHORE_ADMIN_GROUP_URL,
       sigHashEnc,
       sigHashEnc,
       false
@@ -92,7 +93,7 @@ export function CreatePoll({
     const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
     const request: CreatePollRequest = {
       pollsterType: UserType.ANON,
-      pollsterSemaphoreGroupUrl: SEMAPHORE_GROUP_URL,
+      pollsterSemaphoreGroupUrl: SEMAPHORE_ADMIN_GROUP_URL,
       pollType: PollType.REFERENDUM,
       body: pollBody,
       expiry: pollExpiry,
