@@ -3,24 +3,39 @@ import {
   SemaphoreGroupPCDPackage,
   SerializedSemaphoreGroup,
 } from "@pcd/semaphore-group-pcd";
-import { SemaphoreSignaturePCDPackage, generateMessageHash } from "@pcd/semaphore-signature-pcd";
+import {
+  generateMessageHash,
+  SemaphoreSignaturePCDPackage,
+} from "@pcd/semaphore-signature-pcd";
 import { Group } from "@semaphore-protocol/group";
-import { SEMAPHORE_GROUP_URL } from "./auth";
 
 // Returns nullfier or throws error.
 export async function verifyGroupProof(
   semaphoreGroupUrl: string,
   proof: string,
-  signal?: string,
-  allowedGroups?: string[]
+  options: {
+    signal?: string;
+    allowedGroups?: string[];
+    claimedExtNullifier?: string;
+  }
 ): Promise<string> {
-  if (allowedGroups && !allowedGroups.includes(semaphoreGroupUrl)) {
+  if (
+    options.allowedGroups &&
+    !options.allowedGroups.includes(semaphoreGroupUrl)
+  ) {
     throw new Error(
-      `Not in semaphore groups allowed to perform action. expected ${allowedGroups} actual: ${semaphoreGroupUrl}`
+      `Not in semaphore groups allowed to perform action. expected ${options.allowedGroups} actual: ${semaphoreGroupUrl}`
     );
   }
 
   const pcd = await SemaphoreGroupPCDPackage.deserialize(proof);
+  if (
+    options.claimedExtNullifier &&
+    generateMessageHash(options.claimedExtNullifier).toString() !=
+      pcd.claim.externalNullifier
+  ) {
+    throw new Error("invalid external nullifier in proof");
+  }
 
   const verified = await SemaphoreGroupPCDPackage.verify(pcd);
   if (!verified) {
@@ -42,7 +57,10 @@ export async function verifyGroupProof(
     );
   }
 
-  if (signal && pcd.claim.signal !== generateMessageHash(signal).toString()) {
+  if (
+    options.signal &&
+    pcd.claim.signal !== generateMessageHash(options.signal).toString()
+  ) {
     throw new Error("signal doesn't match claim");
   }
 
@@ -80,9 +98,7 @@ export async function verifySignatureProof(
 
   // check commitment matches the claim
   if (commitment !== pcd.claim.identityCommitment) {
-    throw new Error(
-      "given commitment doesn't match PCD signature"
-    );
+    throw new Error("given commitment doesn't match PCD signature");
   }
 
   if (pcd.claim.signedMessage !== signal) {

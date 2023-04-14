@@ -4,6 +4,7 @@ import {
   usePassportResponse,
 } from "@pcd/passport-interface";
 import { useEffect, useState } from "react";
+import { ConfessionsError, ErrorOverlay } from "./shared/ErrorOverlay";
 import { PASSPORT_URL, SEMAPHORE_GROUP_URL, requestProofFromPassport } from "../src/util";
 import { login } from "../src/api";
 
@@ -19,11 +20,12 @@ export function Login({
 }: {
   onLoggedIn: (_: string) => void;
 }) {
+  const [error, setError] = useState<ConfessionsError>();
   const [loggingIn, setLoggingIn] = useState(false);
 
   const [pcdStr] = usePassportResponse();
 
-  const { proof, valid, error } = useSemaphorePassportProof(
+  const { proof, valid, error: proofError } = useSemaphorePassportProof(
     SEMAPHORE_GROUP_URL!,
     pcdStr
   )
@@ -31,16 +33,23 @@ export function Login({
   useEffect(() =>  {
     if (valid === undefined) return; // verifying
 
-    if (error) {
-      // TODO: display error to the user
-      console.error("error using semaphore passport proof", error);
+    if (proofError) {
+      console.error("error using semaphore passport proof: ", proofError);
+      const err = {
+        title: "Login failed",
+        message: "There's an error in generating proof.",
+      } as ConfessionsError;
+      setError(err);
       setLoggingIn(false);
       return;
     }
 
     if (!valid) {
-      // TODO: display error to the user
-      console.error("proof is invalid");
+      const err = {
+        title: "Login failed",
+        message: "Proof is invalid.",
+      } as ConfessionsError;
+      setError(err);
       setLoggingIn(false);
       return;
     }
@@ -48,9 +57,13 @@ export function Login({
     (async () => {
       const res = await login(SEMAPHORE_GROUP_URL!, pcdStr);
       if (!res.ok) {
-        // TODO: display error to the user
-        const err = await res.text();
-        console.error("error login to the server:", err);
+        const resErr = await res.text();
+        console.error("error login to the server: ", resErr);
+        const err = {
+          title: "Login failed",
+          message: "Fail to connect to the server, please try again later.",
+        } as ConfessionsError;
+        setError(err);
         setLoggingIn(false);
         return;
       }
@@ -60,7 +73,7 @@ export function Login({
       setLoggingIn(false);
       onLoggedIn(accessToken);
     })
-  }, [proof, valid, error, pcdStr, onLoggedIn]);
+  }, [proof, valid, proofError, pcdStr, onLoggedIn]);
 
   return (
     <>
@@ -68,13 +81,14 @@ export function Login({
         onClick={
           () => {
             setLoggingIn(true);
-            requestZuzaluMembershipProof();
+            requestZuzaluMembershipProof(() => setLoggingIn(false));
           }
         }
         disabled={loggingIn}
       >
         Login
       </button>
+      {error && <ErrorOverlay error={error} onClose={() => setError(undefined)}/> }
       <br />
       <br />
     </>
@@ -85,12 +99,12 @@ export function Login({
 // Show the Passport popup
 // TODO: make the description in the "prove membership" screen
 // more relevant to this login case
-function requestZuzaluMembershipProof() {
+function requestZuzaluMembershipProof(onPopupClose: () => void) {
   const proofUrl = requestZuzaluMembershipUrl(
     PASSPORT_URL,
     window.location.origin + "/popup",
     SEMAPHORE_GROUP_URL!
   );
 
-  requestProofFromPassport(proofUrl);
+  requestProofFromPassport(proofUrl, onPopupClose);
 }

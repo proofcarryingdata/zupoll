@@ -19,7 +19,7 @@ export function initAuthedRoutes(
     const request = req.body as LoginRequest;
 
     try {
-      await verifyGroupProof(request.semaphoreGroupUrl, request.proof);
+      await verifyGroupProof(request.semaphoreGroupUrl, request.proof, {});
 
       const accessToken = sign({ groupUrl: request.semaphoreGroupUrl }, ACCESS_TOKEN_SECRET!)
 
@@ -34,6 +34,9 @@ export function initAuthedRoutes(
     // TODO: do we need pagination
     
     const polls = await prisma.poll.findMany({
+      include: {
+        votes: true
+      },
       orderBy: { expiry: "asc" }
     });
     res.status(200).json({ polls });

@@ -21,6 +21,7 @@
     "@types/pg": "^8.6.6",
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "json-stable-stringify": "^1.0.2",
     "jsonwebtoken": "^9.0.0",
     "libhoney": "^4.0.1",
     "lodash": "^4.17.21",
@@ -31,7 +32,6 @@
     "postgres-migrations": "^5.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "sort-keys": "^4.2.0",
     "ts-node": "^10.9.1",
     "uuid": "^9.0.0"
   },
@@ -42,6 +42,7 @@
     "@types/cors": "^2.8.13",
     "@types/expect": "^24.3.0",
     "@types/express": "^4.17.16",
+    "@types/json-stable-stringify": "^1.0.34",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/mocha": "^10.0.1",
     "@types/morgan": "^1.9.4",

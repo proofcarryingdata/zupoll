@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Confessions } from "../components/Confessions";
+import { Polls } from "../components/Polls";
 import { Login } from "../components/Login";
-import { PublishConfession } from "../components/PublishConfession";
+import { CreatePoll } from "../components/CreatePoll";
+import { ConfessionsError, ErrorOverlay } from "../components/shared/ErrorOverlay";
 
 export default function Page() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [newConfession, setNewConfession] = useState<string | undefined>();
+  const [newPoll, setNewPoll] = useState<string | undefined>();
+  const [error, setError] = useState<ConfessionsError>();
 
   useEffect(() => {
     if (accessToken) return;
@@ -24,20 +26,25 @@ export default function Page() {
     }
   };
 
+  const onError = (err: ConfessionsError) => setError(err);
+
   return (
     <>
-      <h1>Confessions Board</h1>
+      <h1>Polls</h1>
       {accessToken ? (
         <>
           <button onClick={() => updateAccessToken(null)}>Logout</button>
           <br />
           <br />
           <Container>
-            <PublishConfession onPublished={setNewConfession} />
+            <CreatePoll onCreated={setNewPoll} onError={onError}/>
           </Container>
           <Container>
-            <Confessions accessToken={accessToken} newConfession={newConfession} />
+            <Polls accessToken={accessToken} newPoll={newPoll} onError={onError} />
           </Container>
+          {error && (
+            <ErrorOverlay error={error} onClose={() => setError(undefined)} />
+          )}
         </>
       ) : (
         <Login onLoggedIn={updateAccessToken} />
