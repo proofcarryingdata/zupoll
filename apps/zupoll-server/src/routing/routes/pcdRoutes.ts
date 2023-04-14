@@ -125,6 +125,10 @@ export function initPCDRoutes(
         throw new Error("Invalid vote idx");
       }
 
+      if (poll.expiry < (new Date())) {
+        throw new Error("Poll has expired.");
+      }
+
       if (request.voterType == UserType.ANON) {
         const nullifier = await verifyGroupProof(
           request.voterSemaphoreGroupUrl!,

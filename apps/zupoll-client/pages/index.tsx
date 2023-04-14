@@ -15,10 +15,20 @@ export default function Page() {
   const [newPoll, setNewPoll] = useState<string | undefined>();
   const [error, setError] = useState<ConfessionsError>();
 
+  function parseJwt (token: string) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(window.atob(base64));
+}
+
   useEffect(() => {
     if (accessToken) return;
 
     const token = window.localStorage.getItem("access_token");
+    if (token !== null) {
+      const group = parseJwt(token)['groupUrl'] || null;
+      setGroup(group);
+    }
     setAccessToken(token);
   }, [accessToken]);
 

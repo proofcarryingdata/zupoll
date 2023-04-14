@@ -17,23 +17,27 @@ export function Poll({
     statistics[vote.voteIdx] += 1;
   }
 
-  const getVoteDisplay = (a, b) => {
-    const percentVal = (a/b * 100).toFixed(2);
-    return `${a}/${b} - ${percentVal}%`
+  const getVoteDisplay = (a: number, b: number) => {
+    const percentVal = ((a / b) * 100).toFixed(2);
+    return `${a}/${b} - ${percentVal}%`;
   };
+
+  const expired = new Date(poll.expiry) < new Date();
 
   return (
     <>
       <h3>{poll.body}</h3>
       <ul>
         {poll.options.map((opt, idx) => (
-          <li key={idx}>{opt} - {getVoteDisplay(statistics[idx], totalVotes)} </li>
+          <li key={idx}>
+            {opt} - {getVoteDisplay(statistics[idx], totalVotes)}{" "}
+          </li>
         ))}
       </ul>
       Expires: {poll.expiry}
       <br />
       <br />
-      <VoteForm poll={poll} onError={onError} onVoted={onVoted} />
+      {!expired && <VoteForm poll={poll} onError={onError} onVoted={onVoted} />}
     </>
   );
 }
