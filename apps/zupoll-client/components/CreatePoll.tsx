@@ -1,7 +1,7 @@
 import {
-  requestZuzaluMembershipUrl,
-  usePassportResponse,
-  useSemaphorePassportProof,
+  openZuzaluMembershipPopup,
+  usePassportPopupMessages,
+  useSemaphoreGroupProof,
 } from "@pcd/passport-interface";
 import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
@@ -16,30 +16,35 @@ import {
 } from "../src/types";
 import {
   PASSPORT_URL,
-  requestProofFromPassport,
+  SEMAPHORE_ADMIN_GROUP_URL,
   SEMAPHORE_GROUP_URL,
-  SEMAPHORE_ADMIN_GROUP_URL
 } from "../src/util";
-import { ConfessionsError } from "./shared/ErrorOverlay";
+import { ZupollError } from "./shared/ErrorOverlay";
 
 export function CreatePoll({
   onCreated,
   onError,
 }: {
   onCreated: (newPoll: string) => void;
-  onError: (err: ConfessionsError) => void;
+  onError: (err: ZupollError) => void;
 }) {
   const [pollSubmit, setPollSubmit] = useState<boolean>(false);
   const [pollBody, setPollBody] = useState<string>("");
   const [pollOptions, setPollOptions] = useState<Array<string>>([]);
   const [pollExpiry, setPollExpiry] = useState<Date>(new Date());
+  const [signalHashEnc, setSignalHashEnc] = useState<string>("");
 
-  const [pcdStr] = usePassportResponse();
+  const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
   const {
     proof,
     valid,
     error: proofError,
-  } = useSemaphorePassportProof(SEMAPHORE_ADMIN_GROUP_URL, pcdStr);
+  } = useSemaphoreGroupProof(
+    pcdStr,
+    SEMAPHORE_GROUP_URL,
+    "zupoll",
+    signalHashEnc
+  );
 
   const handleSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -54,17 +59,16 @@ export function CreatePoll({
     };
     const signalHash = sha256(stableStringify(signal));
     const sigHashEnc = generateMessageHash(signalHash).toString();
+    setSignalHashEnc(sigHashEnc);
 
-    const proofUrl = requestZuzaluMembershipUrl(
+    openZuzaluMembershipPopup(
       PASSPORT_URL,
       window.location.origin + "/popup",
-      SEMAPHORE_ADMIN_GROUP_URL,
+      SEMAPHORE_GROUP_URL,
+      "zupoll",
       sigHashEnc,
-      sigHashEnc,
-      false
+      sigHashEnc
     );
-
-    requestProofFromPassport(proofUrl, () => undefined);
   };
 
   useEffect(() => {
@@ -76,7 +80,7 @@ export function CreatePoll({
       const err = {
         title: "Create poll failed",
         message: "There's an error in generating proof.",
-      } as ConfessionsError;
+      } as ZupollError;
       onError(err);
       return;
     }
@@ -85,7 +89,7 @@ export function CreatePoll({
       const err = {
         title: "Create poll failed",
         message: "Proof is invalid.",
-      } as ConfessionsError;
+      } as ZupollError;
       onError(err);
       return;
     }
@@ -110,7 +114,7 @@ export function CreatePoll({
         const err = {
           title: "Publish confession failed",
           message: `Server Error: ${resErr}`,
-        } as ConfessionsError;
+        } as ZupollError;
         onError(err);
         return;
       }

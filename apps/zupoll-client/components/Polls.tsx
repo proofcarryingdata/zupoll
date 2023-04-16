@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { listPolls } from "../src/api";
 import { Poll } from "./Poll";
-import { ConfessionsError } from "./shared/ErrorOverlay";
+import { ZupollError } from "./shared/ErrorOverlay";
 
 /**
  * Shows the user with access token a list of confessions.
@@ -11,11 +11,11 @@ import { ConfessionsError } from "./shared/ErrorOverlay";
 export function Polls({
   accessToken,
   newPoll,
-  onError
+  onError,
 }: {
   accessToken: string | null;
   newPoll: string | undefined;
-  onError: (err: ConfessionsError) => void;
+  onError: (err: ZupollError) => void;
 }) {
   const [polls, setPolls] = useState<Array<Poll>>([]);
   const [newVote, setNewVote] = useState<string | undefined>();
@@ -29,7 +29,7 @@ export function Polls({
     (async () => {
       // TODO: paging
       const resp = await listPolls(accessToken);
-      setPolls(resp['polls']);
+      setPolls(resp["polls"]);
     })();
   }, [accessToken, newPoll, newVote]);
 
@@ -38,7 +38,7 @@ export function Polls({
       <h2>Polls</h2>
       {polls.map((poll) => (
         <Fragment key={poll.id}>
-          <Poll poll={poll} onError={onError} onVoted={setNewVote}/>
+          <Poll poll={poll} onError={onError} onVoted={setNewVote} />
         </Fragment>
       ))}
     </>

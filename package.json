@@ -14,7 +14,7 @@
     "db:push": "turbo run db:push"
   },
   "devDependencies": {
-    "@pcd/eslint-config-custom": "0.2.0-next.0",
+    "@pcd/eslint-config-custom": "0.4.0",
     "prettier": "latest",
     "prettier-plugin-organize-imports": "^3.2.2"
   },

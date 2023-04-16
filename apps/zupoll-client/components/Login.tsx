@@ -1,48 +1,48 @@
 import {
-  useSemaphorePassportProof,
-  requestZuzaluMembershipUrl,
-  usePassportResponse,
+  openZuzaluMembershipPopup,
+  usePassportPopupMessages,
+  useSemaphoreGroupProof,
 } from "@pcd/passport-interface";
 import { useEffect, useState } from "react";
-import { ConfessionsError, ErrorOverlay } from "./shared/ErrorOverlay";
-import { PASSPORT_URL, SEMAPHORE_GROUP_URL, requestProofFromPassport } from "../src/util";
 import { login } from "../src/api";
+import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../src/util";
+import { ErrorOverlay, ZupollError } from "./shared/ErrorOverlay";
 
 /**
  * Login for the user who belongs to the specified semaphore group.
  * Generate a semaphore proof, calls the /login endpoint on the server, and
- * gets a jwt. The jwt can be used to make other requests to the server.
- * @param onLoggedIn a callback function which will be called after the user logged in
- * with the jwt
+ * gets a JWT. The JWT can be used to make other requests to the server.
+ * @param onLoggedIn a callback function which will be called after the user
+ * logged in with the JWT.
  */
 export function Login({
   onLoggedIn,
   requestedGroup,
-  prompt
+  prompt,
 }: {
   onLoggedIn: (token: string, group: string) => void;
   requestedGroup: string;
   prompt: string;
 }) {
-  const [error, setError] = useState<ConfessionsError>();
+  const [error, setError] = useState<ZupollError>();
   const [loggingIn, setLoggingIn] = useState(false);
 
-  const [pcdStr] = usePassportResponse();
+  const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
+  const {
+    proof,
+    valid,
+    error: proofError,
+  } = useSemaphoreGroupProof(pcdStr, SEMAPHORE_GROUP_URL, "zupoll");
 
-  const { proof, valid, error: proofError } = useSemaphorePassportProof(
-    requestedGroup,
-    pcdStr
-  )
-
-  useEffect(() =>  {
-    if (valid === undefined) return; // verifying
+  useEffect(() => {
+    if (valid === undefined) return;
 
     if (proofError) {
       console.error("error using semaphore passport proof: ", proofError);
       const err = {
         title: "Login failed",
         message: "There's an error in generating proof.",
-      } as ConfessionsError;
+      } as ZupollError;
       setError(err);
       setLoggingIn(false);
       return;
@@ -52,13 +52,13 @@ export function Login({
       const err = {
         title: "Login failed",
         message: "Proof is invalid.",
-      } as ConfessionsError;
+      } as ZupollError;
       setError(err);
       setLoggingIn(false);
       return;
     }
 
-    (async () => {
+    const sendLogin = async () => {
       const res = await login(requestedGroup, pcdStr);
       if (!res.ok) {
         const resErr = await res.text();
@@ -66,49 +66,42 @@ export function Login({
         const err = {
           title: "Login failed",
           message: "Fail to connect to the server, please try again later.",
-        } as ConfessionsError;
+        } as ZupollError;
         setError(err);
         setLoggingIn(false);
         return;
       }
       const token = await res.json();
       return token.accessToken;
-    })().then((accessToken) => {
+    };
+
+    sendLogin().then((accessToken) => {
       setLoggingIn(false);
       onLoggedIn(accessToken, requestedGroup);
-    })
+    });
   }, [proof, valid, proofError, pcdStr, onLoggedIn, requestedGroup]);
 
   return (
     <>
       <button
-        onClick={
-          () => {
-            setLoggingIn(true);
-            requestZuzaluMembershipProof(() => setLoggingIn(false));
-          }
-        }
+        onClick={() => {
+          setLoggingIn(true);
+          openZuzaluMembershipPopup(
+            PASSPORT_URL,
+            window.location.origin + "/popup",
+            SEMAPHORE_GROUP_URL,
+            "zupoll"
+          );
+        }}
         disabled={loggingIn}
       >
-        { prompt }
+        {prompt}
       </button>
-      {error && <ErrorOverlay error={error} onClose={() => setError(undefined)}/> }
+      {error && (
+        <ErrorOverlay error={error} onClose={() => setError(undefined)} />
+      )}
       <br />
       <br />
     </>
   );
-}
-
-
-// Show the Passport popup
-// TODO: make the description in the "prove membership" screen
-// more relevant to this login case
-function requestZuzaluMembershipProof(onPopupClose: () => void) {
-  const proofUrl = requestZuzaluMembershipUrl(
-    PASSPORT_URL,
-    window.location.origin + "/popup",
-    SEMAPHORE_GROUP_URL!
-  );
-
-  requestProofFromPassport(proofUrl, onPopupClose);
 }

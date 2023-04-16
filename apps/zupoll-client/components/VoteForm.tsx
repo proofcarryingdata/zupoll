@@ -1,21 +1,17 @@
 import {
-  requestZuzaluMembershipUrl,
-  usePassportResponse,
-  useSemaphorePassportProof,
+  openZuzaluMembershipPopup,
+  usePassportPopupMessages,
+  useSemaphoreGroupProof,
 } from "@pcd/passport-interface";
 import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
-import { FormEventHandler, useEffect, useState } from "react";
 import stableStringify from "json-stable-stringify";
+import { FormEventHandler, useEffect, useState } from "react";
 import { doVote } from "../src/api";
 import { UserType, VoteRequest, VoteSignal } from "../src/types";
-import {
-  PASSPORT_URL,
-  requestProofFromPassport,
-  SEMAPHORE_GROUP_URL,
-} from "../src/util";
+import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../src/util";
 import { Poll } from "./Poll";
-import { ConfessionsError } from "./shared/ErrorOverlay";
+import { ZupollError } from "./shared/ErrorOverlay";
 
 export function VoteForm({
   poll,
@@ -23,18 +19,23 @@ export function VoteForm({
   onVoted,
 }: {
   poll: Poll;
-  onError: (err: ConfessionsError) => void;
+  onError: (err: ZupollError) => void;
   onVoted: (id: string) => void;
 }) {
   const [option, setOption] = useState<string>("-1");
   const [pollSubmit, setPollSubmit] = useState<boolean>(false);
 
-  const [pcdStr] = usePassportResponse();
+  const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
   const {
     proof,
     valid,
     error: proofError,
-  } = useSemaphorePassportProof(SEMAPHORE_GROUP_URL, pcdStr);
+  } = useSemaphoreGroupProof(
+    pcdStr,
+    SEMAPHORE_GROUP_URL,
+    "zupoll",
+    generateMessageHash(poll.id).toString()
+  );
 
   const handleSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -45,7 +46,7 @@ export function VoteForm({
       const err = {
         title: "Voting failed",
         message: "Invalid option selected.",
-      } as ConfessionsError;
+      } as ZupollError;
       onError(err);
       return;
     }
@@ -58,16 +59,14 @@ export function VoteForm({
     const sigHashEnc = generateMessageHash(signalHash).toString();
     const externalNullifier = generateMessageHash(poll.id).toString();
 
-    const proofUrl = requestZuzaluMembershipUrl(
+    openZuzaluMembershipPopup(
       PASSPORT_URL,
       window.location.origin + "/popup",
       SEMAPHORE_GROUP_URL,
-      externalNullifier,
+      "zupoll",
       sigHashEnc,
-      false
+      externalNullifier
     );
-
-    requestProofFromPassport(proofUrl, () => undefined);
   };
 
   useEffect(() => {
@@ -79,7 +78,7 @@ export function VoteForm({
       const err = {
         title: "Voting failed",
         message: "There's an error in generating proof.",
-      } as ConfessionsError;
+      } as ZupollError;
       onError(err);
       return;
     }
@@ -88,7 +87,7 @@ export function VoteForm({
       const err = {
         title: "Voting failed",
         message: "Proof is invalid.",
-      } as ConfessionsError;
+      } as ZupollError;
       onError(err);
       return;
     }
@@ -110,7 +109,7 @@ export function VoteForm({
         const err = {
           title: "Voting failed",
           message: `Server Error: ${resErr}`,
-        } as ConfessionsError;
+        } as ZupollError;
         onError(err);
         return;
       }
@@ -121,7 +120,7 @@ export function VoteForm({
       setVoted(newVoted);
       setOption("-1");
       setPollSubmit(false);
-      onVoted(newVote['id']);
+      onVoted(newVote["id"]);
     }
 
     doRequest();
@@ -140,7 +139,9 @@ export function VoteForm({
         >
           <option key="-1" value="-1"></option>
           {poll.options.map((opt, idx) => (
-            <option key={idx} value={idx}>{opt}</option>
+            <option key={idx} value={idx}>
+              {opt}
+            </option>
           ))}
         </select>
         <br />

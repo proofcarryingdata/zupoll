@@ -1,5 +1,5 @@
 import { PollType, UserType } from "../src/types";
-import { ConfessionsError } from "./shared/ErrorOverlay";
+import { ZupollError } from "./shared/ErrorOverlay";
 import { VoteForm } from "./VoteForm";
 
 export function Poll({
@@ -8,7 +8,7 @@ export function Poll({
   onVoted,
 }: {
   poll: Poll;
-  onError: (err: ConfessionsError) => void;
+  onError: (err: ZupollError) => void;
   onVoted: (id: string) => void;
 }) {
   const totalVotes = poll.votes.length;

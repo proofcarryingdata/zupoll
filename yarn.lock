@@ -1616,10 +1616,10 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/semantic-conventions/-/semantic-conventions-1.9.1.tgz#ad3367684a57879392513479e0a436cb2ac46dad"
   integrity sha512-oPQdbFDmZvjXk5ZDoBGXG8B4tSB/qW5vQunJWQMFUBp7Xe8O1ByPANueJ+Jzg58esEBegyyxZ7LRmfJr7kFcFg==
 
-"@pcd/eslint-config-custom@0.2.0-next.0":
-  version "0.2.0-next.0"
-  resolved "https://registry.yarnpkg.com/@pcd/eslint-config-custom/-/eslint-config-custom-0.2.0-next.0.tgz#3b1619b671c93b66f65a80d2a815cad2b09efea2"
-  integrity sha512-HvxEEkwEfC/3bluljJLMNE70hx+UrQlV9QHi01evVZ+rSKAD27nx5jNLWfHSF//bm0kdFB5wA8PhaziA+nnc1w==
+"@pcd/eslint-config-custom@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@pcd/eslint-config-custom/-/eslint-config-custom-0.4.0.tgz#7a17766da4d8e5cc0a29642ea57bf550cb722b51"
+  integrity sha512-bRZHD2OlFOyGp7xi76hBZPLUxC+meyDu+46S2s0mvl7+L4jGEfiv+AbVnCORahjYLiKZH/iXbGSvbRql1hJHQQ==
   dependencies:
     eslint "^7.23.0"
     eslint-config-next "13.0.0"
@@ -1627,15 +1627,15 @@
     eslint-config-turbo latest
     eslint-plugin-react "7.31.8"
 
-"@pcd/passport-crypto@0.2.0-next.1":
-  version "0.2.0-next.1"
-  resolved "https://registry.yarnpkg.com/@pcd/passport-crypto/-/passport-crypto-0.2.0-next.1.tgz#068e2ede8e53f12cd1a55ed6975d6ccb7a51a7c1"
-  integrity sha512-moBaWV0/QhKZORbGnqBm000tjBqISE9GUxb0ifIz3QBQ3LPyRacuvpHC1v/zCYpoDeSciiS2AdFfzCxI/znj6Q==
+"@pcd/passport-crypto@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@pcd/passport-crypto/-/passport-crypto-0.4.0.tgz#94fe1614e73f180e605bc8ae527c590ff4e65d71"
+  integrity sha512-HnZ/+7aPGwc1IK+j2vIHKzupSQ/BpK+NughwdCIRgkUEGsrxoVx2slHRycBTjIXBsQMVAMIeRO7zzGmykYQEgQ==
   dependencies:
-    "@pcd/pcd-collection" "0.2.0-next.1"
-    "@pcd/pcd-types" "0.2.0-next.1"
-    "@pcd/semaphore-identity-pcd" "0.2.0-next.1"
-    "@pcd/tsconfig" "0.2.0-next.1"
+    "@pcd/pcd-collection" "0.4.0"
+    "@pcd/pcd-types" "0.4.0"
+    "@pcd/semaphore-identity-pcd" "0.4.0"
+    "@pcd/tsconfig" "0.4.0"
     "@semaphore-protocol/identity" "^3.1.0"
     "@types/libsodium-wrappers" "^0.7.10"
     "@types/mocha" "^10.0.1"
@@ -1645,16 +1645,16 @@
     react "^18.2.0"
     typescript "^4.5.2"
 
-"@pcd/passport-interface@0.2.0-next.1":
-  version "0.2.0-next.1"
-  resolved "https://registry.yarnpkg.com/@pcd/passport-interface/-/passport-interface-0.2.0-next.1.tgz#cf6022b0368231978c5694a3abd0abe860d1a774"
-  integrity sha512-AFE5/gd9ro2gzoJkWLhmNuCxJhufdpu/Dk7Y31q1XWzyNnEFdnYhhB21Zz0oCdsOenS+xRCyOyA9CPyHUtuOOg==
+"@pcd/passport-interface@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@pcd/passport-interface/-/passport-interface-0.4.0.tgz#a4401d5d44363e7399da5641f5be0d390b7ae23a"
+  integrity sha512-Msm4Idm+WWvflaHMX95ZBnxI8mVOO3nVwHd2l7rN83a3masuP7IybA2j4oVfjyjXIwu/WUWys5l5+93ORpskyQ==
   dependencies:
-    "@pcd/passport-crypto" "0.2.0-next.1"
-    "@pcd/pcd-types" "0.2.0-next.1"
-    "@pcd/semaphore-group-pcd" "0.2.0-next.1"
-    "@pcd/semaphore-signature-pcd" "0.2.0-next.1"
-    "@pcd/tsconfig" "0.2.0-next.1"
+    "@pcd/passport-crypto" "0.4.0"
+    "@pcd/pcd-types" "0.4.0"
+    "@pcd/semaphore-group-pcd" "0.4.0"
+    "@pcd/semaphore-signature-pcd" "0.4.0"
+    "@pcd/tsconfig" "0.4.0"
     "@semaphore-protocol/group" "^3.1.0"
     "@semaphore-protocol/identity" "^3.1.0"
     "@semaphore-protocol/proof" "^3.1.0"
@@ -1664,32 +1664,33 @@
     react "^18.2.0"
     typescript "^4.9.5"
 
-"@pcd/pcd-collection@0.2.0-next.1":
-  version "0.2.0-next.1"
-  resolved "https://registry.yarnpkg.com/@pcd/pcd-collection/-/pcd-collection-0.2.0-next.1.tgz#aef7a7a2fb10085dd1dc1a33d0239e5565d06dae"
-  integrity sha512-dox+HNJYdJFiJl1AYPZpMZdVzJgCL885YetYu6HXs9b88W10HPEbfk+5Gp7udRztASSV40YX8fvRBdY8roHlHA==
+"@pcd/pcd-collection@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@pcd/pcd-collection/-/pcd-collection-0.4.0.tgz#2df27139276c7e99464da3c30e4c765f86c22ba6"
+  integrity sha512-/a9sGrnqu/wZONHt39R2mM8i7F7I0lAF8dsVXHyYXNMOgTmU8ufRFffbLpLydUuNGwja0tS7Mn5Q+zLT3WBmXg==
   dependencies:
-    "@pcd/pcd-types" "0.2.0-next.1"
-    "@pcd/tsconfig" "0.2.0-next.1"
+    "@pcd/pcd-types" "0.4.0"
+    "@pcd/tsconfig" "0.4.0"
     typescript "^4.5.2"
 
-"@pcd/pcd-types@0.2.0-next.1":
-  version "0.2.0-next.1"
-  resolved "https://registry.yarnpkg.com/@pcd/pcd-types/-/pcd-types-0.2.0-next.1.tgz#c4224d17a83a9a51b77144c00b778f0e55c83493"
-  integrity sha512-JLy3g5lkH0o5dwDSqgwsiqhCwdmch5wgZpl4qvtJMJMw7EIc6WzmEMDe3KaGIYUZPoa6bov4nFOMxUqQBmIf+w==
+"@pcd/pcd-types@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@pcd/pcd-types/-/pcd-types-0.4.0.tgz#ba9f40515659d0967ee2516be001117ff9e3005b"
+  integrity sha512-oOdXbEnJC7Z3pIsUjEjWDk6NxZZyGusXPssvFsbSab7N1NiJdRL+x2CRK25ah9bJGPzByy4jpVnT9agN+VLkWw==
   dependencies:
-    "@pcd/tsconfig" "0.2.0-next.1"
+    "@pcd/tsconfig" "0.4.0"
     typescript "^4.5.2"
 
-"@pcd/semaphore-group-pcd@0.2.0-next.1":
-  version "0.2.0-next.1"
-  resolved "https://registry.yarnpkg.com/@pcd/semaphore-group-pcd/-/semaphore-group-pcd-0.2.0-next.1.tgz#363e8ea1b29e05a2aa80cf4c1d130dd012c6afa2"
-  integrity sha512-BFm3fY6GyFAjGAdXm1+SzEhKhStyV/qYDtF09iKr0A260XEWbt/c7hNQDk9q/agR/cNBt4t78aRjNlnuqNYxTw==
+"@pcd/semaphore-group-pcd@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@pcd/semaphore-group-pcd/-/semaphore-group-pcd-0.4.0.tgz#837e68b1454faf15b3b17b0ee876e02a68730d50"
+  integrity sha512-XbBYwurVL6tmtORvl1v4SJbIC/j+A/mIuk+LklWroMHGNfWNf6f0lKPjha/S27TrJdyZo6rMg9dg/+YWgcoHBQ==
   dependencies:
-    "@pcd/eslint-config-custom" "0.2.0-next.0"
-    "@pcd/pcd-types" "0.2.0-next.1"
-    "@pcd/semaphore-identity-pcd" "0.2.0-next.1"
-    "@pcd/tsconfig" "0.2.0-next.1"
+    "@pcd/eslint-config-custom" "0.4.0"
+    "@pcd/pcd-types" "0.4.0"
+    "@pcd/semaphore-identity-pcd" "0.4.0"
+    "@pcd/semaphore-signature-pcd" "0.4.0"
+    "@pcd/tsconfig" "0.4.0"
     "@semaphore-protocol/group" "^3.1.0"
     "@semaphore-protocol/identity" "^3.1.0"
     "@semaphore-protocol/proof" "^3.1.0"
@@ -1697,17 +1698,18 @@
     "@types/json-bigint" "^1.0.1"
     "@types/mocha" "^10.0.1"
     "@types/uuid" "^9.0.0"
+    js-sha256 "^0.9.0"
     json-bigint "^1.0.0"
     typescript "^4.9.5"
     uuid "^9.0.0"
 
-"@pcd/semaphore-identity-pcd@0.2.0-next.1":
-  version "0.2.0-next.1"
-  resolved "https://registry.yarnpkg.com/@pcd/semaphore-identity-pcd/-/semaphore-identity-pcd-0.2.0-next.1.tgz#2c90bab3f3bc36adcd343d67b5cac83337e08bc3"
-  integrity sha512-bTeaNkDgd1bzRbZvtgbBFjjAxcxTg7pW85fl8rfB9U058Q63mCx9XgB/QRXWzsZgkeaH4LbRwXQnB0l2TmyP8w==
+"@pcd/semaphore-identity-pcd@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@pcd/semaphore-identity-pcd/-/semaphore-identity-pcd-0.4.0.tgz#c65478a59bd3a1b6f8a65becd6bbf0f2528803cc"
+  integrity sha512-PvhAn7WHPstUUeE7NYcSzE67CWha+fMeh4wY+3LD4KVwunlF0pMQmluXPYHktIeazNAeSzRRHPiMDLBuJ14Ezw==
   dependencies:
-    "@pcd/pcd-types" "0.2.0-next.1"
-    "@pcd/tsconfig" "0.2.0-next.1"
+    "@pcd/pcd-types" "0.4.0"
+    "@pcd/tsconfig" "0.4.0"
     "@semaphore-protocol/group" "^3.1.0"
     "@semaphore-protocol/identity" "^3.1.0"
     "@semaphore-protocol/proof" "^3.1.0"
@@ -1717,13 +1719,13 @@
     typescript "^4.5.2"
     uuid "^9.0.0"
 
-"@pcd/semaphore-signature-pcd@0.2.0-next.1":
-  version "0.2.0-next.1"
-  resolved "https://registry.yarnpkg.com/@pcd/semaphore-signature-pcd/-/semaphore-signature-pcd-0.2.0-next.1.tgz#650c9c55e24f621313ec93de13ff5dd108b68e7c"
-  integrity sha512-Rqk6xO2l3KxWuQXktEB4b3lXvuznu9CzDTCMjVBkvGYYn8ZU0RGSsqviYpZeZzmpmYHeVYC7dgLCONvUMjdnyA==
+"@pcd/semaphore-signature-pcd@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@pcd/semaphore-signature-pcd/-/semaphore-signature-pcd-0.4.0.tgz#8bae588d40ea887b405e2da74ef681218c6fd659"
+  integrity sha512-DfZ3xlAAxmQaUQWgyf2rulkkXMNkhApsSVK/q6Oyagm0vcgpO+pA9c7KFxRChPPFNXjx88HzOJu52dkSmScxnA==
   dependencies:
-    "@pcd/pcd-types" "0.2.0-next.1"
-    "@pcd/tsconfig" "0.2.0-next.1"
+    "@pcd/pcd-types" "0.4.0"
+    "@pcd/tsconfig" "0.4.0"
     "@semaphore-protocol/group" "^3.1.0"
     "@semaphore-protocol/identity" "^3.1.0"
     "@semaphore-protocol/proof" "^3.1.0"
@@ -1737,10 +1739,10 @@
     react "^18.2.0"
     typescript "^4.5.2"
 
-"@pcd/tsconfig@0.2.0-next.1":
-  version "0.2.0-next.1"
-  resolved "https://registry.yarnpkg.com/@pcd/tsconfig/-/tsconfig-0.2.0-next.1.tgz#5714a8abf210a51b3b0bdd50d3fa27f9163cedca"
-  integrity sha512-oSq5lkfOOozsUPYD4XQ/EQ1lsbuyOjCrqc7XnidzuvqtoXVIHmF3NDLxOTsVefbTL8zHDsYi45tICXZBiN1eXA==
+"@pcd/tsconfig@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@pcd/tsconfig/-/tsconfig-0.4.0.tgz#49f508848f255b57f7ee7d6316aa18e8e14cc97e"
+  integrity sha512-3HWjq1O7S3fLwKnXlLknm6reO9plOL9zbgE9SCzMoeDbP3/31bEIQSj9P2/c89LPI4TAuh2/fmQxVn9loEcFpg==
 
 "@prisma/client@^4.12.0":
   version "4.12.0"

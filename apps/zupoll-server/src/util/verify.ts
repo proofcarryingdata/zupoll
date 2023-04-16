@@ -1,5 +1,4 @@
 import {
-  deserializeSemaphoreGroup,
   SemaphoreGroupPCDPackage,
   SerializedSemaphoreGroup,
 } from "@pcd/semaphore-group-pcd";
@@ -48,10 +47,7 @@ export async function verifyGroupProof(
   const serializedGroup = JSON.parse(json) as SerializedSemaphoreGroup;
   const group = new Group(1, 16);
   group.addMembers(serializedGroup.members);
-  if (
-    deserializeSemaphoreGroup(pcd.claim.group).root.toString() !==
-    group.root.toString()
-  ) {
+  if (pcd.claim.merkleRoot !== group.root.toString()) {
     throw new Error(
       "semaphoreGroupUrl doesn't match claim group merkletree root"
     );

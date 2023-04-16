@@ -5,7 +5,7 @@ export function ErrorOverlay({
   error,
   onClose,
 }: {
-  error: ConfessionsError;
+  error: ZupollError;
   onClose: () => void;
 }) {
   return (
@@ -15,18 +15,18 @@ export function ErrorOverlay({
       <br />
       <p>{error.message}</p>
       {error.stack && (
-          <>
-            <br />
-            <pre>{error.stack}</pre>
-          </>
+        <>
+          <br />
+          <pre>{error.stack}</pre>
+        </>
       )}
-      <br/>
+      <br />
       <button onClick={onClose}>Close</button>
     </Overlay>
   );
 }
 
-export interface ConfessionsError {
+export interface ZupollError {
   /** Big title, should be under 40 chars */
   title: string;
   /** Useful explanation, avoid "Something went wrong." */

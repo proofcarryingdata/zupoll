@@ -3,30 +3,27 @@ import styled from "styled-components";
 import { CreatePoll } from "../components/CreatePoll";
 import { Login } from "../components/Login";
 import { Polls } from "../components/Polls";
-import {
-  ConfessionsError,
-  ErrorOverlay,
-} from "../components/shared/ErrorOverlay";
+import { ErrorOverlay, ZupollError } from "../components/shared/ErrorOverlay";
 import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../src/util";
 
 export default function Page() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [group, setGroup] = useState<string | null>(null);
   const [newPoll, setNewPoll] = useState<string | undefined>();
-  const [error, setError] = useState<ConfessionsError>();
+  const [error, setError] = useState<ZupollError>();
 
-  function parseJwt (token: string) {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  function parseJwt(token: string) {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     return JSON.parse(window.atob(base64));
-}
+  }
 
   useEffect(() => {
     if (accessToken) return;
 
     const token = window.localStorage.getItem("access_token");
     if (token !== null) {
-      const group = parseJwt(token)['groupUrl'] || null;
+      const group = parseJwt(token)["groupUrl"] || null;
       setGroup(group);
     }
     setAccessToken(token);
@@ -42,7 +39,7 @@ export default function Page() {
     }
   };
 
-  const onError = (err: ConfessionsError) => setError(err);
+  const onError = (err: ZupollError) => setError(err);
 
   return (
     <>
