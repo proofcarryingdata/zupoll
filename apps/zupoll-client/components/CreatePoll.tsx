@@ -34,7 +34,7 @@ export function CreatePoll({
   onCreated: (newPoll: string) => void;
   onError: (err: ZupollError) => void;
 }) {
-  const createState = useRef(CreateState.DEFAULT);
+  const [createState, setCreateState] = useState<CreateState>(CreateState.DEFAULT);
   const [pollBody, setPollBody] = useState<string>("");
   const [pollOptions, setPollOptions] = useState<Array<string>>([]);
   const [pollExpiry, setPollExpiry] = useState<Date>(new Date());
@@ -43,23 +43,33 @@ export function CreatePoll({
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
   const onVerified = useCallback((valid: boolean) => {
-    if (createState.current != CreateState.RECEIVED) return;
-    createState.current = CreateState.DEFAULT;
+    if (createState == CreateState.REQUESTING) {
+      if (valid) {
+        setCreateState(CreateState.RECEIVED);
+      }
+    }
+  }, [createState]);
+
+  const {
+    proof,
+    error: proofError,
+  } = useSemaphoreGroupProof(
+    pcdStr,
+    SEMAPHORE_GROUP_URL,
+    "zupoll",
+    onVerified,
+    signalHashEnc
+  );
+
+  useEffect(() => {
+    if (createState != CreateState.RECEIVED) return;
+    setCreateState(CreateState.DEFAULT);
 
     if (proofError) {
       console.error("error using semaphore passport proof: ", proofError);
       const err = {
         title: "Create poll failed",
         message: "There's an error in generating proof.",
-      } as ZupollError;
-      onError(err);
-      return;
-    }
-
-    if (!valid) {
-      const err = {
-        title: "Create poll failed",
-        message: "Proof is invalid.",
       } as ZupollError;
       onError(err);
       return;
@@ -96,18 +106,7 @@ export function CreatePoll({
     }
 
     doRequest();
-  }, [pcdStr]);
-
-  const {
-    proof,
-    error: proofError,
-  } = useSemaphoreGroupProof(
-    pcdStr,
-    SEMAPHORE_GROUP_URL,
-    "zupoll",
-    onVerified,
-    signalHashEnc
-  );
+  }, [pcdStr, onCreated, onError, pollBody, pollExpiry, pollOptions, proofError, createState]);
 
   const handleSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -131,14 +130,8 @@ export function CreatePoll({
       sigHashEnc,
       sigHashEnc
     );
-    createState.current = CreateState.REQUESTING;
+    setCreateState(CreateState.REQUESTING);
   };
-
-  useEffect(() => {
-    if (createState.current == CreateState.REQUESTING && pcdStr !== undefined) {
-      createState.current = CreateState.RECEIVED;
-    }
-  }, [proof]);
 
   function getDateString(date: Date) {
     const newDate = new Date(date);

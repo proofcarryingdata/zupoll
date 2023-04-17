@@ -28,29 +28,39 @@ export function VoteForm({
   onError: (err: ZupollError) => void;
   onVoted: (id: string) => void;
 }) {
-  const votingState = useRef(VoteState.DEFAULT);
+  const [votingState, setVotingState] = useState<VoteState>(VoteState.DEFAULT);
   const [option, setOption] = useState<string>("-1");
 
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
   const onVerified = useCallback((valid: boolean) => {
-    if (votingState.current != VoteState.RECEIVED) return;
-    votingState.current = VoteState.DEFAULT;
+    if (votingState == VoteState.REQUESTING) {
+      if (valid) {
+        setVotingState(VoteState.RECEIVED);
+      }
+    }
+  }, [votingState]);
+
+  const {
+    proof,
+    error: proofError,
+  } = useSemaphoreGroupProof(
+    pcdStr,
+    SEMAPHORE_GROUP_URL,
+    "zupoll",
+    onVerified,
+    generateMessageHash(poll.id).toString()
+  );
+
+  useEffect(() => {
+    if (votingState != VoteState.RECEIVED) return;
+    setVotingState(VoteState.DEFAULT);
 
     if (proofError) {
       console.error("error using semaphore passport proof: ", proofError);
       const err = {
         title: "Voting failed",
         message: "There's an error in generating proof.",
-      } as ZupollError;
-      onError(err);
-      return;
-    }
-
-    if (!valid) {
-      const err = {
-        title: "Voting failed",
-        message: "Proof is invalid.",
       } as ZupollError;
       onError(err);
       return;
@@ -87,18 +97,7 @@ export function VoteForm({
     }
 
     doRequest();
-  }, [pcdStr]);
-
-  const {
-    proof,
-    error: proofError,
-  } = useSemaphoreGroupProof(
-    pcdStr,
-    SEMAPHORE_GROUP_URL,
-    "zupoll",
-    onVerified,
-    generateMessageHash(poll.id).toString()
-  );
+  }, [pcdStr, onError, onVoted, poll, proofError, votingState, option]);
 
   const handleSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -129,14 +128,8 @@ export function VoteForm({
       sigHashEnc,
       externalNullifier
     );
-    votingState.current = VoteState.REQUESTING;
+    setVotingState(VoteState.REQUESTING);
   };
-
-  useEffect(() => {
-    if (votingState.current == VoteState.REQUESTING && pcdStr !== undefined) {
-      votingState.current = VoteState.RECEIVED;
-    }
-  }, [proof]);
 
   if (getVoted().includes(poll.id)) return null;
 
