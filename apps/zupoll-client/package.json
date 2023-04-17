@@ -11,7 +11,7 @@
     "write-env-local": "./write-env-local.sh"
   },
   "dependencies": {
-    "@pcd/passport-interface": "0.4.0",
+    "@pcd/passport-interface": "0.4.1",
     "@pcd/pcd-types": "0.4.0",
     "@pcd/semaphore-group-pcd": "0.4.0",
     "@pcd/semaphore-identity-pcd": "0.4.0",

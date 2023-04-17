@@ -6,12 +6,18 @@ import {
 import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
-import { FormEventHandler, useEffect, useState } from "react";
+import { FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import { doVote } from "../src/api";
 import { UserType, VoteRequest, VoteSignal } from "../src/types";
 import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../src/util";
 import { Poll } from "./Poll";
 import { ZupollError } from "./shared/ErrorOverlay";
+
+enum VoteState {
+  DEFAULT,
+  REQUESTING,
+  RECEIVED
+}
 
 export function VoteForm({
   poll,
@@ -22,56 +28,14 @@ export function VoteForm({
   onError: (err: ZupollError) => void;
   onVoted: (id: string) => void;
 }) {
+  const votingState = useRef(VoteState.DEFAULT);
   const [option, setOption] = useState<string>("-1");
-  const [pollSubmit, setPollSubmit] = useState<boolean>(false);
 
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
-  const {
-    proof,
-    valid,
-    error: proofError,
-  } = useSemaphoreGroupProof(
-    pcdStr,
-    SEMAPHORE_GROUP_URL,
-    "zupoll",
-    generateMessageHash(poll.id).toString()
-  );
 
-  const handleSubmit: FormEventHandler = async (event) => {
-    event.preventDefault();
-    setPollSubmit(true);
-
-    const voteIdx = parseInt(option);
-    if (!(voteIdx >= 0 && voteIdx < poll.options.length)) {
-      const err = {
-        title: "Voting failed",
-        message: "Invalid option selected.",
-      } as ZupollError;
-      onError(err);
-      return;
-    }
-
-    const signal: VoteSignal = {
-      pollId: poll.id,
-      voteIdx: voteIdx,
-    };
-    const signalHash = sha256(stableStringify(signal));
-    const sigHashEnc = generateMessageHash(signalHash).toString();
-    const externalNullifier = generateMessageHash(poll.id).toString();
-
-    openZuzaluMembershipPopup(
-      PASSPORT_URL,
-      window.location.origin + "/popup",
-      SEMAPHORE_GROUP_URL,
-      "zupoll",
-      sigHashEnc,
-      externalNullifier
-    );
-  };
-
-  useEffect(() => {
-    if (!pollSubmit) return;
-    if (valid === undefined) return; // verifying
+  const onVerified = useCallback((valid: boolean) => {
+    if (votingState.current != VoteState.RECEIVED) return;
+    votingState.current = VoteState.DEFAULT;
 
     if (proofError) {
       console.error("error using semaphore passport proof: ", proofError);
@@ -119,12 +83,60 @@ export function VoteForm({
       newVoted.push(poll.id);
       setVoted(newVoted);
       setOption("-1");
-      setPollSubmit(false);
       onVoted(newVote["id"]);
     }
 
     doRequest();
-  }, [option, pcdStr, onError, valid, poll, proofError, pollSubmit, onVoted]);
+  }, [pcdStr]);
+
+  const {
+    proof,
+    error: proofError,
+  } = useSemaphoreGroupProof(
+    pcdStr,
+    SEMAPHORE_GROUP_URL,
+    "zupoll",
+    onVerified,
+    generateMessageHash(poll.id).toString()
+  );
+
+  const handleSubmit: FormEventHandler = async (event) => {
+    event.preventDefault();
+
+    const voteIdx = parseInt(option);
+    if (!(voteIdx >= 0 && voteIdx < poll.options.length)) {
+      const err = {
+        title: "Voting failed",
+        message: "Invalid option selected.",
+      } as ZupollError;
+      onError(err);
+      return;
+    }
+
+    const signal: VoteSignal = {
+      pollId: poll.id,
+      voteIdx: voteIdx,
+    };
+    const signalHash = sha256(stableStringify(signal));
+    const sigHashEnc = generateMessageHash(signalHash).toString();
+    const externalNullifier = generateMessageHash(poll.id).toString();
+
+    openZuzaluMembershipPopup(
+      PASSPORT_URL,
+      window.location.origin + "/popup",
+      SEMAPHORE_GROUP_URL,
+      "zupoll",
+      sigHashEnc,
+      externalNullifier
+    );
+    votingState.current = VoteState.REQUESTING;
+  };
+
+  useEffect(() => {
+    if (votingState.current == VoteState.REQUESTING && pcdStr !== undefined) {
+      votingState.current = VoteState.RECEIVED;
+    }
+  }, [proof]);
 
   if (getVoted().includes(poll.id)) return null;
 

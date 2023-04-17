@@ -28,13 +28,8 @@ export function Login({
   const [loggingIn, setLoggingIn] = useState(false);
 
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
-  const {
-    proof,
-    valid,
-    error: proofError,
-  } = useSemaphoreGroupProof(pcdStr, SEMAPHORE_GROUP_URL, "zupoll");
 
-  useEffect(() => {
+  const onVerified = (valid: boolean) => {
     if (valid === undefined) return;
 
     if (proofError) {
@@ -79,7 +74,12 @@ export function Login({
       setLoggingIn(false);
       onLoggedIn(accessToken, requestedGroup);
     });
-  }, [proof, valid, proofError, pcdStr, onLoggedIn, requestedGroup]);
+  };
+
+  const {
+    proof,
+    error: proofError,
+  } = useSemaphoreGroupProof(pcdStr, SEMAPHORE_GROUP_URL, "zupoll", onVerified);
 
   return (
     <>
