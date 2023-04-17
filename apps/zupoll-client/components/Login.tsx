@@ -3,9 +3,9 @@ import {
   usePassportPopupMessages,
   useSemaphoreGroupProof,
 } from "@pcd/passport-interface";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { login } from "../src/api";
-import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../src/util";
+import { PASSPORT_URL } from "../src/util";
 import { ErrorOverlay, ZupollError } from "./shared/ErrorOverlay";
 
 /**
@@ -29,24 +29,14 @@ export function Login({
 
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
-  const onVerified = (valid: boolean) => {
-    if (valid === undefined) return;
+  const onVerified = (_valid: boolean) => {
+    if (!loggingIn) return;
 
     if (proofError) {
       console.error("error using semaphore passport proof: ", proofError);
       const err = {
         title: "Login failed",
         message: "There's an error in generating proof.",
-      } as ZupollError;
-      setError(err);
-      setLoggingIn(false);
-      return;
-    }
-
-    if (!valid) {
-      const err = {
-        title: "Login failed",
-        message: "Proof is invalid.",
       } as ZupollError;
       setError(err);
       setLoggingIn(false);
@@ -77,9 +67,9 @@ export function Login({
   };
 
   const {
-    proof,
+    proof: _proof,
     error: proofError,
-  } = useSemaphoreGroupProof(pcdStr, SEMAPHORE_GROUP_URL, "zupoll", onVerified);
+  } = useSemaphoreGroupProof(pcdStr, requestedGroup, "zupoll", onVerified);
 
   return (
     <>
@@ -89,7 +79,7 @@ export function Login({
           openZuzaluMembershipPopup(
             PASSPORT_URL,
             window.location.origin + "/popup",
-            SEMAPHORE_GROUP_URL,
+            requestedGroup,
             "zupoll"
           );
         }}

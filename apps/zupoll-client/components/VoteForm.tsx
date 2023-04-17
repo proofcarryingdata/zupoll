@@ -6,7 +6,7 @@ import {
 import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
-import { FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
+import { FormEventHandler, useCallback, useEffect, useState } from "react";
 import { doVote } from "../src/api";
 import { UserType, VoteRequest, VoteSignal } from "../src/types";
 import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../src/util";
@@ -42,7 +42,7 @@ export function VoteForm({
   }, [votingState]);
 
   const {
-    proof,
+    proof: _proof,
     error: proofError,
   } = useSemaphoreGroupProof(
     pcdStr,

@@ -47,16 +47,3 @@ export interface LoginRequest {
   semaphoreGroupUrl: string;
   proof: string;
 }
-
-function queryStrToInt(
-  s: any,
-  defaultValue: number,
-  predicate?: (i: number) => boolean
-): number {
-  if (s == null || typeof s !== "string") return defaultValue;
-
-  const parsed = parseInt(decodeURIComponent(s));
-  if (isNaN(parsed)) return defaultValue;
-
-  return ((predicate && !predicate(parsed))) ? defaultValue : parsed;
-}

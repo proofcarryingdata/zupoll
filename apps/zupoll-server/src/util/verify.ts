@@ -1,12 +1,12 @@
 import {
   SemaphoreGroupPCDPackage,
   SerializedSemaphoreGroup,
+  deserializeSemaphoreGroup
 } from "@pcd/semaphore-group-pcd";
 import {
   generateMessageHash,
   SemaphoreSignaturePCDPackage,
 } from "@pcd/semaphore-signature-pcd";
-import { Group } from "@semaphore-protocol/group";
 
 // Returns nullfier or throws error.
 export async function verifyGroupProof(
@@ -45,8 +45,7 @@ export async function verifyGroupProof(
   const response = await fetch(semaphoreGroupUrl);
   const json = await response.text();
   const serializedGroup = JSON.parse(json) as SerializedSemaphoreGroup;
-  const group = new Group(1, 16);
-  group.addMembers(serializedGroup.members);
+  const group = deserializeSemaphoreGroup(serializedGroup);
   if (pcd.claim.merkleRoot !== group.root.toString()) {
     throw new Error(
       "semaphoreGroupUrl doesn't match claim group merkletree root"

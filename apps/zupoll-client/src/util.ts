@@ -17,5 +17,5 @@ export const SEMAPHORE_GROUP_URL = IS_PROD
   : "http://localhost:3002/semaphore/1";
 
 export const SEMAPHORE_ADMIN_GROUP_URL = IS_PROD
-  ? "https://api.pcd-passport.com/semaphore/1"
-  : "http://localhost:3002/semaphore/1";
+  ? "https://api.pcd-passport.com/semaphore/4"
+  : "http://localhost:3002/semaphore/4";

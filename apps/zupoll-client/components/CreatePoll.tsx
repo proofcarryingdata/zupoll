@@ -6,7 +6,7 @@ import {
 import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
-import { FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
+import { FormEventHandler, useCallback, useEffect, useState } from "react";
 import { createPoll } from "../src/api";
 import {
   CreatePollRequest,
@@ -51,7 +51,7 @@ export function CreatePoll({
   }, [createState]);
 
   const {
-    proof,
+    proof: _proof,
     error: proofError,
   } = useSemaphoreGroupProof(
     pcdStr,

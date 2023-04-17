@@ -12,7 +12,7 @@ export const SEMAPHORE_GROUP_URL = IS_PROD
 
 export const SEMAPHORE_ADMIN_GROUP_URL = IS_PROD
   ? process.env.SEMAPHORE_ADMIN_GROUP_URL
-  : "http://localhost:3002/semaphore/1";
+  : "http://localhost:3002/semaphore/4";
   
 export const PASSPORT_SERVER = IS_PROD ? process.env.PASSPORT_SERVER : "http://localhost:3002/";
 
