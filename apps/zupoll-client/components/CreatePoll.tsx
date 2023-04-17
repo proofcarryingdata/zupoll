@@ -34,7 +34,7 @@ export function CreatePoll({
   onCreated: (newPoll: string) => void;
   onError: (err: ZupollError) => void;
 }) {
-  const [createState, setCreateState] = useState<CreateState>(CreateState.DEFAULT);
+  const createState = useRef(CreateState.DEFAULT);
   const [pollBody, setPollBody] = useState<string>("");
   const [pollOptions, setPollOptions] = useState<Array<string>>([]);
   const [pollExpiry, setPollExpiry] = useState<Date>(new Date());
@@ -43,8 +43,8 @@ export function CreatePoll({
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
   const onVerified = useCallback((valid: boolean) => {
-    if (createState != CreateState.RECEIVED) return;
-    setCreateState(CreateState.DEFAULT);
+    if (createState.current != CreateState.RECEIVED) return;
+    createState.current = CreateState.DEFAULT;
 
     if (proofError) {
       console.error("error using semaphore passport proof: ", proofError);
@@ -96,7 +96,7 @@ export function CreatePoll({
     }
 
     doRequest();
-  }, [createState]);
+  }, [pcdStr]);
 
   const {
     proof,
@@ -131,12 +131,12 @@ export function CreatePoll({
       sigHashEnc,
       sigHashEnc
     );
-    setCreateState(CreateState.REQUESTING);
+    createState.current = CreateState.REQUESTING;
   };
 
   useEffect(() => {
-    if (createState == CreateState.REQUESTING && pcdStr !== undefined) {
-      setCreateState(CreateState.RECEIVED);
+    if (createState.current == CreateState.REQUESTING && pcdStr !== undefined) {
+      createState.current = CreateState.RECEIVED;
     }
   }, [proof]);
 
