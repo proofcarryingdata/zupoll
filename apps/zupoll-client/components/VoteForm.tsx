@@ -54,6 +54,7 @@ export function VoteForm({
 
   useEffect(() => {
     if (votingState != VoteState.RECEIVED) return;
+    if (option === "-1" || getVoted().includes(poll.id)) return;
     setVotingState(VoteState.DEFAULT);
 
     if (proofError) {
