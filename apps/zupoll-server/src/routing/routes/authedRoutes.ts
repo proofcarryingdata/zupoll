@@ -1,9 +1,9 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import { ApplicationContext } from "../../types";
 import { ACCESS_TOKEN_SECRET, authenticateJWT } from "../../util/auth";
-import { verifyGroupProof } from "../../util/verify";
 import { prisma } from "../../util/prisma";
+import { verifyGroupProof } from "../../util/verify";
 
 /**
  * The routes in this function shows how an auth flow would work.
@@ -15,29 +15,35 @@ export function initAuthedRoutes(
   app: express.Application,
   _context: ApplicationContext
 ): void {
-  app.post("/login", async (req: Request, res: Response, next: NextFunction) => {
-    const request = req.body as LoginRequest;
+  app.post(
+    "/login",
+    async (req: Request, res: Response, next: NextFunction) => {
+      const request = req.body as LoginRequest;
 
-    try {
-      await verifyGroupProof(request.semaphoreGroupUrl, request.proof, {});
+      try {
+        await verifyGroupProof(request.semaphoreGroupUrl, request.proof, {});
 
-      const accessToken = sign({ groupUrl: request.semaphoreGroupUrl }, ACCESS_TOKEN_SECRET!)
+        const accessToken = sign(
+          { groupUrl: request.semaphoreGroupUrl },
+          ACCESS_TOKEN_SECRET!
+        );
 
-      res.status(200).json({ accessToken });
-    } catch (e) {
-      console.error(e);
-      next(e);
+        res.status(200).json({ accessToken });
+      } catch (e) {
+        console.error(e);
+        next(e);
+      }
     }
-  });
+  );
 
   app.get("/polls", authenticateJWT, async (req: Request, res: Response) => {
     // TODO: do we need pagination
-    
+
     const polls = await prisma.poll.findMany({
       include: {
-        votes: true
+        votes: true,
       },
-      orderBy: { expiry: "asc" }
+      orderBy: { expiry: "asc" },
     });
     res.status(200).json({ polls });
   });

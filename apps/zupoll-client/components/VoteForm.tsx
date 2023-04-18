@@ -1,22 +1,21 @@
 import {
   openZuzaluMembershipPopup,
   usePassportPopupMessages,
-  useSemaphoreGroupProof,
 } from "@pcd/passport-interface";
 import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
-import { FormEventHandler, useCallback, useEffect, useState } from "react";
+import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { doVote } from "../src/api";
 import { UserType, VoteRequest, VoteSignal } from "../src/types";
 import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../src/util";
 import { Poll } from "./Poll";
 import { ZupollError } from "./shared/ErrorOverlay";
 
-enum VoteState {
+enum VoteFormState {
   DEFAULT,
-  REQUESTING,
-  RECEIVED
+  AWAITING_PCDSTR,
+  RECEIVED_PCDSTR,
 }
 
 export function VoteForm({
@@ -28,44 +27,23 @@ export function VoteForm({
   onError: (err: ZupollError) => void;
   onVoted: (id: string) => void;
 }) {
-  const [votingState, setVotingState] = useState<VoteState>(VoteState.DEFAULT);
+  const votingState = useRef<VoteFormState>(VoteFormState.DEFAULT);
   const [option, setOption] = useState<string>("-1");
 
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
-  const onVerified = useCallback((valid: boolean) => {
-    if (votingState == VoteState.REQUESTING) {
-      if (valid) {
-        setVotingState(VoteState.RECEIVED);
-      }
+  useEffect(() => {
+    if (votingState.current === VoteFormState.AWAITING_PCDSTR) {
+      votingState.current = VoteFormState.RECEIVED_PCDSTR;
     }
-  }, [votingState]);
-
-  const {
-    proof: _proof,
-    error: proofError,
-  } = useSemaphoreGroupProof(
-    pcdStr,
-    SEMAPHORE_GROUP_URL,
-    "zupoll",
-    onVerified,
-    generateMessageHash(poll.id).toString()
-  );
+  }, [pcdStr]);
 
   useEffect(() => {
-    if (votingState != VoteState.RECEIVED) return;
-    if (option === "-1" || getVoted().includes(poll.id)) return;
-    setVotingState(VoteState.DEFAULT);
+    if (votingState.current !== VoteFormState.RECEIVED_PCDSTR) return;
 
-    if (proofError) {
-      console.error("error using semaphore passport proof: ", proofError);
-      const err = {
-        title: "Voting failed",
-        message: "There's an error in generating proof.",
-      } as ZupollError;
-      onError(err);
-      return;
-    }
+    if (option === "-1" || getVoted().includes(poll.id)) return;
+
+    votingState.current = VoteFormState.DEFAULT;
 
     const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
     const request: VoteRequest = {
@@ -98,10 +76,11 @@ export function VoteForm({
     }
 
     doRequest();
-  }, [pcdStr, onError, onVoted, poll, proofError, votingState, option]);
+  }, [pcdStr, onError, onVoted, poll, option]);
 
   const handleSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
+    votingState.current = VoteFormState.AWAITING_PCDSTR;
 
     const voteIdx = parseInt(option);
     if (!(voteIdx >= 0 && voteIdx < poll.options.length)) {
@@ -129,7 +108,6 @@ export function VoteForm({
       sigHashEnc,
       externalNullifier
     );
-    setVotingState(VoteState.REQUESTING);
   };
 
   if (getVoted().includes(poll.id)) return null;

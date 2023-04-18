@@ -1,12 +1,11 @@
 import {
   openZuzaluMembershipPopup,
   usePassportPopupMessages,
-  useSemaphoreGroupProof,
 } from "@pcd/passport-interface";
 import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
-import { FormEventHandler, useCallback, useEffect, useState } from "react";
+import { FormEventHandler, useEffect, useRef, useState } from "react";
 import { createPoll } from "../src/api";
 import {
   CreatePollRequest,
@@ -21,10 +20,10 @@ import {
 } from "../src/util";
 import { ZupollError } from "./shared/ErrorOverlay";
 
-enum CreateState {
+enum CreatePollState {
   DEFAULT,
-  REQUESTING,
-  RECEIVED
+  AWAITING_PCDSTR,
+  RECEIVED_PCDSTR,
 }
 
 export function CreatePoll({
@@ -34,46 +33,22 @@ export function CreatePoll({
   onCreated: (newPoll: string) => void;
   onError: (err: ZupollError) => void;
 }) {
-  const [createState, setCreateState] = useState<CreateState>(CreateState.DEFAULT);
+  const createState = useRef<CreatePollState>(CreatePollState.DEFAULT);
   const [pollBody, setPollBody] = useState<string>("");
   const [pollOptions, setPollOptions] = useState<Array<string>>([]);
   const [pollExpiry, setPollExpiry] = useState<Date>(new Date());
-  const [signalHashEnc, setSignalHashEnc] = useState<string>("");
 
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
-  const onVerified = useCallback((valid: boolean) => {
-    if (createState == CreateState.REQUESTING) {
-      if (valid) {
-        setCreateState(CreateState.RECEIVED);
-      }
+  useEffect(() => {
+    if (createState.current === CreatePollState.AWAITING_PCDSTR) {
+      createState.current = CreatePollState.RECEIVED_PCDSTR;
     }
-  }, [createState]);
-
-  const {
-    proof: _proof,
-    error: proofError,
-  } = useSemaphoreGroupProof(
-    pcdStr,
-    SEMAPHORE_GROUP_URL,
-    "zupoll",
-    onVerified,
-    signalHashEnc
-  );
+  }, [pcdStr]);
 
   useEffect(() => {
-    if (createState != CreateState.RECEIVED) return;
-    setCreateState(CreateState.DEFAULT);
-
-    if (proofError) {
-      console.error("error using semaphore passport proof: ", proofError);
-      const err = {
-        title: "Create poll failed",
-        message: "There's an error in generating proof.",
-      } as ZupollError;
-      onError(err);
-      return;
-    }
+    if (createState.current !== CreatePollState.RECEIVED_PCDSTR) return;
+    createState.current = CreatePollState.DEFAULT;
 
     const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
     const request: CreatePollRequest = {
@@ -106,10 +81,11 @@ export function CreatePoll({
     }
 
     doRequest();
-  }, [pcdStr, onCreated, onError, pollBody, pollExpiry, pollOptions, proofError, createState]);
+  }, [pcdStr, onCreated, onError, pollBody, pollExpiry, pollOptions]);
 
   const handleSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
+    createState.current = CreatePollState.AWAITING_PCDSTR;
 
     const signal: PollSignal = {
       pollType: PollType.REFERENDUM,
@@ -120,17 +96,15 @@ export function CreatePoll({
     };
     const signalHash = sha256(stableStringify(signal));
     const sigHashEnc = generateMessageHash(signalHash).toString();
-    setSignalHashEnc(sigHashEnc);
 
     openZuzaluMembershipPopup(
       PASSPORT_URL,
       window.location.origin + "/popup",
-      SEMAPHORE_GROUP_URL,
+      SEMAPHORE_ADMIN_GROUP_URL,
       "zupoll",
       sigHashEnc,
       sigHashEnc
     );
-    setCreateState(CreateState.REQUESTING);
   };
 
   function getDateString(date: Date) {

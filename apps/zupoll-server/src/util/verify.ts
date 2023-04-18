@@ -1,7 +1,7 @@
 import {
+  deserializeSemaphoreGroup,
   SemaphoreGroupPCDPackage,
   SerializedSemaphoreGroup,
-  deserializeSemaphoreGroup
 } from "@pcd/semaphore-group-pcd";
 import {
   generateMessageHash,

@@ -1,11 +1,11 @@
 import {
   openZuzaluMembershipPopup,
   usePassportPopupMessages,
-  useSemaphoreGroupProof,
 } from "@pcd/passport-interface";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { login } from "../src/api";
 import { PASSPORT_URL } from "../src/util";
+import { Button } from "./core/Button";
 import { ErrorOverlay, ZupollError } from "./shared/ErrorOverlay";
 
 /**
@@ -29,19 +29,10 @@ export function Login({
 
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
-  const onVerified = (_valid: boolean) => {
+  useEffect(() => {
     if (!loggingIn) return;
 
-    if (proofError) {
-      console.error("error using semaphore passport proof: ", proofError);
-      const err = {
-        title: "Login failed",
-        message: "There's an error in generating proof.",
-      } as ZupollError;
-      setError(err);
-      setLoggingIn(false);
-      return;
-    }
+    if (!pcdStr) return;
 
     const sendLogin = async () => {
       const res = await login(requestedGroup, pcdStr);
@@ -64,16 +55,11 @@ export function Login({
       setLoggingIn(false);
       onLoggedIn(accessToken, requestedGroup);
     });
-  };
-
-  const {
-    proof: _proof,
-    error: proofError,
-  } = useSemaphoreGroupProof(pcdStr, requestedGroup, "zupoll", onVerified);
+  }, [pcdStr, loggingIn, requestedGroup, onLoggedIn]);
 
   return (
     <>
-      <button
+      <Button
         onClick={() => {
           setLoggingIn(true);
           openZuzaluMembershipPopup(
@@ -86,12 +72,10 @@ export function Login({
         disabled={loggingIn}
       >
         {prompt}
-      </button>
+      </Button>
       {error && (
         <ErrorOverlay error={error} onClose={() => setError(undefined)} />
       )}
-      <br />
-      <br />
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { Button } from "../components/core/Button";
 import { CreatePoll } from "../components/CreatePoll";
 import { Login } from "../components/Login";
 import { Polls } from "../components/Polls";
@@ -42,46 +43,89 @@ export default function Page() {
   const onError = (err: ZupollError) => setError(err);
 
   return (
-    <>
-      <h1>Polls</h1>
-      {accessToken ? (
-        <>
-          <button onClick={() => updateAccessToken(null, null)}>Logout</button>
-          <br />
-          <br />
-          {group == SEMAPHORE_ADMIN_GROUP_URL && (
+    <Wrapper>
+      <ReferendumSection>
+        <div
+          style={{ display: "flex", justifyContent: "center", paddingTop: 10 }}
+        >
+          <img src="/zuzalulogo.png" alt="Zuzalu" width="174" />
+        </div>
+
+        <h1>Referendums</h1>
+        {accessToken ? (
+          <>
+            <Button onClick={() => updateAccessToken(null, null)}>
+              Logout
+            </Button>
+            <br />
+            {group == SEMAPHORE_ADMIN_GROUP_URL && (
+              <Container>
+                <CreatePoll onCreated={setNewPoll} onError={onError} />
+              </Container>
+            )}
             <Container>
-              <CreatePoll onCreated={setNewPoll} onError={onError} />
+              <Polls
+                accessToken={accessToken}
+                newPoll={newPoll}
+                onError={onError}
+              />
             </Container>
-          )}
-          <Container>
-            <Polls
-              accessToken={accessToken}
-              newPoll={newPoll}
-              onError={onError}
-            />
-          </Container>
-          {error && (
-            <ErrorOverlay error={error} onClose={() => setError(undefined)} />
-          )}
-        </>
-      ) : (
-        <>
-          <Login
-            onLoggedIn={updateAccessToken}
-            requestedGroup={SEMAPHORE_GROUP_URL!}
-            prompt="Login"
-          />
-          <Login
-            onLoggedIn={updateAccessToken}
-            requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
-            prompt="Login as Admin"
-          />
-        </>
-      )}
-    </>
+            {error && (
+              <ErrorOverlay error={error} onClose={() => setError(undefined)} />
+            )}
+          </>
+        ) : (
+          <>
+            <LoginContainer>
+              <Login
+                onLoggedIn={updateAccessToken}
+                requestedGroup={SEMAPHORE_GROUP_URL}
+                prompt="Anon Login"
+              />
+              <Login
+                onLoggedIn={updateAccessToken}
+                requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
+                prompt="Admin Login"
+              />
+            </LoginContainer>
+          </>
+        )}
+      </ReferendumSection>
+    </Wrapper>
   );
 }
+
+const Wrapper = styled.div`
+  display: flex;
+  height: 100%;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ReferendumSection = styled.div`
+  width: 75ch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #1c2928;
+  border-radius: 20px;
+  padding: 20px;
+  h1 {
+    color: white;
+    font-family: "Roboto", sans-serif;
+    text-align: center;
+    margin-top: 20px;
+  }
+`;
+
+const LoginContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 20px;
+`;
 
 const Container = styled.div`
   font-family: system-ui, sans-serif;
