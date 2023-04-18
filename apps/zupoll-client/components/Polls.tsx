@@ -1,4 +1,5 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import styled from "styled-components";
 import { listPolls } from "../src/api";
 import { Poll } from "./Poll";
 import { ZupollError } from "./shared/ErrorOverlay";
@@ -34,12 +35,19 @@ export function Polls({
   }, [accessToken, newPoll, newVote]);
 
   return (
-    <>
+    <PollsContainer>
       {polls.map((poll) => (
-        <Fragment key={poll.id}>
-          <Poll poll={poll} onError={onError} onVoted={setNewVote} />
-        </Fragment>
+        <Poll
+          key={poll.id}
+          poll={poll}
+          onError={onError}
+          onVoted={setNewVote}
+        />
       ))}
-    </>
+    </PollsContainer>
   );
 }
+
+const PollsContainer = styled.div`
+  width: 100%;
+`;

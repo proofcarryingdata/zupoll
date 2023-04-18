@@ -52,16 +52,19 @@ export default function Page() {
         </div>
 
         <h1>Referendums</h1>
+
         {accessToken ? (
           <>
             {group == SEMAPHORE_ADMIN_GROUP_URL && (
               <CreatePoll onCreated={setNewPoll} onError={onError} />
             )}
+
             <Polls
               accessToken={accessToken}
               newPoll={newPoll}
               onError={onError}
             />
+
             <Button onClick={() => updateAccessToken(null, null)}>
               Logout
             </Button>
@@ -104,11 +107,10 @@ const ReferendumSection = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #1c2928;
   border-radius: 20px;
   padding: 20px;
+
   h1 {
-    color: white;
     font-family: "Roboto", sans-serif;
     text-align: center;
     margin-top: 20px;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { PollType, UserType } from "../src/types";
 import { ZupollError } from "./shared/ErrorOverlay";
 import { VoteForm } from "./VoteForm";
@@ -18,10 +18,15 @@ export function Poll({
   for (const vote of poll.votes) {
     statistics[vote.voteIdx] += 1;
   }
+  const maxVote = Math.max(...statistics);
 
   const getVoteDisplay = (a: number, b: number) => {
-    const percentVal = ((a / b) * 100).toFixed(2);
-    return `${a}/${b} - ${percentVal}%`;
+    if (b === 0) {
+      return "0%";
+    }
+
+    const percentVal = ((a / b) * 100).toFixed(1);
+    return `${percentVal}%`;
   };
 
   const expired = new Date(poll.expiry) < new Date();
@@ -32,25 +37,33 @@ export function Poll({
   return (
     <PollWrapper>
       <PollHeader>
-        {poll.body}{" "}
-        <ArrowWrapper onClick={() => setShowResults(!showResults)}>
+        {poll.body}
+        {/* <ArrowWrapper onClick={() => setShowResults(!showResults)}>
           {showResults ? "⏫" : "⏬"}
-        </ArrowWrapper>
+        </ArrowWrapper> */}
       </PollHeader>
       {/* Show poll results if showResults is true */}
       {showResults && (
         <PollOptions>
           {poll.options.map((opt, idx) => (
             <PollOption key={idx}>
-              <b>{opt}</b>
+              <PollProgressBar
+                percent={totalVotes === 0 ? 0 : statistics[idx] / totalVotes}
+                isMax={maxVote === statistics[idx]}
+              />
               <PollResult>
                 {getVoteDisplay(statistics[idx], totalVotes)}
               </PollResult>
+              <OptionString>{opt}</OptionString>
             </PollOption>
           ))}
         </PollOptions>
       )}
       {!expired && <VoteForm poll={poll} onError={onError} onVoted={onVoted} />}
+
+      <TotalVotesContainer>
+        {totalVotes} vote{totalVotes !== 1 ? "s" : ""}
+      </TotalVotesContainer>
     </PollWrapper>
   );
 }
@@ -87,40 +100,86 @@ export type Vote = {
 };
 
 const PollWrapper = styled.div`
+  border: 1px solid grey;
+  border-bottom: none;
   background-color: white;
-  border-radius: 10px;
-  width: calc(100% - 40px);
-  margin: 10px;
-  padding: 20px;
+  width: 100%;
+  padding: 16px;
   position: relative;
   font-family: system-ui, sans-serif;
+
+  &:first-child {
+    border-radius: 4px 4px 0px 0px;
+  }
+
+  &:last-child {
+    border-bottom: 1px solid grey;
+    border-radius: 0px 0px 4px 4px;
+  }
 `;
 
-const PollHeader = styled.h2`
+const PollHeader = styled.div`
   padding: 0px;
   margin: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 12px;
+  /* font-size: 1.1em; */
 `;
 
-const PollOptions = styled.ul`
+const PollOptions = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   list-style-type: none;
-  padding: 0px;
-  margin: 0;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
-const PollOption = styled.li`
-  margin: 20px 0 20px 0;
-`;
-
-const PollResult = styled.div`
+const PollOption = styled.span`
+  overflow: hidden;
+  position: relative;
+  padding: 4px 8px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
-  justify-content: space-between;
-`;
-
-const ArrowWrapper = styled.div`
-  display: flex;
+  justify-content: flex-start;
   align-items: center;
-  cursor: pointer;
+  flex-direction: row;
+  gap: 8px;
+`;
+
+const PollProgressBar = styled.span<{ percent: number; isMax: boolean }>`
+  ${({ percent, isMax }) => css`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: ${100 * percent}%;
+    height: 100%;
+    background-color: ${isMax ? "#a1f1a2" : "grey"};
+  `}
+`;
+
+const PollResult = styled.span`
+  z-index: 500;
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-weight: bold;
+  width: 5em;
+  font-size: 0.9em;
+`;
+
+const OptionString = styled.span`
+  z-index: 500;
+`;
+
+const TotalVotesContainer = styled.div`
+  margin-top: 12px;
+  color: #666;
 `;
