@@ -40,7 +40,6 @@ export function VoteForm({
 
   useEffect(() => {
     if (votingState.current !== VoteFormState.RECEIVED_PCDSTR) return;
-
     if (option === "-1" || getVoted().includes(poll.id)) return;
 
     votingState.current = VoteFormState.DEFAULT;

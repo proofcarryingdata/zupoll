@@ -37,7 +37,11 @@ export function initPCDRoutes(
           const nullifier = await verifyGroupProof(
             request.pollsterSemaphoreGroupUrl!,
             request.proof,
-            {signal: signalHash, allowedGroups: [SEMAPHORE_ADMIN_GROUP_URL!], claimedExtNullifier: signalHash}
+            {
+              signal: signalHash,
+              allowedGroups: [SEMAPHORE_ADMIN_GROUP_URL!],
+              claimedExtNullifier: signalHash,
+            }
           );
 
           const newPoll = await prisma.poll.create({
@@ -56,7 +60,7 @@ export function initPCDRoutes(
           });
 
           res.json({
-            id: newPoll.id
+            id: newPoll.id,
           });
         } else if (request.pollsterType == UserType.NONANON) {
           // TODO: ok we need to fix this nullfier cuz it's fake. we should generate our own cuz we know the commitment.
@@ -89,7 +93,7 @@ export function initPCDRoutes(
           });
 
           res.json({
-            id: newPoll.id
+            id: newPoll.id,
           });
         } else {
           throw new Error("Unknown pollster type");
@@ -125,7 +129,7 @@ export function initPCDRoutes(
         throw new Error("Invalid vote idx");
       }
 
-      if (poll.expiry < (new Date())) {
+      if (poll.expiry < new Date()) {
         throw new Error("Poll has expired.");
       }
 
@@ -133,8 +137,21 @@ export function initPCDRoutes(
         const nullifier = await verifyGroupProof(
           request.voterSemaphoreGroupUrl!,
           request.proof,
-          { signal: signalHash, allowedGroups: poll.voterSemaphoreGroupUrls, claimedExtNullifier: poll.id }
+          {
+            signal: signalHash,
+            allowedGroups: poll.voterSemaphoreGroupUrls,
+            claimedExtNullifier: poll.id,
+          }
         );
+
+        const previousVote = await prisma.vote.findUnique({
+          where: {
+            voterNullifier: nullifier,
+          },
+        });
+        if (previousVote !== null) {
+          throw new Error("User has already voted");
+        }
 
         const newVote = await prisma.vote.create({
           data: {
@@ -147,7 +164,7 @@ export function initPCDRoutes(
           },
         });
         res.json({
-          id: newVote.id
+          id: newVote.id,
         });
       } else if (request.voterType == UserType.NONANON) {
         // TODO: ok we need to fix this nullfier cuz it's fake. we should generate our own cuz we know the commitment.
@@ -176,7 +193,7 @@ export function initPCDRoutes(
         });
 
         res.json({
-          id: newVote.id
+          id: newVote.id,
         });
       } else {
         throw new Error("Unknown voter type");

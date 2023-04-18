@@ -54,22 +54,17 @@ export default function Page() {
         <h1>Referendums</h1>
         {accessToken ? (
           <>
+            {group == SEMAPHORE_ADMIN_GROUP_URL && (
+              <CreatePoll onCreated={setNewPoll} onError={onError} />
+            )}
+            <Polls
+              accessToken={accessToken}
+              newPoll={newPoll}
+              onError={onError}
+            />
             <Button onClick={() => updateAccessToken(null, null)}>
               Logout
             </Button>
-            <br />
-            {group == SEMAPHORE_ADMIN_GROUP_URL && (
-              <Container>
-                <CreatePoll onCreated={setNewPoll} onError={onError} />
-              </Container>
-            )}
-            <Container>
-              <Polls
-                accessToken={accessToken}
-                newPoll={newPoll}
-                onError={onError}
-              />
-            </Container>
             {error && (
               <ErrorOverlay error={error} onClose={() => setError(undefined)} />
             )}
@@ -125,12 +120,4 @@ const LoginContainer = styled.div`
   flex-direction: row;
   justify-content: center;
   gap: 20px;
-`;
-
-const Container = styled.div`
-  font-family: system-ui, sans-serif;
-  border: 1px solid black;
-  border-radius: 8px;
-  padding: 8px;
-  margin-bottom: 16px;
 `;

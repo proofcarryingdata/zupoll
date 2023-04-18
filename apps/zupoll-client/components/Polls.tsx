@@ -35,7 +35,6 @@ export function Polls({
 
   return (
     <>
-      <h2>Polls</h2>
       {polls.map((poll) => (
         <Fragment key={poll.id}>
           <Poll poll={poll} onError={onError} onVoted={setNewVote} />

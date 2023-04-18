@@ -6,6 +6,7 @@ import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
+import styled from "styled-components";
 import { createPoll } from "../src/api";
 import {
   CreatePollRequest,
@@ -114,41 +115,81 @@ export function CreatePoll({
   }
 
   return (
-    <>
+    <StyledDiv>
       <h2>Create Poll</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="body">Question</label>&nbsp;
-        <input
-          type="text"
-          id="body"
-          value={pollBody}
-          onChange={(e) => setPollBody(e.target.value)}
-          required
-        />
-        <br />
-        <br />
-        <label htmlFor="options">Options (comma-seperated)</label>&nbsp;
-        <input
-          type="text"
-          id="options"
-          value={pollOptions.join(",")}
-          onChange={(e) => setPollOptions(e.target.value.split(","))}
-          required
-        />
-        <br />
-        <br />
-        <label htmlFor="expiry">Expiry</label>&nbsp;
-        <input
-          type="datetime-local"
-          id="expiry"
-          value={getDateString(pollExpiry)}
-          onChange={(e) => setPollExpiry(new Date(e.target.value))}
-          required
-        />
-        <br />
-        <br />
-        <button type="submit">Submit</button>
-      </form>
-    </>
+      <StyledForm onSubmit={handleSubmit}>
+        <StyledLabel htmlFor="body">
+          Question&nbsp;
+          <StyledInput
+            type="text"
+            id="body"
+            value={pollBody}
+            onChange={(e) => setPollBody(e.target.value)}
+            required
+          />
+        </StyledLabel>
+        <StyledLabel htmlFor="options">
+          Options (comma-seperated)&nbsp;
+          <StyledInput
+            type="text"
+            id="options"
+            value={pollOptions.join(",")}
+            onChange={(e) => setPollOptions(e.target.value.split(","))}
+            required
+          />
+        </StyledLabel>
+        <StyledLabel htmlFor="expiry">
+          Expiry&nbsp;
+          <StyledInput
+            type="datetime-local"
+            id="expiry"
+            value={getDateString(pollExpiry)}
+            onChange={(e) => setPollExpiry(new Date(e.target.value))}
+            required
+          />
+        </StyledLabel>
+        <StyledButton type="submit">Submit</StyledButton>
+      </StyledForm>
+    </StyledDiv>
   );
 }
+
+const StyledForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const StyledInput = styled.input`
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  margin-left: 5px;
+`;
+
+const StyledLabel = styled.label`
+  margin-bottom: 10px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+`;
+
+const StyledButton = styled.button`
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #1c2928;
+  color: white;
+  font-weight: bold;
+`;
+
+const StyledDiv = styled.div`
+  background-color: #fcd270;
+  padding: 20px;
+  border-radius: 10px;
+  font-family: system-ui, sans-serif;
+  width: calc(100% - 40px);
+  margin: 10px;
+  padding: 20px;
+`;
