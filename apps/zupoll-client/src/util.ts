@@ -8,8 +8,8 @@ export const PASSPORT_SERVER_URL = IS_PROD
   ? "https://api.pcd-passport.com/"
   : "http://localhost:3002/";
 
-export const CONFESSIONS_SERVER_URL = IS_PROD
-  ? "https://confessions-server.onrender.com/"
+export const ZUPOLL_SERVER_URL = IS_PROD
+  ? "https://zupoll-server.onrender.com/"
   : "http://localhost:3005/";
 
 export const SEMAPHORE_GROUP_URL = IS_PROD

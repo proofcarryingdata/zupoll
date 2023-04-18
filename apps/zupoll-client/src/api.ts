@@ -1,10 +1,10 @@
-import { CONFESSIONS_SERVER_URL } from "../src/util";
+import { ZUPOLL_SERVER_URL } from "../src/util";
 import { CreatePollRequest, VoteRequest } from "./types";
 
 export async function createPoll(
     request: CreatePollRequest
 ): Promise<Response> {
-  const url = `${CONFESSIONS_SERVER_URL}create-poll`;
+  const url = `${ZUPOLL_SERVER_URL}create-poll`;
 
   return await fetch(url, {
     method: "POST",
@@ -19,7 +19,7 @@ export async function createPoll(
 export async function doVote(
   request: VoteRequest
 ): Promise<Response> {
-const url = `${CONFESSIONS_SERVER_URL}vote`;
+const url = `${ZUPOLL_SERVER_URL}vote`;
 
 return await fetch(url, {
   method: "POST",
@@ -41,7 +41,7 @@ export async function login(
     semaphoreGroupUrl,
     proof: parsedPcd.pcd
   };
-  const url = `${CONFESSIONS_SERVER_URL}login`;
+  const url = `${ZUPOLL_SERVER_URL}login`;
 
   return await fetch(url, {
     method: "POST",
@@ -62,7 +62,7 @@ export async function listPolls(
   //   page: page.toString(),
   //   limit: limit.toString()
   // }).toString();
-  const url = `${CONFESSIONS_SERVER_URL}polls`;
+  const url = `${ZUPOLL_SERVER_URL}polls`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` }
   });

@@ -67,9 +67,9 @@ export function CreatePoll({
       const res = await createPoll(request);
       if (!res.ok) {
         const resErr = await res.text();
-        console.error("error posting confession to the server: ", resErr);
+        console.error("error posting post to the server: ", resErr);
         const err = {
-          title: "Publish confession failed",
+          title: "Create poll failed",
           message: `Server Error: ${resErr}`,
         } as ZupollError;
         onError(err);

@@ -5,12 +5,6 @@ import { ACCESS_TOKEN_SECRET, authenticateJWT } from "../../util/auth";
 import { prisma } from "../../util/prisma";
 import { verifyGroupProof } from "../../util/verify";
 
-/**
- * The routes in this function shows how an auth flow would work.
- * The client can call /login with a semaphore group proof, once the proof is verified, it will return
- * an jwt. The client can then use this jwt in future requests to this server.
- * The /confessions endpoint shows how to authenticate the jwt with the middleware authenticateJWT.
- */
 export function initAuthedRoutes(
   app: express.Application,
   _context: ApplicationContext

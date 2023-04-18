@@ -1,16 +1,16 @@
-# Zuzalu Confessions
+# Zupoll
 
 ## For Developers: Local Development
 
 ### Environment Variables
 
 In order to develop locally, you will need to set some environment variables.
-In `confessions-client` prroject, we have included an example
-environment variable file here: [apps/confessions-client/.env.local.example](apps/confessions-client/.env.local.example). 
-In order to make the `confessions-client` use these environment variables, you will need to copy the contents of the example file into an adjacent file called `.env.local`.
-In `confessions-server` prroject, we have included an example
-environment variable file here: [apps/confessions-server/.env.example](apps/confessions-server/.env.example). 
-In order to make the `confessions-server` use these environment variables, you will need to copy the contents of the example file into an adjacent file called `.env`.
+In `zupoll-client` prroject, we have included an example
+environment variable file here: [apps/zupoll-client/.env.local.example](apps/zupoll-client/.env.local.example). 
+In order to make the `zupoll-client` use these environment variables, you will need to copy the contents of the example file into an adjacent file called `.env.local`.
+In `zupoll-server` prroject, we have included an example
+environment variable file here: [apps/zupoll-server/.env.example](apps/zupoll-server/.env.example). 
+In order to make the `zupoll-server` use these environment variables, you will need to copy the contents of the example file into an adjacent file called `.env`.
 
 ### Running the project
 
@@ -23,14 +23,17 @@ In the root of this project, execute the following to start the servers and stat
 # installs dependencies for all apps and packages in this repository
 yarn
 
+# set the postgres connection url in the env file (DATABASE_URL)
+# this will need to you manually create a database for zupoll.
+
 # prepare local Postgres - you must have Postgres installed for this
 # to work properly.
-yarn db:generate && yarn dbb:push
+yarn db:generate && yarn bb:push
 
 # starts all the applications contained in the `/apps` directory of the
-# repository. this includes the confessions server and client.
+# repository. this includes the zupoll server and client.
 yarn dev
 
-# open up the confessions app in your browser.
+# open up the zupoll app in your browser.
 open http://localhost:3004
 ```

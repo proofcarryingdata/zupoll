@@ -4,9 +4,9 @@ import { Poll } from "./Poll";
 import { ZupollError } from "./shared/ErrorOverlay";
 
 /**
- * Shows the user with access token a list of confessions.
+ * Shows the user with access token a list of polls.
  * @param accessToken jwt used to authenticate to the server
- * @param newConfession the new confession string
+ * @param newPoll the new poll string
  */
 export function Polls({
   accessToken,
