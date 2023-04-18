@@ -109,6 +109,7 @@ const LoggedInHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-weight: bold;
 `;
 
 const Wrapper = styled.div`

@@ -19,6 +19,7 @@ import {
   SEMAPHORE_ADMIN_GROUP_URL,
   SEMAPHORE_GROUP_URL,
 } from "../src/util";
+import { Button } from "./core/Button";
 import { ZupollError } from "./shared/ErrorOverlay";
 
 enum CreatePollState {
@@ -115,8 +116,8 @@ export function CreatePoll({
   }
 
   return (
-    <StyledDiv>
-      <h2>Create Poll</h2>
+    <Container>
+      <Header>Admin Create Poll</Header>
       <StyledForm onSubmit={handleSubmit}>
         <StyledLabel htmlFor="body">
           Question&nbsp;
@@ -148,11 +149,20 @@ export function CreatePoll({
             required
           />
         </StyledLabel>
-        <StyledButton type="submit">Submit</StyledButton>
+        <SubmitRow>
+          <Button type="submit">Submit</Button>
+        </SubmitRow>
       </StyledForm>
-    </StyledDiv>
+    </Container>
   );
 }
+
+const SubmitRow = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+`;
 
 const StyledForm = styled.form`
   display: flex;
@@ -174,22 +184,21 @@ const StyledLabel = styled.label`
   align-items: center;
 `;
 
-const StyledButton = styled.button`
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 5px;
-  border: none;
-  background-color: #1c2928;
-  color: white;
-  font-weight: bold;
+const Container = styled.div`
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+  border: 1px solid #bbb;
+  background-color: #fcfcfc;
+  border-radius: 4px;
+  width: 110%;
+  margin: 10px;
+  padding: 16px;
+  margin-bottom: 32px;
 `;
 
-const StyledDiv = styled.div`
-  background-color: #fcd270;
-  padding: 20px;
-  border-radius: 10px;
-  font-family: system-ui, sans-serif;
-  width: calc(100% - 40px);
-  margin: 10px;
-  padding: 20px;
+const Header = styled.div`
+  width: 100%;
+  margin-bottom: 16px;
+  margin-top: 8px;
+  font-size: 1.5em;
 `;
