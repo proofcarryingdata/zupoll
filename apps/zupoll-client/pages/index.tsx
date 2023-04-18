@@ -40,21 +40,31 @@ export default function Page() {
     }
   };
 
+  const logout = () => {
+    if (window.confirm("Are you sure you want to log out?")) {
+      updateAccessToken(null, null);
+    }
+  };
+
   const onError = (err: ZupollError) => setError(err);
 
   return (
     <Wrapper>
       <ReferendumSection>
-        <div
+        {/* <div
           style={{ display: "flex", justifyContent: "center", paddingTop: 10 }}
         >
           <img src="/zuzalulogo.png" alt="Zuzalu" width="174" />
         </div>
 
-        <h1>Referendums</h1>
+        <h1>Referendums</h1> */}
 
         {accessToken ? (
           <>
+            <LoggedInHeader>
+              Zuzalu Polls
+              <Button onClick={logout}>Logout</Button>
+            </LoggedInHeader>
             {group == SEMAPHORE_ADMIN_GROUP_URL && (
               <CreatePoll onCreated={setNewPoll} onError={onError} />
             )}
@@ -65,9 +75,6 @@ export default function Page() {
               onError={onError}
             />
 
-            <Button onClick={() => updateAccessToken(null, null)}>
-              Logout
-            </Button>
             {error && (
               <ErrorOverlay error={error} onClose={() => setError(undefined)} />
             )}
@@ -93,25 +100,35 @@ export default function Page() {
   );
 }
 
+const LoggedInHeader = styled.div`
+  width: 100%;
+  font-size: 2em;
+  margin-bottom: 32px;
+  margin-top: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 const Wrapper = styled.div`
   display: flex;
-  height: 100%;
+  flex-direction: column;
   min-height: 100vh;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 `;
 
 const ReferendumSection = styled.div`
   width: 75ch;
+  max-width: 80vw;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   border-radius: 20px;
   padding: 20px;
 
   h1 {
-    font-family: "Roboto", sans-serif;
     text-align: center;
     margin-top: 20px;
   }

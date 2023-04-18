@@ -100,6 +100,7 @@ export type Vote = {
 };
 
 const PollWrapper = styled.div`
+  box-sizing: border-box;
   border: 1px solid #bbb;
   border-bottom: none;
   background-color: #fcfcfc;
