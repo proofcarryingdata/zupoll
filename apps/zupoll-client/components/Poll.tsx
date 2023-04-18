@@ -54,6 +54,7 @@ export function Poll({
         <PollOptions>
           {poll.options.map((opt, idx) => (
             <PollOption
+              canVote={canVote}
               key={idx}
               onClick={() => {
                 if (voter) {
@@ -167,19 +168,35 @@ const PollOptions = styled.div`
   box-sizing: border-box;
 `;
 
-const PollOption = styled.span`
-  overflow: hidden;
-  position: relative;
-  padding: 6px 8px;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
-  width: 100%;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: row;
-  gap: 8px;
+const PollOption = styled.span<{ canVote: boolean }>`
+  ${({ canVote }) => css`
+    overflow: hidden;
+    position: relative;
+    padding: 6px 8px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+    border: 1px solid transparent;
+
+    ${canVote &&
+    css`
+      &:hover {
+        cursor: pointer;
+        border: 1px solid #888;
+        background-color: #ddd;
+      }
+
+      &:hover:active {
+        background-color: #ccc;
+      }
+    `}
+  `}
 `;
 
 const PollProgressBar = styled.span<{ percent: number; isMax: boolean }>`
@@ -189,7 +206,7 @@ const PollProgressBar = styled.span<{ percent: number; isMax: boolean }>`
     left: 0;
     width: ${100 * percent}%;
     height: 100%;
-    background-color: ${isMax ? "#a1f1a2" : "grey"};
+    background-color: ${isMax ? "#a1f1e4" : "grey"};
   `}
 `;
 
