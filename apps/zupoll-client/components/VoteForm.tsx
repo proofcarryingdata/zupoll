@@ -108,7 +108,7 @@ export function VoteForm({
     );
   };
 
-  if (getVoted().includes(poll.id)) return null;
+  if (votedOn(poll.id)) return null;
 
   return (
     <>
@@ -133,13 +133,17 @@ export function VoteForm({
   );
 }
 
-function getVoted(): Array<string> {
+export function votedOn(id: string): boolean {
+  return getVoted().includes(id);
+}
+
+export function getVoted(): Array<string> {
   const voted: Array<string> = JSON.parse(
     window.localStorage.getItem("voted") || "[]"
   );
   return voted;
 }
 
-function setVoted(voted: Array<string>) {
+export function setVoted(voted: Array<string>) {
   window.localStorage.setItem("voted", JSON.stringify(voted));
 }
