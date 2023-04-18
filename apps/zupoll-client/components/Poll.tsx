@@ -100,20 +100,25 @@ export type Vote = {
 };
 
 const PollWrapper = styled.div`
-  border: 1px solid grey;
+  border: 1px solid #bbb;
   border-bottom: none;
-  background-color: white;
+  background-color: #fcfcfc;
   width: 100%;
   padding: 16px;
   position: relative;
   font-family: system-ui, sans-serif;
+  transition: 200ms;
 
   &:first-child {
     border-radius: 4px 4px 0px 0px;
   }
 
+  &:hover {
+    background-color: #f8f8f8;
+  }
+
   &:last-child {
-    border-bottom: 1px solid grey;
+    border-bottom: 1px solid #bbb;
     border-radius: 0px 0px 4px 4px;
   }
 `;
