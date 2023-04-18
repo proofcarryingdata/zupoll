@@ -2,10 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button } from "../components/core/Button";
 import { CreatePoll } from "../components/CreatePoll";
-import { Login } from "../components/Login";
+import { LoginScreen } from "../components/LoginScreen";
 import { Polls } from "../components/Polls";
 import { ErrorOverlay, ZupollError } from "../components/shared/ErrorOverlay";
-import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../src/util";
+import { SEMAPHORE_ADMIN_GROUP_URL } from "../src/util";
 
 export default function Page() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export default function Page() {
     if (!token) {
       window.localStorage.removeItem("access_token");
     } else {
-      window.localStorage.setItem("access_token", token!);
+      window.localStorage.setItem("access_token", token);
     }
   };
 
@@ -51,14 +51,6 @@ export default function Page() {
   return (
     <Wrapper>
       <ReferendumSection>
-        {/* <div
-          style={{ display: "flex", justifyContent: "center", paddingTop: 10 }}
-        >
-          <img src="/zuzalulogo.png" alt="Zuzalu" width="174" />
-        </div>
-
-        <h1>Referendums</h1> */}
-
         {accessToken ? (
           <>
             <LoggedInHeader>
@@ -80,21 +72,7 @@ export default function Page() {
             )}
           </>
         ) : (
-          <>
-            <LoginContainer>
-              <Login
-                onLoggedIn={updateAccessToken}
-                requestedGroup={SEMAPHORE_GROUP_URL}
-                prompt="Anon Login"
-              />
-              <Login
-                onLoggedIn={updateAccessToken}
-                requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
-                prompt="Admin Login"
-                deemphasized
-              />
-            </LoginContainer>
-          </>
+          <LoginScreen updateAccessToken={updateAccessToken} />
         )}
       </ReferendumSection>
     </Wrapper>
@@ -118,6 +96,7 @@ const Wrapper = styled.div`
   min-height: 100vh;
   justify-content: flex-start;
   align-items: center;
+  background: rgb(28, 41, 40);
 `;
 
 const ReferendumSection = styled.div`
@@ -129,16 +108,4 @@ const ReferendumSection = styled.div`
   justify-content: flex-start;
   border-radius: 20px;
   padding: 20px;
-
-  h1 {
-    text-align: center;
-    margin-top: 20px;
-  }
-`;
-
-const LoginContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 20px;
 `;

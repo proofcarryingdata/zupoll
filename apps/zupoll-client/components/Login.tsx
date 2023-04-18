@@ -86,14 +86,15 @@ export function Login({
 }
 
 const DeemphasizedLoginButton = styled(Button)`
-  background-color: #ffffff;
+  background-color: #eee;
+  font-weight: normal;
   border: none;
 
   &:hover {
-    background-color: #eee;
+    background-color: #e8e8e8;
   }
 
   &:active {
-    background-color: #dedede;
+    background-color: #e3e3e3;
   }
 `;
