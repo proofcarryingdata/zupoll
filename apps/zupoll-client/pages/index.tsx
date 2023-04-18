@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button } from "../components/core/Button";
 import { CreatePoll } from "../components/CreatePoll";
@@ -46,7 +46,7 @@ export default function Page() {
     }
   };
 
-  const onError = (err: ZupollError) => setError(err);
+  const onError = useCallback((err: ZupollError) => setError(err), []);
 
   return (
     <Wrapper>

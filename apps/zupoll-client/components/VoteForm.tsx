@@ -5,7 +5,7 @@ import {
 import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { doVote } from "../src/api";
 import { UserType, VoteRequest, VoteSignal } from "../src/types";
 import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../src/util";
@@ -72,35 +72,39 @@ export function usePollVote(
     doRequest();
   }, [pcdStr, onError, onVoted, poll, option]);
 
-  const handleVote = async (voteIdx: number) => {
-    votingState.current = VoteFormState.AWAITING_PCDSTR;
+  const handleVote = useCallback(
+    async (voteIdx: number) => {
+      setOption(voteIdx);
+      votingState.current = VoteFormState.AWAITING_PCDSTR;
 
-    if (!(voteIdx >= 0 && voteIdx < poll.options.length)) {
-      const err = {
-        title: "Voting failed",
-        message: "Invalid option selected.",
-      } as ZupollError;
-      onError(err);
-      return;
-    }
+      if (!(voteIdx >= 0 && voteIdx < poll.options.length)) {
+        const err = {
+          title: "Voting failed",
+          message: "Invalid option selected.",
+        } as ZupollError;
+        onError(err);
+        return;
+      }
 
-    const signal: VoteSignal = {
-      pollId: poll.id,
-      voteIdx: voteIdx,
-    };
-    const signalHash = sha256(stableStringify(signal));
-    const sigHashEnc = generateMessageHash(signalHash).toString();
-    const externalNullifier = generateMessageHash(poll.id).toString();
+      const signal: VoteSignal = {
+        pollId: poll.id,
+        voteIdx: voteIdx,
+      };
+      const signalHash = sha256(stableStringify(signal));
+      const sigHashEnc = generateMessageHash(signalHash).toString();
+      const externalNullifier = generateMessageHash(poll.id).toString();
 
-    openZuzaluMembershipPopup(
-      PASSPORT_URL,
-      window.location.origin + "/popup",
-      SEMAPHORE_GROUP_URL,
-      "zupoll",
-      sigHashEnc,
-      externalNullifier
-    );
-  };
+      openZuzaluMembershipPopup(
+        PASSPORT_URL,
+        window.location.origin + "/popup",
+        SEMAPHORE_GROUP_URL,
+        "zupoll",
+        sigHashEnc,
+        externalNullifier
+      );
+    },
+    [onError, poll.id, poll.options.length]
+  );
 
   if (votedOn(poll.id)) return null;
 
