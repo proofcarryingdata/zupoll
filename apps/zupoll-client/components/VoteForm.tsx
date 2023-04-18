@@ -29,7 +29,6 @@ export function VoteForm({
 }) {
   const votingState = useRef<VoteFormState>(VoteFormState.DEFAULT);
   const [option, setOption] = useState<string>("-1");
-
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
   useEffect(() => {

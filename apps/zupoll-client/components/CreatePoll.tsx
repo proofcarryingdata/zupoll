@@ -117,7 +117,7 @@ export function CreatePoll({
 
   return (
     <Container>
-      <Header>Admin Create Poll</Header>
+      {/* <Header>Admin Create Poll</Header> */}
       <StyledForm onSubmit={handleSubmit}>
         <StyledLabel htmlFor="body">
           Question&nbsp;
@@ -150,7 +150,7 @@ export function CreatePoll({
           />
         </StyledLabel>
         <SubmitRow>
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Create Poll</Button>
         </SubmitRow>
       </StyledForm>
     </Container>
@@ -171,10 +171,12 @@ const StyledForm = styled.form`
 `;
 
 const StyledInput = styled.input`
-  padding: 10px;
-  border-radius: 5px;
-  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
   margin-left: 5px;
+  border: none;
+  border: 1px solid #555;
+  width: 50%;
 `;
 
 const StyledLabel = styled.label`
@@ -182,6 +184,9 @@ const StyledLabel = styled.label`
   font-size: 16px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  text-align: right;
 `;
 
 const Container = styled.div`
