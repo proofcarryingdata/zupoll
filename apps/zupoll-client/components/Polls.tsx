@@ -50,4 +50,5 @@ export function Polls({
 
 const PollsContainer = styled.div`
   width: 100%;
+  margin-bottom: 256px;
 `;
