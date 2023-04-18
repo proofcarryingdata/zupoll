@@ -48,8 +48,10 @@ export default function Page() {
 
   const onError = useCallback((err: ZupollError) => setError(err), []);
 
+  const Wrap = accessToken ? Wrapper : WrapDark;
+
   return (
-    <Wrapper>
+    <Wrap>
       <ReferendumSection>
         {accessToken ? (
           <>
@@ -75,7 +77,7 @@ export default function Page() {
           <LoginScreen updateAccessToken={updateAccessToken} />
         )}
       </ReferendumSection>
-    </Wrapper>
+    </Wrap>
   );
 }
 
@@ -96,6 +98,9 @@ const Wrapper = styled.div`
   min-height: 100vh;
   justify-content: flex-start;
   align-items: center;
+`;
+
+const WrapDark = styled(Wrapper)`
   background: rgb(28, 41, 40);
 `;
 
