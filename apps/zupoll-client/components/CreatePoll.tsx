@@ -81,7 +81,7 @@ export function CreatePoll({
       onCreated(pollBody);
       setPollBody("");
       setPollOptions([]);
-      setPollExpiry(new Date());
+      setPollExpiry(new Date(new Date().getTime() + 1000 * 60 * 60 * 24));
     }
 
     doRequest();
