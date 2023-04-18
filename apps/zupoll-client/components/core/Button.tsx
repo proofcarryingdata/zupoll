@@ -1,19 +1,20 @@
 import styled from "styled-components";
 
 export const Button = styled.button`
-  height: 48px;
-  padding: 12px;
+  padding: 8px 16px;
   font-size: 16px;
   margin: 0 0 5px 0;
   border: none;
-  border-radius: 99px;
-  background-color: #fcd270;
+  border-radius: 8px;
+  background-color: #eee;
   opacity: 1;
   cursor: pointer;
+
   &:hover {
-    opacity: 0.95;
+    background-color: #dedede;
   }
+
   &:active {
-    opacity: 0.9;
+    background-color: #d3d3d3;
   }
 `;
