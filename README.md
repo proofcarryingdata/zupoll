@@ -6,10 +6,10 @@
 
 In order to develop locally, you will need to set some environment variables.
 In `zupoll-client` prroject, we have included an example
-environment variable file here: [apps/zupoll-client/.env.local.example](apps/zupoll-client/.env.local.example). 
+environment variable file here: [apps/zupoll-client/.env.local.example](apps/zupoll-client/.env.local.example).
 In order to make the `zupoll-client` use these environment variables, you will need to copy the contents of the example file into an adjacent file called `.env.local`.
 In `zupoll-server` prroject, we have included an example
-environment variable file here: [apps/zupoll-server/.env.example](apps/zupoll-server/.env.example). 
+environment variable file here: [apps/zupoll-server/.env.example](apps/zupoll-server/.env.example).
 In order to make the `zupoll-server` use these environment variables, you will need to copy the contents of the example file into an adjacent file called `.env`.
 
 ### Running the project
@@ -28,7 +28,7 @@ yarn
 
 # prepare local Postgres - you must have Postgres installed for this
 # to work properly.
-yarn db:generate && yarn bb:push
+yarn db:generate && yarn db:push
 
 # starts all the applications contained in the `/apps` directory of the
 # repository. this includes the zupoll server and client.
