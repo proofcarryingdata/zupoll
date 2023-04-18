@@ -126,6 +126,7 @@ export function CreatePoll({
           <StyledInput
             type="text"
             id="body"
+            autoComplete="off"
             value={pollBody}
             onChange={(e) => setPollBody(e.target.value)}
             required
@@ -135,6 +136,7 @@ export function CreatePoll({
           Options (comma-seperated)&nbsp;
           <StyledInput
             type="text"
+            autoComplete="off"
             id="options"
             value={pollOptions.join(",")}
             onChange={(e) => setPollOptions(e.target.value.split(","))}
@@ -145,6 +147,7 @@ export function CreatePoll({
           Expiry&nbsp;
           <StyledInput
             type="datetime-local"
+            autoComplete="off"
             id="expiry"
             value={getDateString(pollExpiry)}
             onChange={(e) => setPollExpiry(new Date(e.target.value))}
