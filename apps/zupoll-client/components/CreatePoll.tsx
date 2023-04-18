@@ -38,7 +38,9 @@ export function CreatePoll({
   const createState = useRef<CreatePollState>(CreatePollState.DEFAULT);
   const [pollBody, setPollBody] = useState<string>("");
   const [pollOptions, setPollOptions] = useState<Array<string>>([]);
-  const [pollExpiry, setPollExpiry] = useState<Date>(new Date());
+  const [pollExpiry, setPollExpiry] = useState<Date>(
+    new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
+  );
 
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
