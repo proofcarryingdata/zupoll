@@ -91,6 +91,7 @@ export default function Page() {
                 onLoggedIn={updateAccessToken}
                 requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
                 prompt="Admin Login"
+                deemphasized
               />
             </LoginContainer>
           </>
