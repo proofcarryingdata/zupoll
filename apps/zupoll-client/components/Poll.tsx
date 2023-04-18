@@ -206,7 +206,7 @@ const PollProgressBar = styled.span<{ percent: number; isMax: boolean }>`
     left: 0;
     width: ${100 * percent}%;
     height: 100%;
-    background-color: ${isMax ? "#a1f1e4" : "grey"};
+    background-color: ${isMax ? "#90ccf1" : "#cce5f3"};
   `}
 `;
 
