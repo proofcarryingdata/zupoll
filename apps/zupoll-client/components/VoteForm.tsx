@@ -5,7 +5,7 @@ import {
 import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
-import { FormEventHandler, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { doVote } from "../src/api";
 import { UserType, VoteRequest, VoteSignal } from "../src/types";
 import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../src/util";
@@ -18,15 +18,11 @@ enum VoteFormState {
   RECEIVED_PCDSTR,
 }
 
-export function VoteForm({
-  poll,
-  onError,
-  onVoted,
-}: {
-  poll: Poll;
-  onError: (err: ZupollError) => void;
-  onVoted: (id: string) => void;
-}) {
+export function usePollVote(
+  poll: Poll,
+  onError: (err: ZupollError) => void,
+  onVoted: (id: string) => void
+): ((voteIdx: number) => Promise<void>) | null {
   const votingState = useRef<VoteFormState>(VoteFormState.DEFAULT);
   const [option, setOption] = useState<string>("-1");
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
@@ -76,11 +72,9 @@ export function VoteForm({
     doRequest();
   }, [pcdStr, onError, onVoted, poll, option]);
 
-  const handleSubmit: FormEventHandler = async (event) => {
-    event.preventDefault();
+  const handleVote = async (voteIdx: number) => {
     votingState.current = VoteFormState.AWAITING_PCDSTR;
 
-    const voteIdx = parseInt(option);
     if (!(voteIdx >= 0 && voteIdx < poll.options.length)) {
       const err = {
         title: "Voting failed",
@@ -110,27 +104,7 @@ export function VoteForm({
 
   if (votedOn(poll.id)) return null;
 
-  return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="pollOptions">Vote Option:</label>&nbsp;&nbsp;
-        <select
-          value={option} // ...force the select's value to match the state variable...
-          onChange={(e) => setOption(e.target.value)} // ... and update the state variable on any change!
-          id="pollOptions"
-        >
-          <option key="-1" value="-1"></option>
-          {poll.options.map((opt, idx) => (
-            <option key={idx} value={idx}>
-              {opt}
-            </option>
-          ))}
-        </select>
-        <br />
-        <button type="submit">Vote</button>
-      </form>
-    </>
-  );
+  return handleVote;
 }
 
 export function votedOn(id: string): boolean {

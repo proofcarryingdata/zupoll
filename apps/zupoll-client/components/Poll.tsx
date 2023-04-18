@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import styled, { css } from "styled-components";
 import { PollType, UserType } from "../src/types";
 import { ZupollError } from "./shared/ErrorOverlay";
-import { VoteForm } from "./VoteForm";
+import { usePollVote, votedOn } from "./VoteForm";
 
 export function Poll({
   poll,
@@ -13,11 +13,20 @@ export function Poll({
   onError: (err: ZupollError) => void;
   onVoted: (id: string) => void;
 }) {
+  const voter = usePollVote(poll, onError, onVoted);
   const totalVotes = poll.votes.length;
   const statistics = new Array(poll.options.length).fill(0);
+  const expired = new Date(poll.expiry) < new Date();
+
+  const canVote = useMemo(() => {
+    return !votedOn(poll.id) && !expired;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expired, poll.id, poll]);
+
   for (const vote of poll.votes) {
     statistics[vote.voteIdx] += 1;
   }
+
   const maxVote = Math.max(...statistics);
 
   const getVoteDisplay = (a: number, b: number) => {
@@ -28,8 +37,6 @@ export function Poll({
     const percentVal = ((a / b) * 100).toFixed(1);
     return `${percentVal}%`;
   };
-
-  const expired = new Date(poll.expiry) < new Date();
 
   // Add state to track whether to show poll results or not
   const [showResults, setShowResults] = useState(true);
@@ -46,7 +53,18 @@ export function Poll({
       {showResults && (
         <PollOptions>
           {poll.options.map((opt, idx) => (
-            <PollOption key={idx}>
+            <PollOption
+              key={idx}
+              onClick={() => {
+                if (voter) {
+                  if (
+                    confirm(`are you sure you want to vote for option ${idx}?`)
+                  ) {
+                    voter(idx);
+                  }
+                }
+              }}
+            >
               <PollProgressBar
                 percent={totalVotes === 0 ? 0 : statistics[idx] / totalVotes}
                 isMax={maxVote === statistics[idx]}
@@ -59,10 +77,14 @@ export function Poll({
           ))}
         </PollOptions>
       )}
-      {!expired && <VoteForm poll={poll} onError={onError} onVoted={onVoted} />}
 
       <TotalVotesContainer>
         {totalVotes} vote{totalVotes !== 1 ? "s" : ""}
+        {" · "}
+        {expired
+          ? "Expired"
+          : "Expires " + new Date(poll.expiry).toLocaleString()}
+        {canVote ? " · Can Vote" : ""}
       </TotalVotesContainer>
     </PollWrapper>
   );
@@ -148,7 +170,7 @@ const PollOptions = styled.div`
 const PollOption = styled.span`
   overflow: hidden;
   position: relative;
-  padding: 4px 8px;
+  padding: 6px 8px;
   background-color: rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   width: 100%;
@@ -188,4 +210,5 @@ const OptionString = styled.span`
 const TotalVotesContainer = styled.div`
   margin-top: 12px;
   color: #666;
+  font-size: 0.9em;
 `;
