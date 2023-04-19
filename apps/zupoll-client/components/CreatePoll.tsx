@@ -200,7 +200,7 @@ const Container = styled.div`
   border: 1px solid #bbb;
   background-color: #fcfcfc;
   border-radius: 4px;
-  width: 110%;
+  width: 100%;
   margin: 10px;
   padding: 16px;
   margin-bottom: 32px;

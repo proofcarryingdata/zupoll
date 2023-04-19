@@ -88,7 +88,7 @@ export function Login({
 const DeemphasizedLoginButton = styled(Button)`
   background-color: #eee;
   font-weight: normal;
-  border: none;
+  border: 1px solid #888;
 
   &:hover {
     background-color: #e8e8e8;

@@ -57,9 +57,9 @@ export function Poll({
               canVote={canVote}
               key={idx}
               onClick={() => {
-                if (voter) {
+                if (voter && canVote) {
                   if (
-                    confirm(`are you sure you want to vote for option ${idx}?`)
+                    confirm(`Are you sure you want to vote for option ${idx}?`)
                   ) {
                     voter(idx);
                   }
