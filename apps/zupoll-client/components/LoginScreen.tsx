@@ -11,7 +11,7 @@ export function LoginScreen({
     <Bg>
       <Header>
         <img src="/zuzalulogo.webp" alt="Zuzalu" width="160" height="42" />
-        <H1>Anonymous Polls</H1>
+        <H1>Polling</H1>
       </Header>
       <Body>
         <Description>
@@ -47,7 +47,7 @@ export function LoginScreen({
 }
 
 const Bg = styled.div`
-  width: 512px;
+  max-width: 512px;
 `;
 
 const Description = styled.div`
