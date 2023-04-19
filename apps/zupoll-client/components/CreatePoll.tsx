@@ -19,6 +19,7 @@ import {
   SEMAPHORE_ADMIN_GROUP_URL,
   SEMAPHORE_GROUP_URL,
 } from "../src/util";
+import { Button } from "./core/Button";
 import { ZupollError } from "./shared/ErrorOverlay";
 
 enum CreatePollState {
@@ -37,7 +38,9 @@ export function CreatePoll({
   const createState = useRef<CreatePollState>(CreatePollState.DEFAULT);
   const [pollBody, setPollBody] = useState<string>("");
   const [pollOptions, setPollOptions] = useState<Array<string>>([]);
-  const [pollExpiry, setPollExpiry] = useState<Date>(new Date());
+  const [pollExpiry, setPollExpiry] = useState<Date>(
+    new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
+  );
 
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
@@ -78,7 +81,7 @@ export function CreatePoll({
       onCreated(pollBody);
       setPollBody("");
       setPollOptions([]);
-      setPollExpiry(new Date());
+      setPollExpiry(new Date(new Date().getTime() + 1000 * 60 * 60 * 24));
     }
 
     doRequest();
@@ -115,14 +118,15 @@ export function CreatePoll({
   }
 
   return (
-    <StyledDiv>
-      <h2>Create Poll</h2>
+    <Container>
+      {/* <Header>Admin Create Poll</Header> */}
       <StyledForm onSubmit={handleSubmit}>
         <StyledLabel htmlFor="body">
           Question&nbsp;
           <StyledInput
             type="text"
             id="body"
+            autoComplete="off"
             value={pollBody}
             onChange={(e) => setPollBody(e.target.value)}
             required
@@ -132,6 +136,7 @@ export function CreatePoll({
           Options (comma-seperated)&nbsp;
           <StyledInput
             type="text"
+            autoComplete="off"
             id="options"
             value={pollOptions.join(",")}
             onChange={(e) => setPollOptions(e.target.value.split(","))}
@@ -142,17 +147,27 @@ export function CreatePoll({
           Expiry&nbsp;
           <StyledInput
             type="datetime-local"
+            autoComplete="off"
             id="expiry"
             value={getDateString(pollExpiry)}
             onChange={(e) => setPollExpiry(new Date(e.target.value))}
             required
           />
         </StyledLabel>
-        <StyledButton type="submit">Submit</StyledButton>
+        <SubmitRow>
+          <Button type="submit">Create Poll</Button>
+        </SubmitRow>
       </StyledForm>
-    </StyledDiv>
+    </Container>
   );
 }
+
+const SubmitRow = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+`;
 
 const StyledForm = styled.form`
   display: flex;
@@ -161,10 +176,12 @@ const StyledForm = styled.form`
 `;
 
 const StyledInput = styled.input`
-  padding: 10px;
-  border-radius: 5px;
-  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
   margin-left: 5px;
+  border: none;
+  border: 1px solid #555;
+  width: 50%;
 `;
 
 const StyledLabel = styled.label`
@@ -172,24 +189,19 @@ const StyledLabel = styled.label`
   font-size: 16px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  text-align: right;
 `;
 
-const StyledButton = styled.button`
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 5px;
-  border: none;
-  background-color: #1c2928;
-  color: white;
-  font-weight: bold;
-`;
-
-const StyledDiv = styled.div`
-  background-color: #fcd270;
-  padding: 20px;
-  border-radius: 10px;
+const Container = styled.div`
+  box-sizing: border-box;
   font-family: system-ui, sans-serif;
-  width: calc(100% - 40px);
+  border: 1px solid #bbb;
+  background-color: #fcfcfc;
+  border-radius: 4px;
+  width: 100%;
   margin: 10px;
-  padding: 20px;
+  padding: 16px;
+  margin-bottom: 32px;
 `;

@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button } from "../components/core/Button";
 import { CreatePoll } from "../components/CreatePoll";
-import { Login } from "../components/Login";
+import { LoginScreen } from "../components/LoginScreen";
 import { Polls } from "../components/Polls";
 import { ErrorOverlay, ZupollError } from "../components/shared/ErrorOverlay";
-import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../src/util";
+import { SEMAPHORE_ADMIN_GROUP_URL } from "../src/util";
 
 export default function Page() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -36,88 +36,81 @@ export default function Page() {
     if (!token) {
       window.localStorage.removeItem("access_token");
     } else {
-      window.localStorage.setItem("access_token", token!);
+      window.localStorage.setItem("access_token", token);
     }
   };
 
-  const onError = (err: ZupollError) => setError(err);
+  const logout = () => {
+    if (window.confirm("Are you sure you want to log out?")) {
+      updateAccessToken(null, null);
+    }
+  };
+
+  const onError = useCallback((err: ZupollError) => setError(err), []);
+
+  const Wrap = accessToken ? Wrapper : WrapDark;
 
   return (
-    <Wrapper>
+    <Wrap>
       <ReferendumSection>
-        <div
-          style={{ display: "flex", justifyContent: "center", paddingTop: 10 }}
-        >
-          <img src="/zuzalulogo.png" alt="Zuzalu" width="174" />
-        </div>
-
-        <h1>Referendums</h1>
         {accessToken ? (
           <>
+            <LoggedInHeader>
+              Zuzalu Polls
+              <Button onClick={logout}>Logout</Button>
+            </LoggedInHeader>
             {group == SEMAPHORE_ADMIN_GROUP_URL && (
               <CreatePoll onCreated={setNewPoll} onError={onError} />
             )}
+
             <Polls
               accessToken={accessToken}
               newPoll={newPoll}
               onError={onError}
             />
-            <Button onClick={() => updateAccessToken(null, null)}>
-              Logout
-            </Button>
+
             {error && (
               <ErrorOverlay error={error} onClose={() => setError(undefined)} />
             )}
           </>
         ) : (
-          <>
-            <LoginContainer>
-              <Login
-                onLoggedIn={updateAccessToken}
-                requestedGroup={SEMAPHORE_GROUP_URL}
-                prompt="Anon Login"
-              />
-              <Login
-                onLoggedIn={updateAccessToken}
-                requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
-                prompt="Admin Login"
-              />
-            </LoginContainer>
-          </>
+          <LoginScreen updateAccessToken={updateAccessToken} />
         )}
       </ReferendumSection>
-    </Wrapper>
+    </Wrap>
   );
 }
 
+const LoggedInHeader = styled.div`
+  width: 100%;
+  font-size: 2em;
+  margin-bottom: 32px;
+  margin-top: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+`;
+
 const Wrapper = styled.div`
   display: flex;
-  height: 100%;
+  flex-direction: column;
   min-height: 100vh;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+`;
+
+const WrapDark = styled(Wrapper)`
+  background: rgb(28, 41, 40);
 `;
 
 const ReferendumSection = styled.div`
   width: 75ch;
+  max-width: 80vw;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background-color: #1c2928;
+  justify-content: flex-start;
   border-radius: 20px;
   padding: 20px;
-  h1 {
-    color: white;
-    font-family: "Roboto", sans-serif;
-    text-align: center;
-    margin-top: 20px;
-  }
-`;
-
-const LoginContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 20px;
 `;

@@ -3,6 +3,7 @@ import {
   usePassportPopupMessages,
 } from "@pcd/passport-interface";
 import { useEffect, useState } from "react";
+import styled from "styled-components";
 import { login } from "../src/api";
 import { PASSPORT_URL } from "../src/util";
 import { Button } from "./core/Button";
@@ -19,10 +20,12 @@ export function Login({
   onLoggedIn,
   requestedGroup,
   prompt,
+  deemphasized,
 }: {
   onLoggedIn: (token: string, group: string) => void;
   requestedGroup: string;
   prompt: string;
+  deemphasized?: boolean;
 }) {
   const [error, setError] = useState<ZupollError>();
   const [loggingIn, setLoggingIn] = useState(false);
@@ -57,9 +60,11 @@ export function Login({
     });
   }, [pcdStr, loggingIn, requestedGroup, onLoggedIn]);
 
+  const ButtonComponent = deemphasized ? DeemphasizedLoginButton : Button;
+
   return (
     <>
-      <Button
+      <ButtonComponent
         onClick={() => {
           setLoggingIn(true);
           openZuzaluMembershipPopup(
@@ -72,10 +77,24 @@ export function Login({
         disabled={loggingIn}
       >
         {prompt}
-      </Button>
+      </ButtonComponent>
       {error && (
         <ErrorOverlay error={error} onClose={() => setError(undefined)} />
       )}
     </>
   );
 }
+
+const DeemphasizedLoginButton = styled(Button)`
+  background-color: #eee;
+  font-weight: normal;
+  border: 1px solid #888;
+
+  &:hover {
+    background-color: #e8e8e8;
+  }
+
+  &:active {
+    background-color: #e3e3e3;
+  }
+`;

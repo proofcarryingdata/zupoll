@@ -5,7 +5,7 @@ import {
 import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
-import { FormEventHandler, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { doVote } from "../src/api";
 import { UserType, VoteRequest, VoteSignal } from "../src/types";
 import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../src/util";
@@ -18,18 +18,13 @@ enum VoteFormState {
   RECEIVED_PCDSTR,
 }
 
-export function VoteForm({
-  poll,
-  onError,
-  onVoted,
-}: {
-  poll: Poll;
-  onError: (err: ZupollError) => void;
-  onVoted: (id: string) => void;
-}) {
+export function usePollVote(
+  poll: Poll,
+  onError: (err: ZupollError) => void,
+  onVoted: (id: string) => void
+): ((voteIdx: number) => Promise<void>) | null {
   const votingState = useRef<VoteFormState>(VoteFormState.DEFAULT);
   const [option, setOption] = useState<string>("-1");
-
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
   useEffect(() => {
@@ -77,70 +72,56 @@ export function VoteForm({
     doRequest();
   }, [pcdStr, onError, onVoted, poll, option]);
 
-  const handleSubmit: FormEventHandler = async (event) => {
-    event.preventDefault();
-    votingState.current = VoteFormState.AWAITING_PCDSTR;
+  const handleVote = useCallback(
+    async (voteIdx: number) => {
+      setOption(voteIdx.toString());
+      votingState.current = VoteFormState.AWAITING_PCDSTR;
 
-    const voteIdx = parseInt(option);
-    if (!(voteIdx >= 0 && voteIdx < poll.options.length)) {
-      const err = {
-        title: "Voting failed",
-        message: "Invalid option selected.",
-      } as ZupollError;
-      onError(err);
-      return;
-    }
+      if (!(voteIdx >= 0 && voteIdx < poll.options.length)) {
+        const err = {
+          title: "Voting failed",
+          message: "Invalid option selected.",
+        } as ZupollError;
+        onError(err);
+        return;
+      }
 
-    const signal: VoteSignal = {
-      pollId: poll.id,
-      voteIdx: voteIdx,
-    };
-    const signalHash = sha256(stableStringify(signal));
-    const sigHashEnc = generateMessageHash(signalHash).toString();
-    const externalNullifier = generateMessageHash(poll.id).toString();
+      const signal: VoteSignal = {
+        pollId: poll.id,
+        voteIdx: voteIdx,
+      };
+      const signalHash = sha256(stableStringify(signal));
+      const sigHashEnc = generateMessageHash(signalHash).toString();
+      const externalNullifier = generateMessageHash(poll.id).toString();
 
-    openZuzaluMembershipPopup(
-      PASSPORT_URL,
-      window.location.origin + "/popup",
-      SEMAPHORE_GROUP_URL,
-      "zupoll",
-      sigHashEnc,
-      externalNullifier
-    );
-  };
-
-  if (getVoted().includes(poll.id)) return null;
-
-  return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="pollOptions">Vote Option:</label>&nbsp;&nbsp;
-        <select
-          value={option} // ...force the select's value to match the state variable...
-          onChange={(e) => setOption(e.target.value)} // ... and update the state variable on any change!
-          id="pollOptions"
-        >
-          <option key="-1" value="-1"></option>
-          {poll.options.map((opt, idx) => (
-            <option key={idx} value={idx}>
-              {opt}
-            </option>
-          ))}
-        </select>
-        <br />
-        <button type="submit">Vote</button>
-      </form>
-    </>
+      openZuzaluMembershipPopup(
+        PASSPORT_URL,
+        window.location.origin + "/popup",
+        SEMAPHORE_GROUP_URL,
+        "zupoll",
+        sigHashEnc,
+        externalNullifier
+      );
+    },
+    [onError, poll.id, poll.options.length]
   );
+
+  if (votedOn(poll.id)) return null;
+
+  return handleVote;
 }
 
-function getVoted(): Array<string> {
+export function votedOn(id: string): boolean {
+  return getVoted().includes(id);
+}
+
+export function getVoted(): Array<string> {
   const voted: Array<string> = JSON.parse(
     window.localStorage.getItem("voted") || "[]"
   );
   return voted;
 }
 
-function setVoted(voted: Array<string>) {
+export function setVoted(voted: Array<string>) {
   window.localStorage.setItem("voted", JSON.stringify(voted));
 }
