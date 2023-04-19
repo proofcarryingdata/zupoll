@@ -59,7 +59,7 @@ export function Poll({
               onClick={() => {
                 if (voter && canVote) {
                   if (
-                    confirm(`Are you sure you want to vote for option ${idx}?`)
+                    confirm(`Are you sure you want to vote for option ${opt}?`)
                   ) {
                     voter(idx);
                   }
