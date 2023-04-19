@@ -35,10 +35,22 @@ export function initAuthedRoutes(
 
     const polls = await prisma.poll.findMany({
       include: {
-        votes: true,
+        votes: {
+          select: {
+            voteIdx: true,
+          }
+        },
       },
       orderBy: { expiry: "asc" },
     });
+    polls.forEach((poll) => {
+      const counts = new Array(poll.options.length).fill(0);
+      for (const vote of poll.votes) {
+        counts[vote.voteIdx] += 1;
+      }
+      poll.votes = counts;
+    });
+
     res.status(200).json({ polls });
   });
 }

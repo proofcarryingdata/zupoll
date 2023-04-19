@@ -14,8 +14,7 @@ export function Poll({
   onVoted: (id: string) => void;
 }) {
   const voter = usePollVote(poll, onError, onVoted);
-  const totalVotes = poll.votes.length;
-  const statistics = new Array(poll.options.length).fill(0);
+  const totalVotes = poll.votes.reduce((a, b) => a + b, 0);
   const expired = new Date(poll.expiry) < new Date();
 
   const canVote = useMemo(() => {
@@ -23,11 +22,8 @@ export function Poll({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expired, poll.id, poll]);
 
-  for (const vote of poll.votes) {
-    statistics[vote.voteIdx] += 1;
-  }
 
-  const maxVote = Math.max(...statistics);
+  const maxVote = Math.max(...poll.votes);
 
   const getVoteDisplay = (a: number, b: number) => {
     if (b === 0) {
@@ -58,11 +54,11 @@ export function Poll({
             }}
           >
             <PollProgressBar
-              percent={totalVotes === 0 ? 0 : statistics[idx] / totalVotes}
-              isMax={maxVote === statistics[idx]}
+              percent={totalVotes === 0 ? 0 : poll.votes[idx] / totalVotes}
+              isMax={maxVote === poll.votes[idx]}
             />
             <PollResult>
-              {getVoteDisplay(statistics[idx], totalVotes)}
+              {getVoteDisplay(poll.votes[idx], totalVotes)}
             </PollResult>
             <OptionString>{opt}</OptionString>
           </PollOption>
@@ -95,20 +91,7 @@ export type Poll = {
   expiry: string;
   options: string[];
   voterSemaphoreGroupUrls: string[];
-  votes: Vote[];
-  proof: string;
-};
-
-export type Vote = {
-  id: string;
-  pollId: string;
-  voterType: UserType;
-  voterNullifier: string;
-  voterSemaphoreGroupUrl: string | null;
-  voterName: string | null;
-  voterUuid: string | null;
-  voterCommitment: string | null;
-  voteIdx: number;
+  votes: number[];
   proof: string;
 };
 
