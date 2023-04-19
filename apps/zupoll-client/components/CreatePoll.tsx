@@ -205,10 +205,3 @@ const Container = styled.div`
   padding: 16px;
   margin-bottom: 32px;
 `;
-
-const Header = styled.div`
-  width: 100%;
-  margin-bottom: 16px;
-  margin-top: 8px;
-  font-size: 1.5em;
-`;
