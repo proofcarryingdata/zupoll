@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import styled, { css } from "styled-components";
 import { PollType, UserType } from "../src/types";
 import { ZupollError } from "./shared/ErrorOverlay";
@@ -38,46 +38,36 @@ export function Poll({
     return `${percentVal}%`;
   };
 
-  // Add state to track whether to show poll results or not
-  const [showResults, setShowResults] = useState(true);
-
   return (
     <PollWrapper>
-      <PollHeader>
-        {poll.body}
-        {/* <ArrowWrapper onClick={() => setShowResults(!showResults)}>
-          {showResults ? "⏫" : "⏬"}
-        </ArrowWrapper> */}
-      </PollHeader>
-      {/* Show poll results if showResults is true */}
-      {showResults && (
-        <PollOptions>
-          {poll.options.map((opt, idx) => (
-            <PollOption
-              canVote={canVote}
-              key={idx}
-              onClick={() => {
-                if (voter && canVote) {
-                  if (
-                    confirm(`Are you sure you want to vote for option ${opt}?`)
-                  ) {
-                    voter(idx);
-                  }
+      <PollHeader>{poll.body}</PollHeader>
+
+      <PollOptions>
+        {poll.options.map((opt, idx) => (
+          <PollOption
+            canVote={canVote}
+            key={idx}
+            onClick={() => {
+              if (voter && canVote) {
+                if (
+                  confirm(`Are you sure you want to vote for option ${opt}?`)
+                ) {
+                  voter(idx);
                 }
-              }}
-            >
-              <PollProgressBar
-                percent={totalVotes === 0 ? 0 : statistics[idx] / totalVotes}
-                isMax={maxVote === statistics[idx]}
-              />
-              <PollResult>
-                {getVoteDisplay(statistics[idx], totalVotes)}
-              </PollResult>
-              <OptionString>{opt}</OptionString>
-            </PollOption>
-          ))}
-        </PollOptions>
-      )}
+              }
+            }}
+          >
+            <PollProgressBar
+              percent={totalVotes === 0 ? 0 : statistics[idx] / totalVotes}
+              isMax={maxVote === statistics[idx]}
+            />
+            <PollResult>
+              {getVoteDisplay(statistics[idx], totalVotes)}
+            </PollResult>
+            <OptionString>{opt}</OptionString>
+          </PollOption>
+        ))}
+      </PollOptions>
 
       <TotalVotesContainer>
         {totalVotes} vote{totalVotes !== 1 ? "s" : ""}

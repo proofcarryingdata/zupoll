@@ -74,7 +74,7 @@ export function usePollVote(
 
   const handleVote = useCallback(
     async (voteIdx: number) => {
-      setOption(voteIdx);
+      setOption(voteIdx.toString());
       votingState.current = VoteFormState.AWAITING_PCDSTR;
 
       if (!(voteIdx >= 0 && voteIdx < poll.options.length)) {
