@@ -2,8 +2,8 @@ import cors from "cors";
 import express, { NextFunction } from "express";
 import morgan from "morgan";
 import { ApplicationContext } from "../types";
-import { initHealthcheckRoutes } from "./routes/healthCheckRoutes";
 import { initAuthedRoutes } from "./routes/authedRoutes";
+import { initHealthcheckRoutes } from "./routes/healthCheckRoutes";
 import { initPCDRoutes } from "./routes/pcdRoutes";
 import { RouteInitializer } from "./types";
 

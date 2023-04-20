@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { listPolls } from "../src/api";
+import { listPolls } from "../../src/api";
+import { ZupollError } from "./ErrorOverlay";
 import { Poll } from "./Poll";
-import { ZupollError } from "./shared/ErrorOverlay";
 
 /**
  * Shows the user with access token a list of polls.

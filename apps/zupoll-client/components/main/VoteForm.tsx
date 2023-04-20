@@ -6,11 +6,11 @@ import { generateMessageHash } from "@pcd/semaphore-signature-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { doVote } from "../src/api";
-import { UserType, VoteRequest, VoteSignal } from "../src/types";
-import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../src/util";
+import { doVote } from "../../src/api";
+import { UserType, VoteRequest, VoteSignal } from "../../src/types";
+import { PASSPORT_URL, SEMAPHORE_GROUP_URL } from "../../src/util";
+import { ZupollError } from "./ErrorOverlay";
 import { Poll } from "./Poll";
-import { ZupollError } from "./shared/ErrorOverlay";
 
 enum VoteFormState {
   DEFAULT,

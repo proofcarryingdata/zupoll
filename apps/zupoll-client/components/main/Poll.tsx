@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import styled, { css } from "styled-components";
-import { PollType, UserType } from "../src/types";
-import { ZupollError } from "./shared/ErrorOverlay";
+import { PollType, UserType } from "../../src/types";
+import { ZupollError } from "./ErrorOverlay";
 import { usePollVote, votedOn } from "./VoteForm";
 
 export function Poll({
@@ -21,7 +21,6 @@ export function Poll({
     return !votedOn(poll.id) && !expired;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expired, poll.id, poll]);
-
 
   const maxVote = Math.max(...poll.votes);
 
