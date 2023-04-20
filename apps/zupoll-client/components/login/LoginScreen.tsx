@@ -4,10 +4,10 @@ import { Login } from "./Login";
 
 export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
   return (
-    <Bg>
+    <Center>
       <Header>
         <Logo src="/zuzalulogo.webp" alt="Zuzalu" width="160" height="42" />
-        <H1>Polling</H1>
+        <H1>Zuzalu Polls</H1>
       </Header>
       <Body>
         <Description>
@@ -38,7 +38,7 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
           />
         </LoginRow>
       </Body>
-    </Bg>
+    </Center>
   );
 }
 
@@ -53,8 +53,10 @@ const H1 = styled.h1`
   font-size: 1.8rem;
 `;
 
-const Bg = styled.div`
-  max-width: 512px;
+const Center = styled.div`
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 0 1rem;
 `;
 
 const Description = styled.div`

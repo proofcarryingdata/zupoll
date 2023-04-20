@@ -52,7 +52,7 @@ function parseJwt(token: string) {
 
 const Center = styled.div`
   width: 100%;
-  max-width: 512px;
+  max-width: 580px;
   padding: 0 1rem;
   margin: 0 auto;
 `;
