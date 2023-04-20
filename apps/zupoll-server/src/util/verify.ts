@@ -7,6 +7,10 @@ import {
   generateMessageHash,
   SemaphoreSignaturePCDPackage,
 } from "@pcd/semaphore-signature-pcd";
+import { sha256 } from "js-sha256";
+import stableStringify from "json-stable-stringify";
+
+const merkleRootCache: Record<string, string> = {};
 
 // Returns nullfier or throws error.
 export async function verifyGroupProof(
@@ -45,8 +49,16 @@ export async function verifyGroupProof(
   const response = await fetch(semaphoreGroupUrl);
   const json = await response.text();
   const serializedGroup = JSON.parse(json) as SerializedSemaphoreGroup;
-  const group = deserializeSemaphoreGroup(serializedGroup);
-  if (pcd.claim.merkleRoot !== group.root.toString()) {
+  const serializedGroupHash = sha256(stableStringify(serializedGroup));
+  let groupRoot: string;
+  if (serializedGroupHash in merkleRootCache) {
+    groupRoot = merkleRootCache[serializedGroupHash];
+  } else {
+    const group = deserializeSemaphoreGroup(serializedGroup);
+    groupRoot = group.root.toString();
+    merkleRootCache[serializedGroupHash] = groupRoot;
+  }
+  if (pcd.claim.merkleRoot !== groupRoot) {
     throw new Error(
       "semaphoreGroupUrl doesn't match claim group merkletree root"
     );
