@@ -70,13 +70,9 @@ export function CreatePoll({
 
     async function doRequest() {
       setLoading(true);
-      await new Promise<void>((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 5000);
-      });
       const res = await createPoll(request);
       setLoading(false);
+
       if (!res.ok) {
         const resErr = await res.text();
         console.error("error posting post to the server: ", resErr);
