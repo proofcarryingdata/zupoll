@@ -47,7 +47,7 @@ export function Polls({
         return;
       }
 
-      if (res.status === 401) {
+      if (res.status === 403) {
         resetToken();
         return;
       }

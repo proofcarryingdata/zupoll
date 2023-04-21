@@ -13,7 +13,7 @@ export const SEMAPHORE_GROUP_URL = IS_PROD
 export const SEMAPHORE_ADMIN_GROUP_URL = IS_PROD
   ? process.env.SEMAPHORE_ADMIN_GROUP_URL
   : "http://localhost:3002/semaphore/4";
-  
+
 export const PASSPORT_SERVER = IS_PROD ? process.env.PASSPORT_SERVER : "http://localhost:3002/";
 
 export interface GroupJwtPayload extends JwtPayload {
@@ -31,9 +31,8 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
         return res.sendStatus(403);
       }
 
-      const payload = group as GroupJwtPayload;
-
-      // Maybe we want to gate?
+      // Code to gate certain information
+      // const payload = group as GroupJwtPayload;
       // if (SEMAPHORE_GROUP_URL.includes(payload.groupUrl)) {
       //     return res.sendStatus(403);
       // }
