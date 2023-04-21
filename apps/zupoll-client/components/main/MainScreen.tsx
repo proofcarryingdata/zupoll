@@ -60,8 +60,8 @@ const Center = styled.div`
 const LoggedInHeader = styled.div`
   width: 100%;
   font-size: 2em;
-  margin-bottom: 32px;
-  margin-top: 32px;
+  margin-bottom: 2rem;
+  margin-top: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;

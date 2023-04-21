@@ -7,7 +7,7 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
     <Center>
       <Header>
         <Logo src="/zuzalulogo.webp" alt="Zuzalu" width="160" height="42" />
-        <H1>Zuzalu Polls</H1>
+        <H1>Polls</H1>
       </Header>
       <Body>
         <Description>
@@ -18,10 +18,6 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
             The server never learns who you are. The Zuzalu Passport creates a
             zero-knowledge proof that you're a participant without revealing
             which one.
-          </p>
-          <p>
-            You can also log in as an organizer, letting you create your own
-            polls.
           </p>
         </Description>
         <LoginRow>
@@ -61,14 +57,16 @@ const Center = styled.div`
 
 const Description = styled.div`
   font-size: 1.2rem;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
   margin-top: -0.75rem;
+  text-align: center;
 `;
 
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
-  margin: 1rem 0;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
   padding: 0 1rem 0 0.25rem;
 `;
 
@@ -81,6 +79,6 @@ const Body = styled.div`
 const LoginRow = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: left;
+  justify-content: center;
   gap: 1rem;
 `;

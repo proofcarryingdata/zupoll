@@ -171,6 +171,7 @@ const Container = styled.div`
   border-radius: 1rem;
   width: 100%;
   padding: 1rem;
+  margin-bottom: 1rem;
 `;
 
 const SubmitRow = styled.div`
@@ -196,7 +197,7 @@ const StyledInput = styled.input`
 
 const StyledLabel = styled.label`
   margin-bottom: 0.5rem;
-  font-size: 16rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;

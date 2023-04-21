@@ -126,6 +126,7 @@ const PollHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.75rem;
+  font-weight: 600;
   /* font-size: 1.1em; */
 `;
 
