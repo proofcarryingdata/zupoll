@@ -17,6 +17,16 @@ enum VoteFormState {
     RECEIVED_PCDSTR,
 }
 
+/**
+ * Returns a function that handles all logic pertaining to voting on a specific
+ * vote option.
+ * 
+ * @param poll Definition of the poll being voted on
+ * @param onError Set to any error to display on ErrorOverlay
+ * @param onVoted Set to new vote to reset poll feed after vote is confirmed
+ * @param setServerLoading Set to true if we are waiting for server response
+ * @returns 
+ */
 export function usePollVote(
     poll: PollDefinition,
     onError: (err: ZupollError) => void,
