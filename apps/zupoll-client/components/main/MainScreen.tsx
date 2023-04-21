@@ -9,9 +9,11 @@ import { ZupollError } from "../../src/types";
 
 export function MainScreen({
   token,
+  resetToken,
   onLogout,
 }: {
   token: string;
+  resetToken: () => void;
   onLogout: () => void;
 }) {
   const [newPoll, setNewPoll] = useState<string>();
@@ -36,7 +38,7 @@ export function MainScreen({
         <CreatePoll onCreated={setNewPoll} onError={onError} />
       )}
 
-      <Polls accessToken={token} newPoll={newPoll} onError={onError} />
+      <Polls accessToken={token} newPoll={newPoll} resetToken={resetToken} onError={onError} />
 
       {error && (
         <ErrorOverlay error={error} onClose={() => setError(undefined)} />

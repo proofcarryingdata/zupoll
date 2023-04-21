@@ -31,8 +31,6 @@ export function initAuthedRoutes(
   );
 
   app.get("/polls", authenticateJWT, async (req: Request, res: Response) => {
-    // TODO: do we need pagination
-
     const polls = await prisma.poll.findMany({
       include: {
         votes: {

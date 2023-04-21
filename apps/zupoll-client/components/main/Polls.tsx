@@ -7,16 +7,20 @@ import { Poll } from "./Poll";
 
 /**
  * Shows the user with access token a list of polls.
+ * 
  * @param accessToken jwt used to authenticate to the server
  * @param newPoll the new poll string
+ * @param resetToken resets the auth token in case it expired
  */
 export function Polls({
   accessToken,
   newPoll,
+  resetToken,
   onError,
 }: {
   accessToken: string | null;
   newPoll: string | undefined;
+  resetToken: () => void;
   onError: (err: ZupollError) => void;
 }) {
   const [polls, setPolls] = useState<Array<PollDefinition>>([]);
@@ -31,11 +35,27 @@ export function Polls({
 
     (async () => {
       setLoading(true);
-      const resp = await listPolls(accessToken);
+      const res = await listPolls(accessToken);
       setLoading(false);
-      setPolls(resp["polls"]);
+
+      if (res === undefined) {
+        const serverDownError: ZupollError = {
+          title: "Retrieving polls failed",
+          message: "Server is down. Contact passport@0xparc.org."
+        };
+        onError(serverDownError);
+        return;
+      }
+
+      if (res.status === 403) {
+        resetToken();
+        return;
+      }
+
+      const polls = await res.json();
+      setPolls(polls["polls"]);
     })();
-  }, [accessToken, newPoll, newVote]);
+  }, [accessToken, newPoll, newVote, onError, resetToken]);
 
   return (
     <PollsContainer>

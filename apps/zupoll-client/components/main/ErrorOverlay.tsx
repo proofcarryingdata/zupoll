@@ -10,6 +10,7 @@ export function ErrorOverlay({
   error: ZupollError;
   onClose: () => void;
 }) {
+  console.log(error);
   return (
     <Overlay onClose={onClose}>
       <br />

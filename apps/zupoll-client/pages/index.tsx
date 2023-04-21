@@ -29,14 +29,13 @@ export default function Page() {
       {loading ? (
         <RippleLoader />
       ) : token ? (
-        <MainScreen token={token} onLogout={logout} />
+        <MainScreen token={token} resetToken={() => setToken(undefined)} onLogout={logout} />
       ) : (
         <LoginScreen onLogin={saveToken} />
       )}
     </Wrapper>
   );
 }
-
 
 const Wrapper = styled.div`
   display: flex;
