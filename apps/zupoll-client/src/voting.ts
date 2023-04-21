@@ -64,10 +64,10 @@ export function usePollVote(
             setServerLoading(false);
 
             if (res === undefined) {
-                const serverDownError = {
+                const serverDownError: ZupollError = {
                     title: "Voting failed",
                     message: "Server is down. Contact passport@0xparc.org."
-                } as ZupollError;
+                };
                 onError(serverDownError);
                 return;
             }
@@ -75,10 +75,10 @@ export function usePollVote(
             if (!res.ok) {
                 const resErr = await res.text();
                 console.error("error posting vote to the server: ", resErr);
-                const err = {
+                const err: ZupollError = {
                     title: "Voting failed",
                     message: `Server Error: ${resErr}`,
-                } as ZupollError;
+                };
                 onError(err);
                 return;
             }
@@ -100,10 +100,10 @@ export function usePollVote(
             votingState.current = VoteFormState.AWAITING_PCDSTR;
 
             if (!(voteIdx >= 0 && voteIdx < poll.options.length)) {
-                const err = {
+                const err: ZupollError = {
                     title: "Voting failed",
                     message: "Invalid option selected.",
-                } as ZupollError;
+                };
                 onError(err);
                 return;
             }

@@ -3,7 +3,7 @@ import { CreatePollRequest, VoteRequest } from "./types";
 
 export async function createPoll(
   request: CreatePollRequest
-): Promise<any> {
+): Promise<Response | undefined> {
   const url = `${ZUPOLL_SERVER_URL}create-poll`;
 
   try {
@@ -17,13 +17,14 @@ export async function createPoll(
     });
     return await res;
   } catch (e) {
+    console.log(e);
     return undefined;
   }
 }
 
 export async function doVote(
   request: VoteRequest
-): Promise<any> {
+): Promise<Response | undefined> {
   const url = `${ZUPOLL_SERVER_URL}vote`;
 
   try {
@@ -36,7 +37,8 @@ export async function doVote(
       },
     });
     return await res;
-  } catch {
+  } catch (e) {
+    console.log(e);
     return undefined;
   }
 }
@@ -44,7 +46,7 @@ export async function doVote(
 export async function login(
   semaphoreGroupUrl: string,
   pcdStr: string
-): Promise<any> {
+): Promise<Response | undefined> {
   const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
 
   const request = {
@@ -64,14 +66,15 @@ export async function login(
     });
     return await res;
   } catch (e) {
+    console.log(e);
     return undefined;
   }
 }
 
 export async function listPolls(
   accessToken: string | null
-): Promise<any> {
-  if (!accessToken) return null;
+): Promise<Response | undefined> {
+  if (!accessToken) return undefined;
 
   const url = `${ZUPOLL_SERVER_URL}polls`;
 
@@ -79,9 +82,10 @@ export async function listPolls(
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
-    if (!res.ok) return null;
-    return await res.json();
+    if (!res.ok) return undefined;
+    return await res;
   } catch (e) {
+    console.log(e);
     return undefined;
   }
 }

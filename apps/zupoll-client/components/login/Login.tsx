@@ -47,10 +47,10 @@ export function Login({
         const token = await fetchLoginToken(requestedGroup, pcdStr);
         onLogin(token);
       } catch (err: any) {
-        const loginError = {
+        const loginError: ZupollError = {
           title: "Login failed",
           message: err.message,
-        } as ZupollError;
+        };
         onError(loginError);
       }
       setLoggingIn(false);

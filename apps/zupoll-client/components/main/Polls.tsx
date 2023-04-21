@@ -35,15 +35,16 @@ export function Polls({
       setLoading(false);
 
       if (res === undefined) {
-        const serverDownError = {
+        const serverDownError: ZupollError = {
           title: "Retrieving polls failed",
           message: "Server is down. Contact passport@0xparc.org."
-        } as ZupollError;
+        };
         onError(serverDownError);
         return;
       }
 
-      setPolls(res["polls"]);
+      const polls = await res.json();
+      setPolls(polls["polls"]);
     })();
   }, [accessToken, newPoll, newVote, onError]);
 
