@@ -3,8 +3,9 @@ import styled from "styled-components";
 import { SEMAPHORE_ADMIN_GROUP_URL } from "../../src/util";
 import { Button } from "../core/Button";
 import { CreatePoll } from "./CreatePoll";
-import { ErrorOverlay, ZupollError } from "./ErrorOverlay";
+import { ErrorOverlay } from "./ErrorOverlay";
 import { Polls } from "./Polls";
+import { ZupollError } from "../../src/types";
 
 export function MainScreen({
   token,

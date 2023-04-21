@@ -1,19 +1,21 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import styled, { css } from "styled-components";
-import { PollType, UserType } from "../../src/types";
-import { ZupollError } from "./ErrorOverlay";
-import { usePollVote, votedOn } from "./VoteForm";
+import { PollDefinition, ZupollError } from "../../src/types";
+import { usePollVote, votedOn } from "../../src/voting";
+import { RippleLoader } from "../core/RippleLoader";
 
 export function Poll({
   poll,
   onError,
   onVoted,
 }: {
-  poll: Poll;
+  poll: PollDefinition;
   onError: (err: ZupollError) => void;
   onVoted: (id: string) => void;
 }) {
-  const voter = usePollVote(poll, onError, onVoted);
+  const [serverLoading, setServerLoading] = useState<boolean>(false);
+
+  const voter = usePollVote(poll, onError, onVoted, setServerLoading);
   const totalVotes = poll.votes.reduce((a, b) => a + b, 0);
   const expired = new Date(poll.expiry) < new Date();
 
@@ -35,7 +37,10 @@ export function Poll({
 
   return (
     <PollWrapper>
-      <PollHeader>{poll.body}</PollHeader>
+      <PollHeader>
+        {poll.body}
+        {serverLoading ? <RippleLoader /> : <></>}
+      </PollHeader>
 
       <PollOptions>
         {poll.options.map((opt, idx) => (
@@ -72,27 +77,9 @@ export function Poll({
           : "Expires " + new Date(poll.expiry).toLocaleString()}
         {canVote ? " · Can Vote" : ""}
       </TotalVotesContainer>
-    </PollWrapper>
+    </PollWrapper >
   );
 }
-
-export type Poll = {
-  id: string;
-  createdAt: string;
-  pollsterType: UserType;
-  pollsterNullifier: string;
-  pollsterSemaphoreGroupUrl: string | null;
-  pollsterName: string | null;
-  pollsterUuid: string | null;
-  pollsterCommitment: string | null;
-  pollType: PollType;
-  body: string;
-  expiry: string;
-  options: string[];
-  voterSemaphoreGroupUrls: string[];
-  votes: number[];
-  proof: string;
-};
 
 const PollWrapper = styled.div`
   box-sizing: border-box;
@@ -125,9 +112,8 @@ const PollHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
   font-weight: 600;
-  /* font-size: 1.1em; */
 `;
 
 const PollOptions = styled.div`

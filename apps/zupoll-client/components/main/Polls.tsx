@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { listPolls } from "../../src/api";
-import { ZupollError } from "./ErrorOverlay";
+import { ZupollError, PollDefinition } from "../../src/types";
 import { Poll } from "./Poll";
 
 /**
@@ -18,7 +18,7 @@ export function Polls({
   newPoll: string | undefined;
   onError: (err: ZupollError) => void;
 }) {
-  const [polls, setPolls] = useState<Array<Poll>>([]);
+  const [polls, setPolls] = useState<Array<PollDefinition>>([]);
   const [newVote, setNewVote] = useState<string | undefined>();
 
   useEffect(() => {

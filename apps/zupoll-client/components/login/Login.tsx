@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { login } from "../../src/api";
 import { PASSPORT_URL } from "../../src/util";
 import { Button } from "../core/Button";
-import { ErrorOverlay, ZupollError } from "../main/ErrorOverlay";
+import { ErrorOverlay } from "../main/ErrorOverlay";
+import { ZupollError } from "../../src/types";
 
 /**
  * Login for the user who belongs to the specified semaphore group.

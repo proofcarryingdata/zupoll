@@ -21,7 +21,7 @@ import {
 } from "../../src/util";
 import { Button } from "../core/Button";
 import { RippleLoader } from "../core/RippleLoader";
-import { ZupollError } from "./ErrorOverlay";
+import { ZupollError } from "../../src/types";
 
 enum CreatePollState {
   DEFAULT,
