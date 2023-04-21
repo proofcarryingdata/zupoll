@@ -73,16 +73,26 @@ export function CreatePoll({
       const res = await createPoll(request);
       setLoading(false);
 
+      if (res === undefined) {
+        const serverDownError = {
+          title: "Creating poll failed",
+          message: "Server is down. Contact passport@0xparc.org."
+        } as ZupollError;
+        onError(serverDownError);
+        return;
+      }
+
       if (!res.ok) {
         const resErr = await res.text();
         console.error("error posting post to the server: ", resErr);
         const err = {
           title: "Create poll failed",
-          message: `Server Error: ${resErr}`,
+          message: `Server error: ${resErr}`,
         } as ZupollError;
         onError(err);
         return;
       }
+
       onCreated(pollBody);
       setPollBody("");
       setPollOptions([]);

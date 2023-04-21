@@ -3,9 +3,12 @@ import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../../src/util";
 import { Login } from "./Login";
 import { RippleLoader } from "../core/RippleLoader";
 import { useState } from "react";
+import { ErrorOverlay } from "../main/ErrorOverlay";
+import { ZupollError } from "../../src/types";
 
 export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
   const [serverLoading, setServerLoading] = useState<boolean>(false);
+  const [error, setError] = useState<ZupollError>();
 
   return (
     <Center>
@@ -32,13 +35,15 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
               <>
                 <Login
                   onLogin={onLogin}
-                  onServerLoading={() => setServerLoading(true)}
+                  onError={setError}
+                  setServerLoading={setServerLoading}
                   requestedGroup={SEMAPHORE_GROUP_URL}
                   prompt="Log in to vote"
                 />
                 <Login
                   onLogin={onLogin}
-                  onServerLoading={() => setServerLoading(true)}
+                  onError={setError}
+                  setServerLoading={setServerLoading}
                   requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
                   prompt="Log in as an organizer"
                   deemphasized
@@ -46,9 +51,12 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
               </>
             )
           }
-
         </LoginRow>
       </Body>
+
+      {error && (
+        <ErrorOverlay error={error} onClose={() => setError(undefined)} />
+      )}
     </Center>
   );
 }

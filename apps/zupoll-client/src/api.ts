@@ -3,32 +3,42 @@ import { CreatePollRequest, VoteRequest } from "./types";
 
 export async function createPoll(
   request: CreatePollRequest
-): Promise<Response> {
+): Promise<any> {
   const url = `${ZUPOLL_SERVER_URL}create-poll`;
 
-  return await fetch(url, {
-    method: "POST",
-    body: JSON.stringify(request),
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
+  try {
+    const res = fetch(url, {
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+    return await res;
+  } catch (e) {
+    return undefined;
+  }
 }
 
 export async function doVote(
   request: VoteRequest
-): Promise<Response> {
+): Promise<any> {
   const url = `${ZUPOLL_SERVER_URL}vote`;
 
-  return await fetch(url, {
-    method: "POST",
-    body: JSON.stringify(request),
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
+  try {
+    const res = fetch(url, {
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+    return await res;
+  } catch {
+    return undefined;
+  }
 }
 
 export async function login(
@@ -43,14 +53,19 @@ export async function login(
   };
   const url = `${ZUPOLL_SERVER_URL}login`;
 
-  return await fetch(url, {
-    method: "POST",
-    body: JSON.stringify(request),
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
+  try {
+    const res = fetch(url, {
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+    return await res;
+  } catch (e) {
+    return undefined;
+  }
 }
 
 export async function listPolls(
@@ -58,15 +73,15 @@ export async function listPolls(
 ): Promise<any> {
   if (!accessToken) return null;
 
-  // const query = new URLSearchParams({
-  //   page: page.toString(),
-  //   limit: limit.toString()
-  // }).toString();
   const url = `${ZUPOLL_SERVER_URL}polls`;
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${accessToken}` }
-  });
 
-  if (!res.ok) return null;
-  return await res.json();
+  try {
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    return undefined;
+  }
 }

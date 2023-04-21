@@ -63,6 +63,15 @@ export function usePollVote(
             const res = await doVote(request);
             setServerLoading(false);
 
+            if (res === undefined) {
+                const serverDownError = {
+                    title: "Voting failed",
+                    message: "Server is down. Contact passport@0xparc.org."
+                } as ZupollError;
+                onError(serverDownError);
+                return;
+            }
+
             if (!res.ok) {
                 const resErr = await res.text();
                 console.error("error posting vote to the server: ", resErr);
@@ -73,8 +82,8 @@ export function usePollVote(
                 onError(err);
                 return;
             }
-            const newVote = await res.json();
 
+            const newVote = await res.json();
             const newVoted = getVoted();
             newVoted.push(poll.id);
             setVoted(newVoted);

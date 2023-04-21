@@ -7,6 +7,7 @@ import { login } from "../../src/api";
 import { PASSPORT_URL } from "../../src/util";
 import { Button } from "../core/Button";
 import { ErrorOverlay } from "../main/ErrorOverlay";
+import { serializeSemaphoreGroup } from "@pcd/semaphore-group-pcd";
 import { ZupollError } from "../../src/types";
 
 /**
@@ -18,38 +19,45 @@ import { ZupollError } from "../../src/types";
  */
 export function Login({
   onLogin,
-  onServerLoading,
+  onError,
+  setServerLoading,
   requestedGroup,
   prompt,
   deemphasized,
 }: {
   onLogin: (token: string) => void;
-  onServerLoading: () => void;
+  onError: (error: ZupollError) => void;
+  setServerLoading: (loading: boolean) => void;
   requestedGroup: string;
   prompt: string;
   deemphasized?: boolean;
 }) {
-  const [error, setError] = useState<ZupollError>();
   const [loggingIn, setLoggingIn] = useState(false);
 
   const [pcdStr] = usePassportPopupMessages();
+
 
   useEffect(() => {
     if (!loggingIn) return;
     if (!pcdStr) return;
 
     (async () => {
+      let loginError = undefined;
       try {
-        onServerLoading();
+        setServerLoading(true);
         const token = await fetchLoginToken(requestedGroup, pcdStr);
         onLogin(token);
       } catch (err: any) {
-        setError({ title: "Login failed", message: err.message });
-      } finally {
-        setLoggingIn(false);
+        loginError = {
+          title: "Login failed",
+          message: err.message,
+        } as ZupollError;
+        onError(loginError);
       }
+      setLoggingIn(false);
+      setServerLoading(false);
     })();
-  }, [pcdStr, loggingIn, requestedGroup, onLogin, onServerLoading]);
+  }, [pcdStr, loggingIn, requestedGroup, onLogin, onError, setServerLoading]);
 
   return (
     <>
@@ -68,15 +76,15 @@ export function Login({
       >
         {prompt}
       </Button>
-      {error && (
-        <ErrorOverlay error={error} onClose={() => setError(undefined)} />
-      )}
     </>
   );
 }
 
 async function fetchLoginToken(requestedGroup: string, pcdStr: string) {
   const res = await login(requestedGroup, pcdStr);
+  if (res === undefined) {
+    throw new Error("Server is down. Contact passport@0xparc.org.")
+  }
   if (!res.ok) {
     const resErr = await res.text();
     console.error("Login error", resErr);

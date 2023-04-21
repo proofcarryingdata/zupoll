@@ -31,11 +31,21 @@ export function Polls({
 
     (async () => {
       setLoading(true);
-      const resp = await listPolls(accessToken);
+      const res = await listPolls(accessToken);
       setLoading(false);
-      setPolls(resp["polls"]);
+
+      if (res === undefined) {
+        const serverDownError = {
+          title: "Retrieving polls failed",
+          message: "Server is down. Contact passport@0xparc.org."
+        } as ZupollError;
+        onError(serverDownError);
+        return;
+      }
+
+      setPolls(res["polls"]);
     })();
-  }, [accessToken, newPoll, newVote]);
+  }, [accessToken, newPoll, newVote, onError]);
 
   return (
     <PollsContainer>
