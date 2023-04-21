@@ -96,7 +96,7 @@ export function initPCDRoutes(
             id: newPoll.id,
           });
         } else {
-          throw new Error("Unknown pollster type");
+          throw new Error("Unknown pollster type.");
         }
 
         res.send("ok");
@@ -122,20 +122,23 @@ export function initPCDRoutes(
           id: request.pollId,
         },
       });
+
       if (poll === null) {
-        throw new Error("Invalid pollId");
+        throw new Error("Invalid poll id.");
       }
       if (request.voteIdx < 0 || request.voteIdx >= poll.options.length) {
-        throw new Error("Invalid vote idx");
+        throw new Error("Invalid vote option.");
       }
-
       if (poll.expiry < new Date()) {
         throw new Error("Poll has expired.");
+      }
+      if (request.voterSemaphoreGroupUrl === undefined) {
+        throw new Error("No Semaphore group URL attached.")
       }
 
       if (request.voterType == UserType.ANON) {
         const nullifier = await verifyGroupProof(
-          request.voterSemaphoreGroupUrl!,
+          request.voterSemaphoreGroupUrl,
           request.proof,
           {
             signal: signalHash,
@@ -150,7 +153,7 @@ export function initPCDRoutes(
           },
         });
         if (previousVote !== null) {
-          throw new Error("User has already voted");
+          throw new Error("User has already voted.");
         }
 
         const newVote = await prisma.vote.create({
@@ -196,7 +199,7 @@ export function initPCDRoutes(
           id: newVote.id,
         });
       } else {
-        throw new Error("Unknown voter type");
+        throw new Error("Unknown voter type.");
       }
     } catch (e) {
       console.error(e);

@@ -23,40 +23,42 @@ export async function verifyGroupProof(
     !options.allowedGroups.includes(semaphoreGroupUrl)
   ) {
     throw new Error(
-      `Not in semaphore groups allowed to perform action. expected ${options.allowedGroups} actual: ${semaphoreGroupUrl}`
+      `Not in Semaphore groups allowed to perform action.`
     );
   }
 
   const pcd = await SemaphoreGroupPCDPackage.deserialize(proof);
+  const verified = await SemaphoreGroupPCDPackage.verify(pcd);
+  if (!verified) {
+    throw new Error("Invalid proof.");
+  }
+
+  // check externalNullifier
   if (
     options.claimedExtNullifier &&
     generateMessageHash(options.claimedExtNullifier).toString() !=
-      pcd.claim.externalNullifier
+    pcd.claim.externalNullifier
   ) {
-    throw new Error("invalid external nullifier in proof");
+    throw new Error("Invalid external nullifier in proof.");
   }
 
-  const verified = await SemaphoreGroupPCDPackage.verify(pcd);
-  if (!verified) {
-    throw new Error("invalid proof");
+  // check signal
+  if (
+    options.signal &&
+    pcd.claim.signal !== generateMessageHash(options.signal).toString()
+  ) {
+    throw new Error("Posted signal doesn't match signal in claim.");
   }
 
-  // check semaphoreGroupUrl matches the claim
+  // check semaphoreGroupUrl
   const response = await fetch(semaphoreGroupUrl);
   const json = await response.text();
   const serializedGroup = JSON.parse(json) as SerializedSemaphoreGroup;
   const group = deserializeSemaphoreGroup(serializedGroup);
   if (pcd.claim.merkleRoot !== group.root.toString()) {
     throw new Error(
-      "semaphoreGroupUrl doesn't match claim group merkletree root"
+      "Current root doesn't match claim group merkle tree root."
     );
-  }
-
-  if (
-    options.signal &&
-    pcd.claim.signal !== generateMessageHash(options.signal).toString()
-  ) {
-    throw new Error("signal doesn't match claim");
   }
 
   return pcd.claim.nullifierHash;
