@@ -82,7 +82,6 @@ export async function listPolls(
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
-    if (!res.ok) return undefined;
     return await res;
   } catch (e) {
     console.log(e);
