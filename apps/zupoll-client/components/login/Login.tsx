@@ -42,13 +42,12 @@ export function Login({
     if (!pcdStr) return;
 
     (async () => {
-      let loginError = undefined;
       try {
         setServerLoading(true);
         const token = await fetchLoginToken(requestedGroup, pcdStr);
         onLogin(token);
       } catch (err: any) {
-        loginError = {
+        const loginError = {
           title: "Login failed",
           message: err.message,
         } as ZupollError;
