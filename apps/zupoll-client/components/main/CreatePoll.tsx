@@ -20,6 +20,7 @@ import {
   SEMAPHORE_GROUP_URL,
 } from "../../src/util";
 import { Button } from "../core/Button";
+import { RippleLoader } from "../core/RippleLoader";
 import { ZupollError } from "./ErrorOverlay";
 
 enum CreatePollState {
@@ -41,6 +42,7 @@ export function CreatePoll({
   const [pollExpiry, setPollExpiry] = useState<Date>(
     new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
   );
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
 
@@ -67,7 +69,14 @@ export function CreatePoll({
     };
 
     async function doRequest() {
+      setLoading(true);
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 5000);
+      });
       const res = await createPoll(request);
+      setLoading(false);
       if (!res.ok) {
         const resErr = await res.text();
         console.error("error posting post to the server: ", resErr);
@@ -156,7 +165,11 @@ export function CreatePoll({
           />
         </StyledLabel>
         <SubmitRow>
-          <Button type="submit">Create Poll</Button>
+          {loading ? (
+            <RippleLoader />
+          ) : (
+            <Button type="submit">Create Poll</Button>
+          )}
         </SubmitRow>
       </StyledForm>
     </Container>
