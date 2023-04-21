@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { listPolls } from "../../src/api";
-import { ZupollError } from "./ErrorOverlay";
+import { ZupollError, PollDefinition } from "../../src/types";
+import { RippleLoaderLight } from "../core/RippleLoader";
 import { Poll } from "./Poll";
 
 /**
@@ -18,8 +19,9 @@ export function Polls({
   newPoll: string | undefined;
   onError: (err: ZupollError) => void;
 }) {
-  const [polls, setPolls] = useState<Array<Poll>>([]);
+  const [polls, setPolls] = useState<Array<PollDefinition>>([]);
   const [newVote, setNewVote] = useState<string | undefined>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (!accessToken) {
@@ -28,22 +30,29 @@ export function Polls({
     }
 
     (async () => {
-      // TODO: paging
+      setLoading(true);
       const resp = await listPolls(accessToken);
+      setLoading(false);
       setPolls(resp["polls"]);
     })();
   }, [accessToken, newPoll, newVote]);
 
   return (
     <PollsContainer>
-      {polls.map((poll) => (
-        <Poll
-          key={poll.id}
-          poll={poll}
-          onError={onError}
-          onVoted={setNewVote}
-        />
-      ))}
+      {
+        loading ? (
+          <RippleLoaderLight />
+        ) : (
+          polls.map((poll) => (
+            <Poll
+              key={poll.id}
+              poll={poll}
+              onError={onError}
+              onVoted={setNewVote}
+            />
+          ))
+        )
+      }
     </PollsContainer>
   );
 }

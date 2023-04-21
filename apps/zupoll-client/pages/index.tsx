@@ -2,12 +2,15 @@ import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
+import { RippleLoader } from "../components/core/RippleLoader";
 
 export default function Page() {
   const [token, setToken] = useState<string>();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     setToken(window.localStorage["access_token"]);
+    setLoading(false);
   }, [setToken]);
 
   const saveToken = useCallback(
@@ -23,7 +26,9 @@ export default function Page() {
 
   return (
     <Wrapper>
-      {token ? (
+      {loading ? (
+        <RippleLoader />
+      ) : token ? (
         <MainScreen token={token} onLogout={logout} />
       ) : (
         <LoginScreen onLogin={saveToken} />
@@ -31,6 +36,7 @@ export default function Page() {
     </Wrapper>
   );
 }
+
 
 const Wrapper = styled.div`
   display: flex;

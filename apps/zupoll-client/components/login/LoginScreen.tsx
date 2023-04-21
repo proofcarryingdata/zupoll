@@ -1,8 +1,12 @@
 import styled from "styled-components";
 import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../../src/util";
 import { Login } from "./Login";
+import { RippleLoader } from "../core/RippleLoader";
+import { useState } from "react";
 
 export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
+  const [serverLoading, setServerLoading] = useState<boolean>(false);
+
   return (
     <Center>
       <Header>
@@ -21,17 +25,28 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
           </p>
         </Description>
         <LoginRow>
-          <Login
-            onLogin={onLogin}
-            requestedGroup={SEMAPHORE_GROUP_URL}
-            prompt="Log in to vote"
-          />
-          <Login
-            onLogin={onLogin}
-            requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
-            prompt="Log in as an organizer"
-            deemphasized
-          />
+          {
+            serverLoading ? (
+              <RippleLoader />
+            ) : (
+              <>
+                <Login
+                  onLogin={onLogin}
+                  onServerLoading={() => setServerLoading(true)}
+                  requestedGroup={SEMAPHORE_GROUP_URL}
+                  prompt="Log in to vote"
+                />
+                <Login
+                  onLogin={onLogin}
+                  onServerLoading={() => setServerLoading(true)}
+                  requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
+                  prompt="Log in as an organizer"
+                  deemphasized
+                />
+              </>
+            )
+          }
+
         </LoginRow>
       </Body>
     </Center>
@@ -73,7 +88,7 @@ const Header = styled.div`
 const Body = styled.div`
   background: #eee;
   border-radius: 1rem;
-  padding: 4rem;
+  padding: 2rem;
 `;
 
 const LoginRow = styled.div`

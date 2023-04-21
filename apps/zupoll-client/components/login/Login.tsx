@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { login } from "../../src/api";
 import { PASSPORT_URL } from "../../src/util";
 import { Button } from "../core/Button";
-import { ErrorOverlay, ZupollError } from "../main/ErrorOverlay";
+import { ErrorOverlay } from "../main/ErrorOverlay";
+import { ZupollError } from "../../src/types";
 
 /**
  * Login for the user who belongs to the specified semaphore group.
@@ -17,11 +18,13 @@ import { ErrorOverlay, ZupollError } from "../main/ErrorOverlay";
  */
 export function Login({
   onLogin,
+  onServerLoading,
   requestedGroup,
   prompt,
   deemphasized,
 }: {
   onLogin: (token: string) => void;
+  onServerLoading: () => void;
   requestedGroup: string;
   prompt: string;
   deemphasized?: boolean;
@@ -36,8 +39,8 @@ export function Login({
     if (!pcdStr) return;
 
     (async () => {
-      setLoggingIn(true);
       try {
+        onServerLoading();
         const token = await fetchLoginToken(requestedGroup, pcdStr);
         onLogin(token);
       } catch (err: any) {
@@ -46,7 +49,7 @@ export function Login({
         setLoggingIn(false);
       }
     })();
-  }, [pcdStr, loggingIn, requestedGroup, onLogin]);
+  }, [pcdStr, loggingIn, requestedGroup, onLogin, onServerLoading]);
 
   return (
     <>
