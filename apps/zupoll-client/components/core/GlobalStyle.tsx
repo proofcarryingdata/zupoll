@@ -3,7 +3,7 @@ import { createGlobalStyle } from "styled-components";
 export const GlobalStyle = createGlobalStyle`
   html {
     font-family: system-ui, sans-serif;
-    font-size: 16px;
+    font-size: 1rem;
     background: rgb(28, 41, 40);
   }
 
@@ -17,7 +17,7 @@ export const GlobalStyle = createGlobalStyle`
 
   @media screen and (max-width: 640px) {
     html {
-      font-size: 12px;
+      font-size: 0.75rem;
     }
   }
 `;

@@ -100,7 +100,7 @@ const PollWrapper = styled.div`
   border-bottom: none;
   background-color: #fcfcfc;
   width: 100%;
-  padding: 16px;
+  padding: 1rem;
   position: relative;
   font-family: system-ui, sans-serif;
   transition: 200ms;
@@ -125,7 +125,7 @@ const PollHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
   /* font-size: 1.1em; */
 `;
 
@@ -135,7 +135,7 @@ const PollOptions = styled.div`
   align-items: center;
   flex-direction: column;
   list-style-type: none;
-  gap: 12px;
+  gap: 0.75rem;
   width: 100%;
   box-sizing: border-box;
 `;
@@ -144,16 +144,16 @@ const PollOption = styled.span<{ canVote: boolean }>`
   ${({ canVote }) => css`
     overflow: hidden;
     position: relative;
-    padding: 6px 8px;
+    padding: 0.5rem 0.5rem;
     background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
+    border-radius: 0.5rem;
     width: 100%;
     box-sizing: border-box;
     display: flex;
     justify-content: flex-start;
     align-items: center;
     flex-direction: row;
-    gap: 8px;
+    gap: 0.5rem;
     border: 1px solid transparent;
 
     ${canVote &&
@@ -197,7 +197,7 @@ const OptionString = styled.span`
 `;
 
 const TotalVotesContainer = styled.div`
-  margin-top: 12px;
+  margin-top: 0.75rem;
   color: #666;
   font-size: 0.9em;
 `;

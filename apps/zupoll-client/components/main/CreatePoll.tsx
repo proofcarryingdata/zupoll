@@ -195,8 +195,8 @@ const StyledInput = styled.input`
 `;
 
 const StyledLabel = styled.label`
-  margin-bottom: 10px;
-  font-size: 16px;
+  margin-bottom: 0.5rem;
+  font-size: 16rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
