@@ -55,7 +55,7 @@ export function Polls({
       const polls = await res.json();
       setPolls(polls["polls"]);
     })();
-  }, [accessToken, newPoll, newVote, onError]);
+  }, [accessToken, newPoll, newVote, onError, resetToken]);
 
   return (
     <PollsContainer>

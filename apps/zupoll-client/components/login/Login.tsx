@@ -6,8 +6,6 @@ import { useEffect, useState } from "react";
 import { login } from "../../src/api";
 import { PASSPORT_URL } from "../../src/util";
 import { Button } from "../core/Button";
-import { ErrorOverlay } from "../main/ErrorOverlay";
-import { serializeSemaphoreGroup } from "@pcd/semaphore-group-pcd";
 import { ZupollError } from "../../src/types";
 
 /**
