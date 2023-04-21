@@ -13,9 +13,7 @@ export function Overlay({
 
   return (
     <ModalBg onClick={onClose}>
-      <ModalWrap onClick={ignore}>
-        {children}
-      </ModalWrap>
+      <ModalWrap onClick={ignore}>{children}</ModalWrap>
     </ModalBg>
   );
 }
@@ -33,13 +31,13 @@ const ModalBg = styled.div`
 
 const ModalWrap = styled.div`
   background: radial-gradient(circle, var(--bg-lite-gray), var(--bg-dark-gray));
-  top: 64px;
+  top: 4rem;
   left: 0;
   width: 100%;
   max-width: 420px;
-  margin: 64px auto 0 auto;
+  margin: 4rem auto 0 auto;
   min-height: 480px;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
   text-align: center;
 `;

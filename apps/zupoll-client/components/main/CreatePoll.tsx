@@ -7,20 +7,20 @@ import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { FormEventHandler, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { createPoll } from "../src/api";
+import { createPoll } from "../../src/api";
 import {
   CreatePollRequest,
   PollSignal,
   PollType,
   UserType,
-} from "../src/types";
+} from "../../src/types";
 import {
   PASSPORT_URL,
   SEMAPHORE_ADMIN_GROUP_URL,
   SEMAPHORE_GROUP_URL,
-} from "../src/util";
-import { Button } from "./core/Button";
-import { ZupollError } from "./shared/ErrorOverlay";
+} from "../../src/util";
+import { Button } from "../core/Button";
+import { ZupollError } from "./ErrorOverlay";
 
 enum CreatePollState {
   DEFAULT,
@@ -119,7 +119,6 @@ export function CreatePoll({
 
   return (
     <Container>
-      {/* <Header>Admin Create Poll</Header> */}
       <StyledForm onSubmit={handleSubmit}>
         <StyledLabel htmlFor="body">
           Question&nbsp;
@@ -130,10 +129,11 @@ export function CreatePoll({
             value={pollBody}
             onChange={(e) => setPollBody(e.target.value)}
             required
+            placeholder="Should we do this?"
           />
         </StyledLabel>
         <StyledLabel htmlFor="options">
-          Options (comma-seperated)&nbsp;
+          Options &nbsp;
           <StyledInput
             type="text"
             autoComplete="off"
@@ -141,6 +141,7 @@ export function CreatePoll({
             value={pollOptions.join(",")}
             onChange={(e) => setPollOptions(e.target.value.split(","))}
             required
+            placeholder="yes,no,maybe"
           />
         </StyledLabel>
         <StyledLabel htmlFor="expiry">
@@ -162,6 +163,17 @@ export function CreatePoll({
   );
 }
 
+const Container = styled.div`
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+  border: 1px solid #bbb;
+  background-color: #fcfcfc;
+  border-radius: 1rem;
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: 1rem;
+`;
+
 const SubmitRow = styled.div`
   width: 100%;
   display: flex;
@@ -176,32 +188,19 @@ const StyledForm = styled.form`
 `;
 
 const StyledInput = styled.input`
-  padding: 4px 8px;
-  border-radius: 4px;
-  margin-left: 5px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
   border: none;
   border: 1px solid #555;
   width: 50%;
 `;
 
 const StyledLabel = styled.label`
-  margin-bottom: 10px;
-  font-size: 16px;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   text-align: right;
-`;
-
-const Container = styled.div`
-  box-sizing: border-box;
-  font-family: system-ui, sans-serif;
-  border: 1px solid #bbb;
-  background-color: #fcfcfc;
-  border-radius: 4px;
-  width: 100%;
-  margin: 10px;
-  padding: 16px;
-  margin-bottom: 32px;
 `;
