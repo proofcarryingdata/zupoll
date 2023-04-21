@@ -43,14 +43,14 @@ export const RippleLoaderWrapper = styled.div`
   height: 100%;
 `;
 
-export const RippleLoaderInner = styled.div`
+export const RippleLoaderInner = styled.div<{ light: boolean }>`
   display: inline-block;
   position: relative;
   width: 2rem;
   height: 2rem;
   & > div {
     position: absolute;
-    border: 4px solid black;
+    border: 4px solid ${({ light }) => (light ? "white" : "black")};
     opacity: 1;
     border-radius: 50%;
     animation: ${ripple} 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
@@ -63,7 +63,18 @@ export const RippleLoaderInner = styled.div`
 export const RippleLoader = () => {
   return (
     <RippleLoaderWrapper>
-      <RippleLoaderInner>
+      <RippleLoaderInner light={false}>
+        <div></div>
+        <div></div>
+      </RippleLoaderInner>
+    </RippleLoaderWrapper>
+  );
+};
+
+export const RippleLoaderLight = () => {
+  return (
+    <RippleLoaderWrapper>
+      <RippleLoaderInner light={true}>
         <div></div>
         <div></div>
       </RippleLoaderInner>

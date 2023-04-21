@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { listPolls } from "../../src/api";
 import { ZupollError, PollDefinition } from "../../src/types";
-import { RippleLoader } from "../core/RippleLoader";
+import { RippleLoaderLight } from "../core/RippleLoader";
 import { Poll } from "./Poll";
 
 /**
@@ -41,7 +41,7 @@ export function Polls({
     <PollsContainer>
       {
         loading ? (
-          <RippleLoader />
+          <RippleLoaderLight />
         ) : (
           polls.map((poll) => (
             <Poll
