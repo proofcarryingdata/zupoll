@@ -89,7 +89,7 @@ export async function listPolls(
   }
 }
 
-export async function getLatestSemaphoreGroupUrl(groupId: string): Promise<string | null> {
+export async function getLatestSemaphoreGroupHash(groupId: string): Promise<string | null> {
   const url = `${PASSPORT_SERVER_URL}semaphore/latest-root/${encodeURIComponent(groupId)}`;
   const res = await fetch(url);
 
@@ -97,6 +97,10 @@ export async function getLatestSemaphoreGroupUrl(groupId: string): Promise<strin
     return null;
   }
 
-  const groupHash = await res.json();
-  return `${PASSPORT_SERVER_URL}semaphore/historic/${groupId}/${groupHash}`
+  const rootHash = await res.json();
+  return rootHash
+}
+
+export function getHistoricGroupUrl(groupId: string, rootHash: string): string {
+  return `${PASSPORT_SERVER_URL}semaphore/historic/${groupId}/${rootHash}`
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getLatestSemaphoreGroupUrl } from "./api";
+import { getHistoricGroupUrl, getLatestSemaphoreGroupHash } from "./api";
 import { ZupollError } from "./types";
 
 export function useHistoricSemaphoreUrl(
@@ -7,16 +7,16 @@ export function useHistoricSemaphoreUrl(
   onError: (error: ZupollError) => void
 ) {
   const [loading, setLoading] = useState(true);
-  const [url, setUrl] = useState<string | null>(null);
+  const [rootHash, setRootHash] = useState<string | null>(null);
 
   useEffect(() => {
-    if (url === null) return;
-    console.log(`using voter url: ${url}`)
-  }, [url])
+    if (rootHash === null) return;
+    console.log(`using voter url: ${rootHash}`)
+  }, [rootHash])
 
   useEffect(() => {
-    getLatestSemaphoreGroupUrl(semaphoreGroupId)
-      .then(url => setUrl(url))
+    getLatestSemaphoreGroupHash(semaphoreGroupId)
+      .then(url => setRootHash(url))
       .catch((e: Error) => {
         console.log(e);
         onError({
@@ -29,5 +29,9 @@ export function useHistoricSemaphoreUrl(
       });
   }, [onError, semaphoreGroupId])
 
-  return { loading, url }
+  return {
+    loading,
+    rootHash,
+    groupUrl: rootHash && getHistoricGroupUrl(semaphoreGroupId, rootHash)
+  }
 }

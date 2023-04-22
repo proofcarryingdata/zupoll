@@ -30,6 +30,7 @@ export type PollDefinition = {
   expiry: string;
   options: string[];
   voterSemaphoreGroupUrls: string[];
+  voterSemaphoreGroupRoots?: string[];
   votes: number[];
   proof: string;
 };
@@ -44,6 +45,7 @@ export type CreatePollRequest = {
   expiry: Date;
   options: string[];
   voterSemaphoreGroupUrls: string[];
+  voterSemaphoreGroupRoots?: string[];
   proof: string;
 };
 
@@ -54,6 +56,7 @@ export type PollSignal = {
   expiry: Date;
   options: string[];
   voterSemaphoreGroupUrls: string[];
+  voterSemaphoreGroupRoots?: string[];
 };
 
 export type VoteRequest = {
