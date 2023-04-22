@@ -11,7 +11,6 @@ import { createPoll } from "../../src/api";
 import {
   CreatePollRequest,
   PollSignal,
-  PollType,
   UserType,
   ZupollError,
 } from "../../src/types";

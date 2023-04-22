@@ -1,4 +1,4 @@
-import { BallotType, UserType } from "@prisma/client";
+import { Ballot, Poll, Vote, UserType, BallotType } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
@@ -21,22 +21,38 @@ export function initPCDRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as CreateBallotRequest;
 
-      // can't use nullifierhash inside signal cuz it is generated after signal is input into proof.
-      const signal: PollSignal[] = request.polls.map((poll: CreatePollRequest) => ( 
-        {
-          body: poll.body,
-          expiry: poll.expiry,
-          options: poll.options,
-          voterSemaphoreGroupUrls: poll.voterSemaphoreGroupUrls,
-          voterSemaphoreGroupRoots: poll.voterSemaphoreGroupRoots,
+      const prevBallot = await prisma.ballot.findUnique({
+        where: {
+          ballotURL: request.ballot.ballotURL,
         }
-      ));
-      const signalHash = sha256(stableStringify(signal));
+      });
+      if (prevBallot !== null) { 
+        throw new Error("Ballot already exists with this URL.");
+      }
+
+      const ballotSignal: BallotSignal = {
+        pollSignals: [],
+        ballotURL: request.ballot.ballotURL,
+        ballotTitle: request.ballot.ballotTitle,
+        ballotDescription: request.ballot.ballotDescription,
+        ballotType: request.ballot.ballotType,
+        expiry: request.ballot.expiry,
+        voterSemaphoreGroupUrls: request.ballot.voterSemaphoreGroupRoots,
+        voterSemaphoreGroupRoots: request.ballot.voterSemaphoreGroupUrls,
+      };
+      request.polls.forEach((poll: Poll) => {
+        const pollSignal: PollSignal = {
+          body: poll.body,
+          options: poll.options,
+        }
+        ballotSignal.pollSignals.push(pollSignal);
+      });
+      const signalHash = sha256(stableStringify(ballotSignal));
 
       try {
-        if (request.pollsterType == UserType.ANON) {
+        if (request.ballot.pollsterType == UserType.ANON) {
           const nullifier = await verifyGroupProof(
-            request.pollsterSemaphoreGroupUrl!,
+            request.ballot.pollsterSemaphoreGroupUrl!,
             request.proof,
             {
               signal: signalHash,
@@ -45,23 +61,36 @@ export function initPCDRoutes(
             }
           );
 
-          const newPoll = await prisma.poll.create({
+          const newBallot = await prisma.ballot.create({
             data: {
-              id: signalHash,
+              ballotId: signalHash,
+              ballotURL: request.ballot.ballotURL,
+              ballotTitle: request.ballot.ballotTitle,
+              ballotDescription: request.ballot.ballotDescription,
+              expiry: request.ballot.expiry,
+              proof: request.proof,
               pollsterType: "ANON",
               pollsterNullifier: nullifier,
-              pollsterSemaphoreGroupUrl: request.pollsterSemaphoreGroupUrl,
-              body: request.body,
-              expiry: request.expiry,
-              options: request.options,
-              voterSemaphoreGroupUrls: request.voterSemaphoreGroupUrls,
-              voterSemaphoreGroupRoots: request.voterSemaphoreGroupRoots ?? [],
-              proof: request.proof,
-            },
+              pollsterSemaphoreGroupUrl: request.ballot.pollsterSemaphoreGroupUrl,
+              voterSemaphoreGroupRoots: request.ballot.voterSemaphoreGroupRoots,
+              voterSemaphoreGroupUrls: request.ballot.voterSemaphoreGroupUrls,
+              ballotType: request.ballot.ballotType,
+            }
           });
 
+          for (const poll of request.polls) {
+            await prisma.poll.create({
+              data: {
+                body: poll.body,
+                options: poll.options,
+                ballotURL: request.ballot.ballotURL,
+                expiry: request.ballot.expiry,
+              }
+            });
+          }
+
           res.json({
-            id: newPoll.id,
+            url: newBallot.ballotURL,
           });
         } else {
           throw new Error("Unknown pollster type.");
@@ -75,72 +104,93 @@ export function initPCDRoutes(
     }
   );
 
-  app.post("/vote", async (req: Request, res: Response, next: NextFunction) => {
-    const request = req.body as VoteRequest;
+  app.post("/vote-ballot", async (req: Request, res: Response, next: NextFunction) => {
+    const request = req.body as MultiVoteRequest;
 
-    const signal: VoteSignal = {
-      pollId: request.pollId,
-      voteIdx: request.voteIdx,
+    const multiVoteSignal : MultiVoteSignal = {
+      voteSignals: [],
     };
-    const signalHash = sha256(stableStringify(signal));
+    request.votes.forEach((vote: Vote) => {
+      const voteSignal: VoteSignal = {
+        pollId: vote.pollId,
+        voteIdx: vote.voteIdx,
+      };
+      multiVoteSignal.voteSignals.push(voteSignal);
+    });
+    const signalHash = sha256(stableStringify(multiVoteSignal));
 
     try {
-      const poll = await prisma.poll.findUnique({
-        where: {
-          id: request.pollId,
-        },
-      });
-
-      if (poll === null) {
-        throw new Error("Invalid poll id.");
-      }
-      if (request.voteIdx < 0 || request.voteIdx >= poll.options.length) {
-        throw new Error("Invalid vote option.");
-      }
-      if (poll.expiry < new Date()) {
-        throw new Error("Poll has expired.");
-      }
-      if (request.voterSemaphoreGroupUrl === undefined) {
-        throw new Error("No Semaphore group URL attached.");
-      }
-
-      if (request.voterType == UserType.ANON) {
-        const nullifier = await verifyGroupProof(
-          request.voterSemaphoreGroupUrl,
-          request.proof,
-          {
-            signal: signalHash,
-            allowedGroups: poll.voterSemaphoreGroupUrls,
-            allowedRoots: poll.voterSemaphoreGroupRoots,
-            claimedExtNullifier: poll.id,
-          }
-        );
-
-        const previousVote = await prisma.vote.findUnique({
+      for (const vote of request.votes) {
+        const poll = await prisma.poll.findUnique({
           where: {
-            voterNullifier: nullifier,
+            id: vote.pollId,
           },
         });
-        if (previousVote !== null) {
-          throw new Error("User has already voted.");
+  
+        if (poll === null) {
+          throw new Error("Invalid poll id.");
         }
+        if (vote.voteIdx < 0 || vote.voteIdx >= poll.options.length) {
+          throw new Error("Invalid vote option.");
+        }
+        if (poll.expiry < new Date()) {
+          throw new Error("Poll has expired.");
+        }
+        if (vote.voterSemaphoreGroupUrl === undefined) {
+          throw new Error("No Semaphore group URL attached.");
+        }
+        if (vote.voterType !== UserType.ANON) {
+          throw new Error("Unknown voter type.");
+        }
+      }
 
+      const ballot = await prisma.ballot.findUnique({
+        where: {
+          ballotURL: request.ballotURL,
+        }
+      });
+      if (ballot === null) { 
+        throw new Error("Invalid ballot id.");
+      }
+
+      const nullifier = await verifyGroupProof(
+        request.voterSemaphoreGroupUrl,
+        request.proof,
+        {
+          signal: signalHash,
+          allowedGroups: ballot.voterSemaphoreGroupUrls,
+          allowedRoots: ballot.voterSemaphoreGroupRoots,
+          claimedExtNullifier: ballot.ballotURL,
+        }
+      );
+
+      const previousBallotVote = await prisma.vote.findUnique({
+        where: {
+          voterNullifier: nullifier,
+        },
+      });
+      if (previousBallotVote !== null) {
+        throw new Error("User has already voted on this ballot.");
+      }
+
+      const voteIds = [];
+      for (const vote of request.votes) {
         const newVote = await prisma.vote.create({
           data: {
-            pollId: request.pollId,
+            pollId: vote.pollId,
             voterType: "ANON",
             voterNullifier: nullifier,
             voterSemaphoreGroupUrl: request.voterSemaphoreGroupUrl,
-            voteIdx: request.voteIdx,
+            voteIdx: vote.voteIdx,
             proof: request.proof,
-          },
+          }
         });
-        res.json({
-          id: newVote.id,
-        });
-      } else {
-        throw new Error("Unknown voter type.");
+        voteIds.push(newVote.id);
       }
+
+      res.json({
+        ids: voteIds
+      });
     } catch (e) {
       console.error(e);
       next(e);
@@ -149,47 +199,39 @@ export function initPCDRoutes(
 }
 
 export type CreateBallotRequest = {
+  ballot: Ballot;
+  polls: Poll[];
+  proof: string;
+}
+
+export type BallotSignal = {
+  pollSignals: PollSignal[];
   ballotURL: string;
   ballotTitle: string;
   ballotDescription: string;
-  ballotExpiry: Date;
-
-  polls: CreatePollRequest[];
   ballotType: BallotType;
+  expiry: Date;
+  voterSemaphoreGroupUrls: string[];
+  voterSemaphoreGroupRoots: string[];
 }
 
-export type VoteRequest = {
-  pollId: string;
-  voterType: UserType;
-  voterSemaphoreGroupUrl: string | undefined;
-  voterCommitment: string | undefined;
-  voterUuid: string | undefined;
-  voteIdx: number;
+export type PollSignal = {
+  body: string;
+  options: string[];
+};
+
+export type MultiVoteRequest = {
+  votes: Vote[];
+  ballotURL: string;
+  voterSemaphoreGroupUrl: string;
   proof: string;
 };
+
+export type MultiVoteSignal = {
+  voteSignals: VoteSignal[];
+}
 
 export type VoteSignal = {
   pollId: string;
   voteIdx: number;
-};
-
-export type CreatePollRequest = {
-  pollsterType: UserType;
-  pollsterSemaphoreGroupUrl: string | undefined;
-  pollsterCommitment: string | undefined;
-  pollsterUuid: string | undefined;
-  body: string;
-  expiry: Date;
-  options: string[];
-  voterSemaphoreGroupUrls: string[];
-  voterSemaphoreGroupRoots?: string[];
-  proof: string;
-};
-
-export type PollSignal = {
-  body: string;
-  expiry: Date;
-  options: string[];
-  voterSemaphoreGroupUrls: string[];
-  voterSemaphoreGroupRoots?: string[];
 };

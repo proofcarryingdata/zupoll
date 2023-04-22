@@ -30,8 +30,26 @@ export function initAuthedRoutes(
     }
   );
 
-  app.get("/polls", authenticateJWT, async (req: Request, res: Response) => {
+  app.get("/ballots", authenticateJWT, async (req: Request, res: Response) => {
+    const ballots = await prisma.ballot.findMany({
+      select: {
+        ballotTitle: true,
+        ballotURL: true,
+        expiry: true,
+      },
+      orderBy: { expiry: "asc" },
+    });
+
+    res.status(200).json({ ballots });
+  })
+
+  app.get("/ballot-polls", authenticateJWT, async (req: Request, res: Response) => {
+    const request = req.body as BallotPollRequest;
+
     const polls = await prisma.poll.findMany({
+      where: {
+        ballotURL: request.ballotURL,
+      },
       include: {
         votes: {
           select: {
@@ -41,6 +59,7 @@ export function initAuthedRoutes(
       },
       orderBy: { expiry: "asc" },
     });
+
     polls.forEach((poll) => {
       const counts = new Array(poll.options.length).fill(0);
       for (const vote of poll.votes) {
@@ -53,7 +72,11 @@ export function initAuthedRoutes(
   });
 }
 
-export interface LoginRequest {
+export type LoginRequest = {
   semaphoreGroupUrl: string;
   proof: string;
+}
+
+export type BallotPollRequest = {
+  ballotURL: string;
 }
