@@ -1,4 +1,4 @@
-import { PollType, UserType } from "@prisma/client";
+import { UserType } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";

@@ -54,8 +54,8 @@ model Poll {
   voterSemaphoreGroupUrls String[]
   voterSemaphoreGroupRoots String[]
 
-  ballot Ballot @relation(fields: [ballotId], references: [id])
-  ballotId String
+  ballot Ballot? @relation(fields: [ballotId], references: [id])
+  ballotId String?
 
   proof Json
   votes Vote[]
