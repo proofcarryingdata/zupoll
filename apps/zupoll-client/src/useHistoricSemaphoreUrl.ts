@@ -10,13 +10,8 @@ export function useHistoricSemaphoreUrl(
   const [rootHash, setRootHash] = useState<string | null>(null);
 
   useEffect(() => {
-    if (rootHash === null) return;
-    console.log(`using voter url: ${rootHash}`)
-  }, [rootHash])
-
-  useEffect(() => {
     getLatestSemaphoreGroupHash(semaphoreGroupId)
-      .then(url => setRootHash(url))
+      .then(hash => setRootHash(hash))
       .catch((e: Error) => {
         console.log(e);
         onError({
