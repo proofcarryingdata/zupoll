@@ -28,15 +28,11 @@ model Ballot {
   id String @id @default(uuid())
   ballotURL String @unique
 	ballotTitle String
+  ballotDescription String
   createdAt DateTime @default(now())
+  expiry DateTime
+  proof Json
 
-	polls Poll[]
-	ballotType BallotType
-} 
-
-model Poll {
-  id String @id
-  createdAt DateTime @default(now())
   pollsterType UserType
   pollsterNullifier String @unique
 
@@ -48,16 +44,22 @@ model Poll {
   pollsterUuid String?
   pollsterCommitment String?
 
-  body String
-  expiry DateTime
-  options String[]
   voterSemaphoreGroupUrls String[]
   voterSemaphoreGroupRoots String[]
+	polls Poll[]
+	ballotType BallotType
+}
+
+model Poll {
+  id String @id
+  createdAt DateTime @default(now())
+
+  body String
+  options String[]
 
   ballot Ballot? @relation(fields: [ballotId], references: [id])
   ballotId String?
 
-  proof Json
   votes Vote[]
 }
 

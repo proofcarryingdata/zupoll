@@ -1,4 +1,4 @@
-import { UserType } from "@prisma/client";
+import { BallotType, UserType } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
@@ -17,18 +17,20 @@ export function initPCDRoutes(
   _context: ApplicationContext
 ): void {
   app.post(
-    "/create-poll",
+    "/create-ballot",
     async (req: Request, res: Response, next: NextFunction) => {
-      const request = req.body as CreatePollRequest;
+      const request = req.body as CreateBallotRequest;
 
       // can't use nullifierhash inside signal cuz it is generated after signal is input into proof.
-      const signal: PollSignal = {
-        body: request.body,
-        expiry: request.expiry,
-        options: request.options,
-        voterSemaphoreGroupUrls: request.voterSemaphoreGroupUrls,
-        voterSemaphoreGroupRoots: request.voterSemaphoreGroupRoots,
-      };
+      const signal: PollSignal[] = request.polls.map((poll: CreatePollRequest) => ( 
+        {
+          body: poll.body,
+          expiry: poll.expiry,
+          options: poll.options,
+          voterSemaphoreGroupUrls: poll.voterSemaphoreGroupUrls,
+          voterSemaphoreGroupRoots: poll.voterSemaphoreGroupRoots,
+        }
+      ));
       const signalHash = sha256(stableStringify(signal));
 
       try {
@@ -146,6 +148,16 @@ export function initPCDRoutes(
   });
 }
 
+export type CreateBallotRequest = {
+  ballotURL: string;
+  ballotTitle: string;
+  ballotDescription: string;
+  ballotExpiry: Date;
+
+  polls: CreatePollRequest[];
+  ballotType: BallotType;
+}
+
 export type VoteRequest = {
   pollId: string;
   voterType: UserType;
@@ -175,7 +187,6 @@ export type CreatePollRequest = {
 };
 
 export type PollSignal = {
-  // nullifier: string;
   body: string;
   expiry: Date;
   options: string[];

@@ -44,7 +44,6 @@ export type CreatePollRequest = {
 };
 
 export type PollSignal = {
-  // nullifier: string;
   body: string;
   expiry: Date;
   options: string[];
