@@ -51,11 +51,11 @@ export function CreatePoll({
      url: voterGroupUrl 
   } = useHistoricSemaphoreUrl(PARTICIPANTS_GROUP_ID, onError)
 
-  useEffect(() => {
-    if (!loadingVoterGroupUrl && voterGroupUrl === null) {
-      onError({ title: "Group Error", message: "Semaphore Group not loaded yet" })
-    }
-  }, [onError, loadingVoterGroupUrl, voterGroupUrl])
+  // useEffect(() => {
+  //   if (!loadingVoterGroupUrl && voterGroupUrl === null) {
+  //     onError({ title: "Group Error", message: "Semaphore Group not loaded yet" })
+  //   }
+  // }, [onError, loadingVoterGroupUrl, voterGroupUrl])
   
   useEffect(() => {
     if (createState.current === CreatePollState.AWAITING_PCDSTR) {
