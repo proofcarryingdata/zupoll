@@ -6,13 +6,18 @@ export const ACCESS_TOKEN_SECRET = IS_PROD
   ? process.env.ACCESS_TOKEN_SECRET
   : "secret";
 
+
+export const PARTICIPANTS_GROUP_ID = "1"
+export const ADMIN_GROUP_ID = "4"
+
 export const SEMAPHORE_GROUP_URL = IS_PROD
   ? process.env.SEMAPHORE_GROUP_URL
-  : "http://localhost:3002/semaphore/1";
+  : `http://localhost:3002/semaphore/${PARTICIPANTS_GROUP_ID}`;
 
 export const SEMAPHORE_ADMIN_GROUP_URL = IS_PROD
   ? process.env.SEMAPHORE_ADMIN_GROUP_URL
-  : "http://localhost:3002/semaphore/4";
+  : `http://localhost:3002/semaphore/${ADMIN_GROUP_ID}`;
+
 
 export const PASSPORT_SERVER = IS_PROD ? process.env.PASSPORT_SERVER : "http://localhost:3002/";
 
@@ -42,4 +47,9 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
   } else {
     res.sendStatus(401);
   }
+}
+
+export function isAdminGroup(url: string) {
+  const regex = new RegExp(`^${PASSPORT_SERVER}/semaphore/historic/${ADMIN_GROUP_ID}/.*$`)
+  return regex.test(url);
 }

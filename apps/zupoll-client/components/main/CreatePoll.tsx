@@ -22,6 +22,7 @@ import {
 import { Button } from "../core/Button";
 import { RippleLoader } from "../core/RippleLoader";
 import { ZupollError } from "../../src/types";
+import { useVoterUrl } from "../../src/useVoterUrl";
 
 enum CreatePollState {
   DEFAULT,
@@ -43,9 +44,15 @@ export function CreatePoll({
     new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
   );
   const [loading, setLoading] = useState<boolean>(false);
-
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
+  const { loading: loadingSemaphore, url: semaphoreGroupUrl } = useVoterUrl("1", onError)
 
+  useEffect(() => {
+    if (!loadingSemaphore && semaphoreGroupUrl === null) {
+      onError({title:"Group Error", message: "Semaphore Group not loaded yet"})
+    }
+  }, [onError, loadingSemaphore, semaphoreGroupUrl])
+  
   useEffect(() => {
     if (createState.current === CreatePollState.AWAITING_PCDSTR) {
       createState.current = CreatePollState.RECEIVED_PCDSTR;
@@ -54,6 +61,8 @@ export function CreatePoll({
 
   useEffect(() => {
     if (createState.current !== CreatePollState.RECEIVED_PCDSTR) return;
+    if (semaphoreGroupUrl == null) return;
+
     createState.current = CreatePollState.DEFAULT;
 
     const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
@@ -64,7 +73,7 @@ export function CreatePoll({
       body: pollBody,
       expiry: pollExpiry,
       options: pollOptions,
-      voterSemaphoreGroupUrls: [SEMAPHORE_GROUP_URL],
+      voterSemaphoreGroupUrls: [semaphoreGroupUrl],
       proof: parsedPcd.pcd,
     };
 
@@ -100,7 +109,7 @@ export function CreatePoll({
     }
 
     doRequest();
-  }, [pcdStr, onCreated, onError, pollBody, pollExpiry, pollOptions]);
+  }, [pcdStr, onCreated, onError, pollBody, pollExpiry, pollOptions, semaphoreGroupUrl]);
 
   const handleSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -171,7 +180,7 @@ export function CreatePoll({
           />
         </StyledLabel>
         <SubmitRow>
-          {loading ? (
+          {(loading || loadingSemaphore) ? (
             <RippleLoader />
           ) : (
             <Button type="submit">Create Poll</Button>

@@ -8,6 +8,6 @@
     "*.env.example": "properties",
     "*.env.local.example": "properties"
   },
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": false
 }
-  

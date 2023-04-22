@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from "express";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { ApplicationContext } from "../../types";
-import { SEMAPHORE_ADMIN_GROUP_URL } from "../../util/auth";
+import { ADMIN_GROUP_ID } from "../../util/auth";
 import { prisma } from "../../util/prisma";
 import { fetchAndVerifyName } from "../../util/util";
 import { verifyGroupProof, verifySignatureProof } from "../../util/verify";
@@ -39,7 +39,7 @@ export function initPCDRoutes(
             request.proof,
             {
               signal: signalHash,
-              allowedGroups: [SEMAPHORE_ADMIN_GROUP_URL!],
+              allowedGroups: [ADMIN_GROUP_ID!],
               claimedExtNullifier: signalHash,
             }
           );
@@ -68,7 +68,7 @@ export function initPCDRoutes(
             request.pollsterCommitment!,
             request.proof,
             signalHash,
-            [SEMAPHORE_ADMIN_GROUP_URL!]
+            [ADMIN_GROUP_ID!]
           );
           const pollsterName = await fetchAndVerifyName(
             request.pollsterCommitment!,
