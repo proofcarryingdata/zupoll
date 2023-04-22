@@ -53,7 +53,7 @@ export function CreatePoll({
 
   useEffect(() => {
     if (!loadingVoterGroupUrl && voterGroupUrl === null) {
-      onError({title:"Group Error", message: "Semaphore Group not loaded yet"})
+      onError({ title: "Group Error", message: "Semaphore Group not loaded yet" })
     }
   }, [onError, loadingVoterGroupUrl, voterGroupUrl])
   
