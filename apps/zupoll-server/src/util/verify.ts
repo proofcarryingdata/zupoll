@@ -82,7 +82,7 @@ export async function verifySignatureProof(
   }
   if (!found) {
     throw new Error(
-      `Not in any of semaphore groups allowed to perform action.`
+      `Not in Semaphore groups allowed to perform action.`
     );
   }
 
