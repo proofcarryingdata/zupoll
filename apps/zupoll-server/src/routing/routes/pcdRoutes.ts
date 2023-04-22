@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from "express";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { ApplicationContext } from "../../types";
-import { ADMIN_GROUP_ID } from "../../util/auth";
+import { ADMIN_GROUP_ID, SEMAPHORE_ADMIN_GROUP_URL } from "../../util/auth";
 import { prisma } from "../../util/prisma";
 import { fetchAndVerifyName } from "../../util/util";
 import { verifyGroupProof, verifySignatureProof } from "../../util/verify";
@@ -39,7 +39,7 @@ export function initPCDRoutes(
             request.proof,
             {
               signal: signalHash,
-              allowedGroups: [ADMIN_GROUP_ID!],
+              allowedGroups: [SEMAPHORE_ADMIN_GROUP_URL!],
               claimedExtNullifier: signalHash,
             }
           );
