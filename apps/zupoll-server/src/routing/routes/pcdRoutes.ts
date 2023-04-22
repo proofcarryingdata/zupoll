@@ -68,7 +68,7 @@ export function initPCDRoutes(
             request.pollsterCommitment!,
             request.proof,
             signalHash,
-            [ADMIN_GROUP_ID!]
+            [SEMAPHORE_ADMIN_GROUP_URL!]
           );
           const pollsterName = await fetchAndVerifyName(
             request.pollsterCommitment!,

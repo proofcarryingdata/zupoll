@@ -22,5 +22,3 @@ export const SEMAPHORE_GROUP_URL = IS_PROD
 export const SEMAPHORE_ADMIN_GROUP_URL = IS_PROD
   ? `https://api.pcd-passport.com/semaphore/${ADMIN_GROUP_ID}`
   : `http://localhost:3002/semaphore/${ADMIN_GROUP_ID}`;
-
-  

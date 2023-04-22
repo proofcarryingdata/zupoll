@@ -111,8 +111,8 @@ export function CreatePoll({
   const handleSubmit: FormEventHandler = async (event) => {
     if (voterGroupUrl == null) {
       onError({
-        title: "Error Creating Poll.",
-        message: 'Voter group not loaded yet'
+        title: "Error Creating Poll",
+        message: 'Voter group not loaded yet.'
       });
       return;
     }

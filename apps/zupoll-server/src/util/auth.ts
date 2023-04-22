@@ -48,8 +48,3 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
     res.sendStatus(401);
   }
 }
-
-export function isHistoricParticipantGroupUrl(url: string) {
-  const regex = new RegExp(`^${PASSPORT_SERVER}/semaphore/historic/${PARTICIPANTS_GROUP_ID}/.*$`)
-  return regex.test(url);
-}
