@@ -7,10 +7,6 @@ export type ZupollError = {
   stack?: string;
 };
 
-export enum PollType {
-  REFERENDUM = "REFERENDUM",
-}
-
 export enum UserType {
   ANON = "ANON",
   NONANON = "NONANON",
@@ -25,7 +21,6 @@ export type PollDefinition = {
   pollsterName: string | null;
   pollsterUuid: string | null;
   pollsterCommitment: string | null;
-  pollType: PollType;
   body: string;
   expiry: string;
   options: string[];
@@ -40,7 +35,6 @@ export type CreatePollRequest = {
   pollsterSemaphoreGroupUrl?: string;
   pollsterCommitment?: string;
   pollsterUuid?: string;
-  pollType: PollType;
   body: string;
   expiry: Date;
   options: string[];
@@ -51,7 +45,6 @@ export type CreatePollRequest = {
 
 export type PollSignal = {
   // nullifier: string;
-  pollType: PollType;
   body: string;
   expiry: Date;
   options: string[];

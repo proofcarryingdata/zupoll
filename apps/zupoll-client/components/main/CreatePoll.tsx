@@ -67,7 +67,6 @@ export function CreatePoll({
     const request: CreatePollRequest = {
       pollsterType: UserType.ANON,
       pollsterSemaphoreGroupUrl: SEMAPHORE_ADMIN_GROUP_URL,
-      pollType: PollType.REFERENDUM,
       body: pollBody,
       expiry: pollExpiry,
       options: pollOptions,
@@ -131,7 +130,6 @@ export function CreatePoll({
     createState.current = CreatePollState.AWAITING_PCDSTR;
 
     const signal: PollSignal = {
-      pollType: PollType.REFERENDUM,
       body: pollBody,
       expiry: pollExpiry,
       options: pollOptions,

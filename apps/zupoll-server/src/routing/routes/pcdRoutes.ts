@@ -23,7 +23,6 @@ export function initPCDRoutes(
 
       // can't use nullifierhash inside signal cuz it is generated after signal is input into proof.
       const signal: PollSignal = {
-        pollType: request.pollType,
         body: request.body,
         expiry: request.expiry,
         options: request.options,
@@ -50,7 +49,6 @@ export function initPCDRoutes(
               pollsterType: "ANON",
               pollsterNullifier: nullifier,
               pollsterSemaphoreGroupUrl: request.pollsterSemaphoreGroupUrl,
-              pollType: request.pollType,
               body: request.body,
               expiry: request.expiry,
               options: request.options,
@@ -168,7 +166,6 @@ export type CreatePollRequest = {
   pollsterSemaphoreGroupUrl: string | undefined;
   pollsterCommitment: string | undefined;
   pollsterUuid: string | undefined;
-  pollType: PollType;
   body: string;
   expiry: Date;
   options: string[];
@@ -179,7 +176,6 @@ export type CreatePollRequest = {
 
 export type PollSignal = {
   // nullifier: string;
-  pollType: PollType;
   body: string;
   expiry: Date;
   options: string[];
