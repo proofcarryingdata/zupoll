@@ -18,7 +18,6 @@ import {
   PARTICIPANTS_GROUP_ID,
   PASSPORT_URL,
   SEMAPHORE_ADMIN_GROUP_URL,
-  SEMAPHORE_GROUP_URL,
 } from "../../src/util";
 import { Button } from "../core/Button";
 import { RippleLoader } from "../core/RippleLoader";
@@ -50,12 +49,6 @@ export function CreatePoll({
     loading: loadingVoterGroupUrl,
     url: voterGroupUrl 
   } = useHistoricSemaphoreUrl(PARTICIPANTS_GROUP_ID, onError)
-
-  // useEffect(() => {
-  //   if (!loadingVoterGroupUrl && voterGroupUrl === null) {
-  //     onError({ title: "Group Error", message: "Semaphore Group not loaded yet" })
-  //   }
-  // }, [onError, loadingVoterGroupUrl, voterGroupUrl])
   
   useEffect(() => {
     if (createState.current === CreatePollState.AWAITING_PCDSTR) {
