@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getLatestSemaphoreGroupUrl } from "./api";
 import { ZupollError } from "./types";
 
-export function useVoterUrl(
+export function useHistoricSemaphoreUrl(
   semaphoreGroupId: string,
   onError: (error: ZupollError) => void
 ) {

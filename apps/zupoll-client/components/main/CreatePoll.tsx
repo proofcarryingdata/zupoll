@@ -22,7 +22,7 @@ import {
 import { Button } from "../core/Button";
 import { RippleLoader } from "../core/RippleLoader";
 import { ZupollError } from "../../src/types";
-import { useVoterUrl } from "../../src/useVoterUrl";
+import { useHistoricSemaphoreUrl } from "../../src/useHistoricSemaphoreUrl";
 
 enum CreatePollState {
   DEFAULT,
@@ -45,7 +45,10 @@ export function CreatePoll({
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
-  const { loading: loadingSemaphore, url: semaphoreGroupUrl } = useVoterUrl("1", onError)
+  const { 
+    loading: loadingSemaphore,
+     url: semaphoreGroupUrl 
+  } = useHistoricSemaphoreUrl("1", onError)
 
   useEffect(() => {
     if (!loadingSemaphore && semaphoreGroupUrl === null) {
