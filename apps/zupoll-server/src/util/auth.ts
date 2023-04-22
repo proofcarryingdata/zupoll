@@ -49,7 +49,7 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
   }
 }
 
-export function isAdminGroup(url: string) {
-  const regex = new RegExp(`^${PASSPORT_SERVER}/semaphore/historic/${ADMIN_GROUP_ID}/.*$`)
+export function isHistoricParticipantGroupUrl(url: string) {
+  const regex = new RegExp(`^${PASSPORT_SERVER}/semaphore/historic/${PARTICIPANTS_GROUP_ID}/.*$`)
   return regex.test(url);
 }
