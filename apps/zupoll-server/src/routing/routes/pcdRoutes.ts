@@ -145,6 +145,7 @@ export function initPCDRoutes(
           {
             signal: signalHash,
             allowedGroups: poll.voterSemaphoreGroupUrls,
+            allowedRoots: poll.voterSemaphoreGroupRoots,
             claimedExtNullifier: poll.id,
           }
         );
