@@ -34,6 +34,7 @@ model Poll {
   expiry DateTime
   options String[]
   voterSemaphoreGroupUrls String[]
+  voterSemaphoreGroupRoots String[]
 
   proof Json
   votes Vote[]

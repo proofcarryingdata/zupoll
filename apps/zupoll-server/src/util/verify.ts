@@ -15,6 +15,7 @@ export async function verifyGroupProof(
   options: {
     signal?: string;
     allowedGroups?: string[];
+    allowedRoots?: string[];
     claimedExtNullifier?: string;
   }
 ): Promise<string> {
@@ -50,15 +51,34 @@ export async function verifyGroupProof(
     throw new Error("Posted signal doesn't match signal in claim.");
   }
 
-  // check semaphoreGroupUrl
-  const response = await fetch(semaphoreGroupUrl);
-  const json = await response.text();
-  const serializedGroup = JSON.parse(json) as SerializedSemaphoreGroup;
-  const group = deserializeSemaphoreGroup(serializedGroup);
-  if (pcd.claim.merkleRoot !== group.root.toString()) {
-    throw new Error(
-      "Current root doesn't match claim group merkle tree root."
-    );
+  if (options.allowedRoots && options.allowedRoots.length > 0) {
+    let anyRootMatches = false;
+
+    for (const root of options.allowedRoots) {
+      if (pcd.claim.merkleRoot === root) {
+        anyRootMatches = true;
+        break;
+      }
+    }
+
+    if (!anyRootMatches) {
+      console.log("allowed roots", options.allowedRoots);
+      console.log("merkle root", pcd.claim.merkleRoot);
+
+      throw new Error(
+        "Current root doesn't match any of the allowed roots"
+      );
+    }
+  } else {
+    const response = await fetch(semaphoreGroupUrl);
+    const json = await response.text();
+    const serializedGroup = JSON.parse(json) as SerializedSemaphoreGroup;
+    const group = deserializeSemaphoreGroup(serializedGroup);
+    if (pcd.claim.merkleRoot !== group.root.toString()) {
+      throw new Error(
+        "Current root doesn't match claim group merkle tree root."
+      );
+    }
   }
 
   return pcd.claim.nullifierHash;
@@ -82,7 +102,7 @@ export async function verifySignatureProof(
   }
   if (!found) {
     throw new Error(
-      `Not in any of semaphore groups allowed to perform action.`
+      `Not in Semaphore groups allowed to perform action.`
     );
   }
 

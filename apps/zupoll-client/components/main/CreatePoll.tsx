@@ -15,13 +15,14 @@ import {
   UserType,
 } from "../../src/types";
 import {
+  PARTICIPANTS_GROUP_ID,
   PASSPORT_URL,
   SEMAPHORE_ADMIN_GROUP_URL,
-  SEMAPHORE_GROUP_URL,
 } from "../../src/util";
 import { Button } from "../core/Button";
 import { RippleLoader } from "../core/RippleLoader";
 import { ZupollError } from "../../src/types";
+import { useHistoricSemaphoreUrl } from "../../src/useHistoricSemaphoreUrl";
 
 enum CreatePollState {
   DEFAULT,
@@ -43,9 +44,13 @@ export function CreatePoll({
     new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
   );
   const [loading, setLoading] = useState<boolean>(false);
-
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
-
+  const { 
+    loading: loadingVoterGroupUrl,
+    rootHash: voterGroupRootHash,
+    groupUrl: voterGroupUrl,
+  } = useHistoricSemaphoreUrl(PARTICIPANTS_GROUP_ID, onError)
+  
   useEffect(() => {
     if (createState.current === CreatePollState.AWAITING_PCDSTR) {
       createState.current = CreatePollState.RECEIVED_PCDSTR;
@@ -54,6 +59,8 @@ export function CreatePoll({
 
   useEffect(() => {
     if (createState.current !== CreatePollState.RECEIVED_PCDSTR) return;
+    if (voterGroupUrl == null || voterGroupRootHash == null) return;
+
     createState.current = CreatePollState.DEFAULT;
 
     const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
@@ -64,7 +71,8 @@ export function CreatePoll({
       body: pollBody,
       expiry: pollExpiry,
       options: pollOptions,
-      voterSemaphoreGroupUrls: [SEMAPHORE_GROUP_URL],
+      voterSemaphoreGroupUrls: [voterGroupUrl],
+      voterSemaphoreGroupRoots: [voterGroupRootHash],
       proof: parsedPcd.pcd,
     };
 
@@ -100,9 +108,25 @@ export function CreatePoll({
     }
 
     doRequest();
-  }, [pcdStr, onCreated, onError, pollBody, pollExpiry, pollOptions]);
+  }, [
+    pcdStr,
+    onCreated,
+    onError,
+    pollBody,
+    pollExpiry,
+    pollOptions,
+    voterGroupRootHash,
+    voterGroupUrl
+  ]);
 
   const handleSubmit: FormEventHandler = async (event) => {
+    if (voterGroupUrl == null || voterGroupRootHash == null) {
+      return onError({
+        title: "Error Creating Poll",
+        message: 'Voter group not loaded yet.'
+      });
+    }
+
     event.preventDefault();
     createState.current = CreatePollState.AWAITING_PCDSTR;
 
@@ -111,7 +135,9 @@ export function CreatePoll({
       body: pollBody,
       expiry: pollExpiry,
       options: pollOptions,
-      voterSemaphoreGroupUrls: [SEMAPHORE_GROUP_URL],
+      voterSemaphoreGroupUrls: [voterGroupUrl],
+      voterSemaphoreGroupRoots: [voterGroupRootHash]
+
     };
     const signalHash = sha256(stableStringify(signal));
     const sigHashEnc = generateMessageHash(signalHash).toString();
@@ -171,7 +197,7 @@ export function CreatePoll({
           />
         </StyledLabel>
         <SubmitRow>
-          {loading ? (
+          {(loading || loadingVoterGroupUrl) ? (
             <RippleLoader />
           ) : (
             <Button type="submit">Create Poll</Button>

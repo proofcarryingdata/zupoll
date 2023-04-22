@@ -53,7 +53,7 @@ export function usePollVote(
         const request: VoteRequest = {
             pollId: poll.id,
             voterType: UserType.ANON,
-            voterSemaphoreGroupUrl: SEMAPHORE_GROUP_URL,
+            voterSemaphoreGroupUrl: poll.voterSemaphoreGroupUrls[0],
             voteIdx: parseInt(option),
             proof: parsedPcd.pcd,
         };
@@ -119,13 +119,13 @@ export function usePollVote(
             openZuzaluMembershipPopup(
                 PASSPORT_URL,
                 window.location.origin + "/popup",
-                SEMAPHORE_GROUP_URL,
+                poll.voterSemaphoreGroupUrls[0],
                 "zupoll",
                 sigHashEnc,
                 externalNullifier
             );
         },
-        [onError, poll.id, poll.options.length]
+        [onError, poll.id, poll.options.length, poll.voterSemaphoreGroupUrls]
     );
 
     if (votedOn(poll.id)) return null;

@@ -1,4 +1,4 @@
-import { ZUPOLL_SERVER_URL } from "../src/util";
+import { PASSPORT_SERVER_URL, ZUPOLL_SERVER_URL } from "../src/util";
 import { CreatePollRequest, VoteRequest } from "./types";
 
 export async function createPoll(
@@ -87,4 +87,20 @@ export async function listPolls(
     console.log(e);
     return undefined;
   }
+}
+
+export async function getLatestSemaphoreGroupHash(groupId: string): Promise<string | null> {
+  const url = `${PASSPORT_SERVER_URL}semaphore/latest-root/${encodeURIComponent(groupId)}`;
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    return null;
+  }
+
+  const rootHash = await res.json();
+  return rootHash
+}
+
+export function getHistoricGroupUrl(groupId: string, rootHash: string): string {
+  return `${PASSPORT_SERVER_URL}semaphore/historic/${groupId}/${rootHash}`
 }

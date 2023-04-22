@@ -29,6 +29,7 @@ export function initPCDRoutes(
         expiry: request.expiry,
         options: request.options,
         voterSemaphoreGroupUrls: request.voterSemaphoreGroupUrls,
+        voterSemaphoreGroupRoots: request.voterSemaphoreGroupRoots
       };
       const signalHash = sha256(stableStringify(signal));
 
@@ -55,6 +56,7 @@ export function initPCDRoutes(
               expiry: request.expiry,
               options: request.options,
               voterSemaphoreGroupUrls: request.voterSemaphoreGroupUrls,
+              voterSemaphoreGroupRoots: request.voterSemaphoreGroupRoots ?? [],
               proof: request.proof,
             },
           });
@@ -143,6 +145,7 @@ export function initPCDRoutes(
           {
             signal: signalHash,
             allowedGroups: poll.voterSemaphoreGroupUrls,
+            allowedRoots: poll.voterSemaphoreGroupRoots,
             claimedExtNullifier: poll.id,
           }
         );
@@ -233,6 +236,7 @@ export type CreatePollRequest = {
   expiry: Date;
   options: string[];
   voterSemaphoreGroupUrls: string[];
+  voterSemaphoreGroupRoots?: string[];
   proof: string;
 };
 
@@ -243,4 +247,5 @@ export type PollSignal = {
   expiry: Date;
   options: string[];
   voterSemaphoreGroupUrls: string[];
+  voterSemaphoreGroupRoots?: string[];
 };
