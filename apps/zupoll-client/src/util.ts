@@ -12,10 +12,15 @@ export const ZUPOLL_SERVER_URL = IS_PROD
   ? "https://zupoll-server.onrender.com/"
   : "http://localhost:3005/";
 
+export const PARTICIPANTS_GROUP_ID = "1"
+export const ADMIN_GROUP_ID = "4"
+
 export const SEMAPHORE_GROUP_URL = IS_PROD
-  ? "https://api.pcd-passport.com/semaphore/1"
-  : "http://localhost:3002/semaphore/1";
+  ? `https://api.pcd-passport.com/semaphore/${PARTICIPANTS_GROUP_ID}`
+  : `http://localhost:3002/semaphore/${PARTICIPANTS_GROUP_ID}`;
 
 export const SEMAPHORE_ADMIN_GROUP_URL = IS_PROD
-  ? "https://api.pcd-passport.com/semaphore/4"
-  : "http://localhost:3002/semaphore/4";
+  ? `https://api.pcd-passport.com/semaphore/${ADMIN_GROUP_ID}`
+  : `http://localhost:3002/semaphore/${ADMIN_GROUP_ID}`;
+
+  

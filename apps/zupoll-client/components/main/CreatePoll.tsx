@@ -15,6 +15,7 @@ import {
   UserType,
 } from "../../src/types";
 import {
+  PARTICIPANTS_GROUP_ID,
   PASSPORT_URL,
   SEMAPHORE_ADMIN_GROUP_URL,
   SEMAPHORE_GROUP_URL,
@@ -46,15 +47,15 @@ export function CreatePoll({
   const [loading, setLoading] = useState<boolean>(false);
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
   const { 
-    loading: loadingSemaphore,
-     url: semaphoreGroupUrl 
-  } = useHistoricSemaphoreUrl("1", onError)
+    loading: loadingVoterGroupUrl,
+     url: voterGroupUrl 
+  } = useHistoricSemaphoreUrl(PARTICIPANTS_GROUP_ID, onError)
 
   useEffect(() => {
-    if (!loadingSemaphore && semaphoreGroupUrl === null) {
+    if (!loadingVoterGroupUrl && voterGroupUrl === null) {
       onError({title:"Group Error", message: "Semaphore Group not loaded yet"})
     }
-  }, [onError, loadingSemaphore, semaphoreGroupUrl])
+  }, [onError, loadingVoterGroupUrl, voterGroupUrl])
   
   useEffect(() => {
     if (createState.current === CreatePollState.AWAITING_PCDSTR) {
@@ -64,7 +65,7 @@ export function CreatePoll({
 
   useEffect(() => {
     if (createState.current !== CreatePollState.RECEIVED_PCDSTR) return;
-    if (semaphoreGroupUrl == null) return;
+    if (voterGroupUrl == null) return;
 
     createState.current = CreatePollState.DEFAULT;
 
@@ -76,7 +77,7 @@ export function CreatePoll({
       body: pollBody,
       expiry: pollExpiry,
       options: pollOptions,
-      voterSemaphoreGroupUrls: [semaphoreGroupUrl],
+      voterSemaphoreGroupUrls: [voterGroupUrl],
       proof: parsedPcd.pcd,
     };
 
@@ -112,7 +113,7 @@ export function CreatePoll({
     }
 
     doRequest();
-  }, [pcdStr, onCreated, onError, pollBody, pollExpiry, pollOptions, semaphoreGroupUrl]);
+  }, [pcdStr, onCreated, onError, pollBody, pollExpiry, pollOptions, voterGroupUrl]);
 
   const handleSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -183,7 +184,7 @@ export function CreatePoll({
           />
         </StyledLabel>
         <SubmitRow>
-          {(loading || loadingSemaphore) ? (
+          {(loading || loadingVoterGroupUrl) ? (
             <RippleLoader />
           ) : (
             <Button type="submit">Create Poll</Button>
