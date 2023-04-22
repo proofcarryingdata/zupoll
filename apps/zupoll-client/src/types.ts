@@ -5,7 +5,7 @@ export type ZupollError = {
   message: string | React.ReactNode;
   /** Optional stacktrace. */
   stack?: string;
-}
+};
 
 export enum PollType {
   REFERENDUM = "REFERENDUM",

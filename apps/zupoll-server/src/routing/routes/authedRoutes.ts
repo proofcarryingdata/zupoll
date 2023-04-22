@@ -36,7 +36,7 @@ export function initAuthedRoutes(
         votes: {
           select: {
             voteIdx: true,
-          }
+          },
         },
       },
       orderBy: { expiry: "asc" },

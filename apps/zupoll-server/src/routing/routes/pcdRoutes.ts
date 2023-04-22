@@ -29,7 +29,7 @@ export function initPCDRoutes(
         expiry: request.expiry,
         options: request.options,
         voterSemaphoreGroupUrls: request.voterSemaphoreGroupUrls,
-        voterSemaphoreGroupRoots: request.voterSemaphoreGroupRoots
+        voterSemaphoreGroupRoots: request.voterSemaphoreGroupRoots,
       };
       const signalHash = sha256(stableStringify(signal));
 
@@ -135,7 +135,7 @@ export function initPCDRoutes(
         throw new Error("Poll has expired.");
       }
       if (request.voterSemaphoreGroupUrl === undefined) {
-        throw new Error("No Semaphore group URL attached.")
+        throw new Error("No Semaphore group URL attached.");
       }
 
       if (request.voterType == UserType.ANON) {

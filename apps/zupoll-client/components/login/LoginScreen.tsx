@@ -1,10 +1,10 @@
-import styled from "styled-components";
-import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../../src/util";
-import { Login } from "./Login";
-import { RippleLoader } from "../core/RippleLoader";
 import { useState } from "react";
-import { ErrorOverlay } from "../main/ErrorOverlay";
+import styled from "styled-components";
 import { ZupollError } from "../../src/types";
+import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../../src/util";
+import { RippleLoader } from "../core/RippleLoader";
+import { ErrorOverlay } from "../main/ErrorOverlay";
+import { Login } from "./Login";
 
 export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
   const [serverLoading, setServerLoading] = useState<boolean>(false);
@@ -28,29 +28,27 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
           </p>
         </Description>
         <LoginRow>
-          {
-            serverLoading ? (
-              <RippleLoader />
-            ) : (
-              <>
-                <Login
-                  onLogin={onLogin}
-                  onError={setError}
-                  setServerLoading={setServerLoading}
-                  requestedGroup={SEMAPHORE_GROUP_URL}
-                  prompt="Log in to vote"
-                />
-                <Login
-                  onLogin={onLogin}
-                  onError={setError}
-                  setServerLoading={setServerLoading}
-                  requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
-                  prompt="Log in as an organizer"
-                  deemphasized
-                />
-              </>
-            )
-          }
+          {serverLoading ? (
+            <RippleLoader />
+          ) : (
+            <>
+              <Login
+                onLogin={onLogin}
+                onError={setError}
+                setServerLoading={setServerLoading}
+                requestedGroup={SEMAPHORE_GROUP_URL}
+                prompt="Log in to vote"
+              />
+              <Login
+                onLogin={onLogin}
+                onError={setError}
+                setServerLoading={setServerLoading}
+                requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
+                prompt="Log in as an organizer"
+                deemphasized
+              />
+            </>
+          )}
         </LoginRow>
       </Body>
 

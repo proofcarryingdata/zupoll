@@ -11,22 +11,22 @@ export function useHistoricSemaphoreUrl(
 
   useEffect(() => {
     getLatestSemaphoreGroupHash(semaphoreGroupId)
-      .then(hash => setRootHash(hash))
+      .then((hash) => setRootHash(hash))
       .catch((e: Error) => {
         console.log(e);
         onError({
-          message: "Failed to load historic Semaphore Group", 
-          title: "Loading Error"
+          message: "Failed to load historic Semaphore Group",
+          title: "Loading Error",
         });
       })
       .finally(() => {
-        setLoading(false)
+        setLoading(false);
       });
-  }, [onError, semaphoreGroupId])
+  }, [onError, semaphoreGroupId]);
 
   return {
     loading,
     rootHash,
-    groupUrl: rootHash && getHistoricGroupUrl(semaphoreGroupId, rootHash)
-  }
+    groupUrl: rootHash && getHistoricGroupUrl(semaphoreGroupId, rootHash),
+  };
 }

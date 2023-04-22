@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
+import { RippleLoader } from "../components/core/RippleLoader";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
-import { RippleLoader } from "../components/core/RippleLoader";
 
 export default function Page() {
   const [token, setToken] = useState<string>();
@@ -29,7 +29,11 @@ export default function Page() {
       {loading ? (
         <RippleLoader />
       ) : token ? (
-        <MainScreen token={token} resetToken={() => setToken(undefined)} onLogout={logout} />
+        <MainScreen
+          token={token}
+          resetToken={() => setToken(undefined)}
+          onLogout={logout}
+        />
       ) : (
         <LoginScreen onLogin={saveToken} />
       )}

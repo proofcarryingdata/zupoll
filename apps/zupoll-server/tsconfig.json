@@ -19,7 +19,7 @@
       "src/util/declarations/",
       "./node_modules/@types/",
       "../../node_modules/@types/"
-    ],
+    ]
   },
   "include": ["**/*.ts", "**/*.d.ts"],
   "exclude": ["node_modules"]

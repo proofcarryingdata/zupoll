@@ -12,8 +12,8 @@ export const ZUPOLL_SERVER_URL = IS_PROD
   ? "https://zupoll-server.onrender.com/"
   : "http://localhost:3005/";
 
-export const PARTICIPANTS_GROUP_ID = "1"
-export const ADMIN_GROUP_ID = "4"
+export const PARTICIPANTS_GROUP_ID = "1";
+export const ADMIN_GROUP_ID = "4";
 
 export const SEMAPHORE_GROUP_URL = IS_PROD
   ? `https://api.pcd-passport.com/semaphore/${PARTICIPANTS_GROUP_ID}`

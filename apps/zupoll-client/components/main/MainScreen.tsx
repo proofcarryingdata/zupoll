@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
+import { ZupollError } from "../../src/types";
 import { SEMAPHORE_ADMIN_GROUP_URL } from "../../src/util";
 import { Button } from "../core/Button";
 import { CreatePoll } from "./CreatePoll";
 import { ErrorOverlay } from "./ErrorOverlay";
 import { Polls } from "./Polls";
-import { ZupollError } from "../../src/types";
 
 export function MainScreen({
   token,
@@ -38,7 +38,12 @@ export function MainScreen({
         <CreatePoll onCreated={setNewPoll} onError={onError} />
       )}
 
-      <Polls accessToken={token} newPoll={newPoll} resetToken={resetToken} onError={onError} />
+      <Polls
+        accessToken={token}
+        newPoll={newPoll}
+        resetToken={resetToken}
+        onError={onError}
+      />
 
       {error && (
         <ErrorOverlay error={error} onClose={() => setError(undefined)} />

@@ -1,7 +1,5 @@
-import * as React from "react";
-import { Overlay } from "./Overlay";
 import { ZupollError } from "../../src/types";
-
+import { Overlay } from "./Overlay";
 
 export function ErrorOverlay({
   error,

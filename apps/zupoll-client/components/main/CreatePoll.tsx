@@ -13,7 +13,9 @@ import {
   PollSignal,
   PollType,
   UserType,
+  ZupollError,
 } from "../../src/types";
+import { useHistoricSemaphoreUrl } from "../../src/useHistoricSemaphoreUrl";
 import {
   PARTICIPANTS_GROUP_ID,
   PASSPORT_URL,
@@ -21,8 +23,6 @@ import {
 } from "../../src/util";
 import { Button } from "../core/Button";
 import { RippleLoader } from "../core/RippleLoader";
-import { ZupollError } from "../../src/types";
-import { useHistoricSemaphoreUrl } from "../../src/useHistoricSemaphoreUrl";
 
 enum CreatePollState {
   DEFAULT,
@@ -45,12 +45,12 @@ export function CreatePoll({
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
-  const { 
+  const {
     loading: loadingVoterGroupUrl,
     rootHash: voterGroupRootHash,
     groupUrl: voterGroupUrl,
-  } = useHistoricSemaphoreUrl(PARTICIPANTS_GROUP_ID, onError)
-  
+  } = useHistoricSemaphoreUrl(PARTICIPANTS_GROUP_ID, onError);
+
   useEffect(() => {
     if (createState.current === CreatePollState.AWAITING_PCDSTR) {
       createState.current = CreatePollState.RECEIVED_PCDSTR;
@@ -84,7 +84,7 @@ export function CreatePoll({
       if (res === undefined) {
         const serverDownError: ZupollError = {
           title: "Creating poll failed",
-          message: "Server is down. Contact passport@0xparc.org."
+          message: "Server is down. Contact passport@0xparc.org.",
         };
         onError(serverDownError);
         return;
@@ -116,14 +116,14 @@ export function CreatePoll({
     pollExpiry,
     pollOptions,
     voterGroupRootHash,
-    voterGroupUrl
+    voterGroupUrl,
   ]);
 
   const handleSubmit: FormEventHandler = async (event) => {
     if (voterGroupUrl == null || voterGroupRootHash == null) {
       return onError({
         title: "Error Creating Poll",
-        message: 'Voter group not loaded yet.'
+        message: "Voter group not loaded yet.",
       });
     }
 
@@ -136,8 +136,7 @@ export function CreatePoll({
       expiry: pollExpiry,
       options: pollOptions,
       voterSemaphoreGroupUrls: [voterGroupUrl],
-      voterSemaphoreGroupRoots: [voterGroupRootHash]
-
+      voterSemaphoreGroupRoots: [voterGroupRootHash],
     };
     const signalHash = sha256(stableStringify(signal));
     const sigHashEnc = generateMessageHash(signalHash).toString();
@@ -197,7 +196,7 @@ export function CreatePoll({
           />
         </StyledLabel>
         <SubmitRow>
-          {(loading || loadingVoterGroupUrl) ? (
+          {loading || loadingVoterGroupUrl ? (
             <RippleLoader />
           ) : (
             <Button type="submit">Create Poll</Button>

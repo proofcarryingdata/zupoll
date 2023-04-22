@@ -51,7 +51,7 @@ export async function login(
 
   const request = {
     semaphoreGroupUrl,
-    proof: parsedPcd.pcd
+    proof: parsedPcd.pcd,
   };
   const url = `${ZUPOLL_SERVER_URL}login`;
 
@@ -80,7 +80,7 @@ export async function listPolls(
 
   try {
     const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` }
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
     return await res;
   } catch (e) {
@@ -89,8 +89,12 @@ export async function listPolls(
   }
 }
 
-export async function getLatestSemaphoreGroupHash(groupId: string): Promise<string | null> {
-  const url = `${PASSPORT_SERVER_URL}semaphore/latest-root/${encodeURIComponent(groupId)}`;
+export async function getLatestSemaphoreGroupHash(
+  groupId: string
+): Promise<string | null> {
+  const url = `${PASSPORT_SERVER_URL}semaphore/latest-root/${encodeURIComponent(
+    groupId
+  )}`;
   const res = await fetch(url);
 
   if (!res.ok) {
@@ -98,9 +102,9 @@ export async function getLatestSemaphoreGroupHash(groupId: string): Promise<stri
   }
 
   const rootHash = await res.json();
-  return rootHash
+  return rootHash;
 }
 
 export function getHistoricGroupUrl(groupId: string, rootHash: string): string {
-  return `${PASSPORT_SERVER_URL}semaphore/historic/${groupId}/${rootHash}`
+  return `${PASSPORT_SERVER_URL}semaphore/historic/${groupId}/${rootHash}`;
 }

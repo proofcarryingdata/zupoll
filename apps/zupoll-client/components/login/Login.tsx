@@ -4,9 +4,9 @@ import {
 } from "@pcd/passport-interface";
 import { useEffect, useState } from "react";
 import { login } from "../../src/api";
+import { ZupollError } from "../../src/types";
 import { PASSPORT_URL } from "../../src/util";
 import { Button } from "../core/Button";
-import { ZupollError } from "../../src/types";
 
 /**
  * Login for the user who belongs to the specified semaphore group.
@@ -33,7 +33,6 @@ export function Login({
   const [loggingIn, setLoggingIn] = useState(false);
 
   const [pcdStr] = usePassportPopupMessages();
-
 
   useEffect(() => {
     if (!loggingIn) return;
@@ -80,7 +79,7 @@ export function Login({
 async function fetchLoginToken(requestedGroup: string, pcdStr: string) {
   const res = await login(requestedGroup, pcdStr);
   if (res === undefined) {
-    throw new Error("Server is down. Contact passport@0xparc.org.")
+    throw new Error("Server is down. Contact passport@0xparc.org.");
   }
   if (!res.ok) {
     const resErr = await res.text();

@@ -77,7 +77,7 @@ export function Poll({
           : "Expires " + new Date(poll.expiry).toLocaleString()}
         {canVote ? " · Can Vote" : ""}
       </TotalVotesContainer>
-    </PollWrapper >
+    </PollWrapper>
   );
 }
 

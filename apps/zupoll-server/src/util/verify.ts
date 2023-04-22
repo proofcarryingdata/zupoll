@@ -23,9 +23,7 @@ export async function verifyGroupProof(
     options.allowedGroups &&
     !options.allowedGroups.includes(semaphoreGroupUrl)
   ) {
-    throw new Error(
-      `Not in Semaphore groups allowed to perform action.`
-    );
+    throw new Error(`Not in Semaphore groups allowed to perform action.`);
   }
 
   const pcd = await SemaphoreGroupPCDPackage.deserialize(proof);
@@ -38,7 +36,7 @@ export async function verifyGroupProof(
   if (
     options.claimedExtNullifier &&
     generateMessageHash(options.claimedExtNullifier).toString() !=
-    pcd.claim.externalNullifier
+      pcd.claim.externalNullifier
   ) {
     throw new Error("Invalid external nullifier in proof.");
   }
@@ -65,9 +63,7 @@ export async function verifyGroupProof(
       console.log("allowed roots", options.allowedRoots);
       console.log("merkle root", pcd.claim.merkleRoot);
 
-      throw new Error(
-        "Current root doesn't match any of the allowed roots"
-      );
+      throw new Error("Current root doesn't match any of the allowed roots");
     }
   } else {
     const response = await fetch(semaphoreGroupUrl);
@@ -101,9 +97,7 @@ export async function verifySignatureProof(
     }
   }
   if (!found) {
-    throw new Error(
-      `Not in Semaphore groups allowed to perform action.`
-    );
+    throw new Error(`Not in Semaphore groups allowed to perform action.`);
   }
 
   const pcd = await SemaphoreSignaturePCDPackage.deserialize(proof);
