@@ -48,7 +48,7 @@ export function CreatePoll({
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
   const { 
     loading: loadingVoterGroupUrl,
-     url: voterGroupUrl 
+    url: voterGroupUrl 
   } = useHistoricSemaphoreUrl(PARTICIPANTS_GROUP_ID, onError)
 
   // useEffect(() => {
@@ -116,6 +116,14 @@ export function CreatePoll({
   }, [pcdStr, onCreated, onError, pollBody, pollExpiry, pollOptions, voterGroupUrl]);
 
   const handleSubmit: FormEventHandler = async (event) => {
+    if (voterGroupUrl == null) {
+      onError({
+        title: "Error Creating Poll.",
+        message: 'Voter group not loaded yet'
+      });
+      return;
+    }
+
     event.preventDefault();
     createState.current = CreatePollState.AWAITING_PCDSTR;
 
@@ -124,7 +132,7 @@ export function CreatePoll({
       body: pollBody,
       expiry: pollExpiry,
       options: pollOptions,
-      voterSemaphoreGroupUrls: [SEMAPHORE_GROUP_URL],
+      voterSemaphoreGroupUrls: [voterGroupUrl],
     };
     const signalHash = sha256(stableStringify(signal));
     const sigHashEnc = generateMessageHash(signalHash).toString();
