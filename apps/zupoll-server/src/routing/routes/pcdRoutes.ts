@@ -5,8 +5,7 @@ import stableStringify from "json-stable-stringify";
 import { ApplicationContext } from "../../types";
 import { SEMAPHORE_ADMIN_GROUP_URL } from "../../util/auth";
 import { prisma } from "../../util/prisma";
-import { fetchAndVerifyName } from "../../util/util";
-import { verifyGroupProof, verifySignatureProof } from "../../util/verify";
+import { verifyGroupProof } from "../../util/verify";
 
 /**
  * The endpoints in this function accepts proof (pcd) in the request.
@@ -57,39 +56,6 @@ export function initPCDRoutes(
               options: request.options,
               voterSemaphoreGroupUrls: request.voterSemaphoreGroupUrls,
               voterSemaphoreGroupRoots: request.voterSemaphoreGroupRoots ?? [],
-              proof: request.proof,
-            },
-          });
-
-          res.json({
-            id: newPoll.id,
-          });
-        } else if (request.pollsterType == UserType.NONANON) {
-          // TODO: ok we need to fix this nullfier cuz it's fake. we should generate our own cuz we know the commitment.
-          const nullifier = await verifySignatureProof(
-            request.pollsterCommitment!,
-            request.proof,
-            signalHash,
-            [SEMAPHORE_ADMIN_GROUP_URL!]
-          );
-          const pollsterName = await fetchAndVerifyName(
-            request.pollsterCommitment!,
-            request.pollsterUuid!
-          );
-
-          const newPoll = await prisma.poll.create({
-            data: {
-              id: signalHash,
-              pollsterType: "NONANON",
-              pollsterNullifier: nullifier,
-              pollsterName: pollsterName,
-              pollsterUuid: request.pollsterUuid,
-              pollsterCommitment: request.pollsterCommitment,
-              pollType: request.pollType,
-              body: request.body,
-              expiry: request.expiry,
-              options: request.options,
-              voterSemaphoreGroupUrls: request.voterSemaphoreGroupUrls,
               proof: request.proof,
             },
           });
@@ -169,35 +135,6 @@ export function initPCDRoutes(
             proof: request.proof,
           },
         });
-        res.json({
-          id: newVote.id,
-        });
-      } else if (request.voterType == UserType.NONANON) {
-        // TODO: ok we need to fix this nullfier cuz it's fake. we should generate our own cuz we know the commitment.
-        const nullifier = await verifySignatureProof(
-          request.voterCommitment!,
-          request.proof,
-          signalHash,
-          poll.voterSemaphoreGroupUrls
-        );
-        const voterName = await fetchAndVerifyName(
-          request.voterCommitment!,
-          request.voterUuid!
-        );
-
-        const newVote = await prisma.vote.create({
-          data: {
-            pollId: request.pollId,
-            voterType: "NONANON",
-            voterNullifier: nullifier,
-            voterName: voterName,
-            voterUuid: request.voterUuid,
-            voterCommitment: request.voterCommitment,
-            voteIdx: request.voteIdx,
-            proof: request.proof,
-          },
-        });
-
         res.json({
           id: newVote.id,
         });
