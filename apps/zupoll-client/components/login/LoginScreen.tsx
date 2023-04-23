@@ -13,8 +13,7 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
   return (
     <Center>
       <Header>
-        <Logo src="/zuzalulogo.webp" alt="Zuzalu" width="160" height="42" />
-        <H1>Polls</H1>
+        <Logo src="/zupoll-logo.png" alt="Zuzalu" />
       </Header>
       <Body>
         <Description>
@@ -60,14 +59,7 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
 }
 
 const Logo = styled.img`
-  width: 10rem;
-  height: 2.625rem;
-`;
-
-const H1 = styled.h1`
-  color: #eee;
-  margin-top: 0;
-  font-size: 1.8rem;
+  width: 12rem;
 `;
 
 const Center = styled.div`
@@ -85,10 +77,9 @@ const Description = styled.div`
 
 const Header = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin-top: 2rem;
-  margin-bottom: 1rem;
-  padding: 0 1rem 0 0.25rem;
+  margin-bottom: 2em;
 `;
 
 const Body = styled.div`

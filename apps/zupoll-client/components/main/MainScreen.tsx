@@ -31,7 +31,7 @@ export function MainScreen({
   return (
     <Center>
       <LoggedInHeader>
-        Zuzalu Polls
+        <Logo src="/zupoll-logo.png" alt="Zuzalu" />
         <Button onClick={confirmLogout}>Logout</Button>
       </LoggedInHeader>
       {group == SEMAPHORE_ADMIN_GROUP_URL && (
@@ -57,6 +57,10 @@ function parseJwt(token: string) {
   const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
   return JSON.parse(window.atob(base64));
 }
+
+const Logo = styled.img`
+  width: 12rem;
+`;
 
 const Center = styled.div`
   width: 100%;
