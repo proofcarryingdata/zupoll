@@ -5,6 +5,8 @@ import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../../src/util";
 import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "../main/ErrorOverlay";
 import { Login } from "./Login";
+import { LoggedOutHeader } from "../core/Headers";
+import { Center } from "../core";
 
 export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
   const [serverLoading, setServerLoading] = useState<boolean>(false);
@@ -12,9 +14,7 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
 
   return (
     <Center>
-      <Header>
-        <Logo src="/zupoll-logo.png" alt="Zuzalu" />
-      </Header>
+      <LoggedOutHeader/>
       <Body>
         <Description>
           <p>
@@ -58,28 +58,11 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
   );
 }
 
-const Logo = styled.img`
-  width: 12rem;
-`;
-
-const Center = styled.div`
-  max-width: 580px;
-  margin: 0 auto;
-  padding: 0 1rem;
-`;
-
 const Description = styled.div`
   font-size: 1.2rem;
   margin-bottom: 2rem;
   margin-top: -0.75rem;
   text-align: center;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 2rem;
-  margin-bottom: 2em;
 `;
 
 const Body = styled.div`

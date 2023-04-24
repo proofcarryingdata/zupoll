@@ -1,11 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
-import styled from "styled-components";
 import { ZupollError } from "../../src/types";
 import { SEMAPHORE_ADMIN_GROUP_URL } from "../../src/util";
 import { Button } from "../core/Button";
 import { CreatePoll } from "./CreatePoll";
 import { ErrorOverlay } from "./ErrorOverlay";
 import { Polls } from "./Polls";
+import { LoggedInHeader } from "../core/Headers";
+import { Center } from "../core";
 
 export function MainScreen({
   token,
@@ -20,20 +21,12 @@ export function MainScreen({
   const [error, setError] = useState<ZupollError>();
   const group = useMemo(() => parseJwt(token)["groupUrl"] || null, [token]);
 
-  const confirmLogout = useCallback(() => {
-    if (window.confirm("Are you sure you want to log out?")) {
-      onLogout();
-    }
-  }, [onLogout]);
-
   const onError = useCallback((err: ZupollError) => setError(err), []);
 
   return (
     <Center>
-      <LoggedInHeader>
-        <Logo src="/zupoll-logo.png" alt="Zuzalu" />
-        <Button onClick={confirmLogout}>Logout</Button>
-      </LoggedInHeader>
+      <LoggedInHeader onLogout={onLogout} />
+      
       {group == SEMAPHORE_ADMIN_GROUP_URL && (
         <CreatePoll onCreated={setNewPoll} onError={onError} />
       )}
@@ -57,26 +50,3 @@ function parseJwt(token: string) {
   const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
   return JSON.parse(window.atob(base64));
 }
-
-const Logo = styled.img`
-  width: 12rem;
-`;
-
-const Center = styled.div`
-  width: 100%;
-  max-width: 580px;
-  padding: 0 1rem;
-  margin: 0 auto;
-`;
-
-const LoggedInHeader = styled.div`
-  width: 100%;
-  font-size: 2em;
-  margin-bottom: 2rem;
-  margin-top: 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: bold;
-  color: #fff;
-`;
