@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import Head from "next/head";
 import styled from "styled-components";
 import { RippleLoader } from "../components/core/RippleLoader";
 import { LoginScreen } from "../components/login/LoginScreen";
@@ -25,6 +26,11 @@ export default function Page() {
   const logout = useCallback(() => saveToken(undefined), [saveToken]);
 
   return (
+    <>
+    <Head>
+      <title>Zupoll</title>
+      <link rel="Zupoll icon" href="/zupoll-icon.ico" />
+    </Head>
     <Wrapper>
       {loading ? (
         <RippleLoader />
@@ -38,6 +44,7 @@ export default function Page() {
         <LoginScreen onLogin={saveToken} />
       )}
     </Wrapper>
+    </>
   );
 }
 

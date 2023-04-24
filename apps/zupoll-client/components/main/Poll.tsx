@@ -16,14 +16,13 @@ export function Poll({
   const [serverLoading, setServerLoading] = useState<boolean>(false);
 
   const voter = usePollVote(poll, onError, onVoted, setServerLoading);
-  const totalVotes = poll.votes.reduce((a, b) => a + b, 0);
   const expired = new Date(poll.expiry) < new Date();
-
   const canVote = useMemo(() => {
     return !votedOn(poll.id) && !expired;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expired, poll.id, poll]);
 
+  const totalVotes = poll.votes.reduce((a, b) => a + b, 0);
   const maxVote = Math.max(...poll.votes);
 
   const getVoteDisplay = (a: number, b: number) => {
@@ -58,12 +57,18 @@ export function Poll({
             }}
           >
             <PollProgressBar
-              percent={totalVotes === 0 ? 0 : poll.votes[idx] / totalVotes}
+              percent={totalVotes === 0 || canVote ? 0 : poll.votes[idx] / totalVotes}
               isMax={maxVote === poll.votes[idx]}
             />
-            <PollResult>
-              {getVoteDisplay(poll.votes[idx], totalVotes)}
-            </PollResult>
+            { 
+              canVote ? (
+                <PollPreResult/>
+              ) : (
+                <PollResult>
+                  {getVoteDisplay(poll.votes[idx], totalVotes)}
+                </PollResult>
+              )
+            }
             <OptionString>{opt}</OptionString>
           </PollOption>
         ))}
@@ -169,13 +174,18 @@ const PollProgressBar = styled.span<{ percent: number; isMax: boolean }>`
   `}
 `;
 
+const PollPreResult = styled.span`
+  z-index: 500;
+  width: 0.5rem;
+`;
+
 const PollResult = styled.span`
   z-index: 500;
   display: inline-flex;
   justify-content: flex-end;
   align-items: center;
   font-weight: bold;
-  width: 5em;
+  width: 4rem;
   font-size: 0.9em;
 `;
 
