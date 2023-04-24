@@ -7,6 +7,7 @@ import { ZupollError } from "../../src/types";
 import { Center } from "../core";
 import { LoggedInHeader } from "../core/Headers";
 import { RippleLoaderLight } from "../core/RippleLoader";
+import { BallotPoll } from "./BallotPoll";
 import { ErrorOverlay } from "./ErrorOverlay";
 
 export function BallotScreen({ ballotURL }: { ballotURL: string }) {
@@ -36,7 +37,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
   }, [setToken, router]);
 
   /**
-   * POLL & VOTING LOGIC
+   * POLL LOGIC
    */
   const [loadingPolls, setLoadingPolls] = useState<boolean>(false);
   const [polls, setPolls] = useState<Array<PollWithCounts>>([]);
@@ -74,6 +75,24 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
     getBallotPolls();
   }, [token, ballotURL, logout]);
 
+  /**
+   * VOTING LOGIC
+   */
+  const [pollToVote, setPollToVote] = useState(
+    new Map<string, number | undefined>()
+  );
+  
+  const onVoted = (pollId: string, voteIdx: number) => {
+    const currentVote = pollToVote.get(pollId);
+    if (currentVote !== undefined) {
+      if (currentVote === voteIdx) {
+        setPollToVote(new Map(pollToVote.set(pollId, undefined)));
+        return;
+      }
+    }
+    setPollToVote(new Map(pollToVote.set(pollId, voteIdx)));
+  };
+
   return (
     <>
       <Head>
@@ -82,7 +101,21 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
       </Head>
       <Center>
         <LoggedInHeader onLogout={logout} />
-        {loadingToken || loadingPolls ? <RippleLoaderLight /> : <></>}
+        {loadingToken || loadingPolls ? (
+          <RippleLoaderLight />
+        ) : (
+          <>
+            {polls.map((poll) => (
+              <BallotPoll
+                key={poll.id}
+                ballotURL={ballotURL}
+                poll={poll}
+                voteIdx={pollToVote.get(poll.id)}
+                onVoted={onVoted}
+              />
+            ))}
+          </>
+        )}
         {error && (
           <ErrorOverlay error={error} onClose={() => setError(undefined)} />
         )}
