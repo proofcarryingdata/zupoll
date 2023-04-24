@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { listBallotPolls } from "../../src/api";
+import { useLogin } from "../../src/login";
 import { PollResponse, PollWithCounts } from "../../src/requestTypes";
 import { ZupollError } from "../../src/types";
 import { Center } from "../core";
@@ -13,28 +14,7 @@ import { ErrorOverlay } from "./ErrorOverlay";
 export function BallotScreen({ ballotURL }: { ballotURL: string }) {
   const router = useRouter();
   const [error, setError] = useState<ZupollError>();
-
-  /**
-   * LOGIN LOGIC
-   */
-  const [token, setToken] = useState<string>("");
-  const [loadingToken, setLoadingToken] = useState<boolean>(true);
-
-  const logout = useCallback(() => {
-    delete window.localStorage["access_token"];
-    router.push("/");
-  }, [router]);
-
-  // Automatically go to login screen if there's no access token
-  useEffect(() => {
-    if (window.localStorage["access_token"] === undefined) {
-      // Go back to login page if no token
-      router.push("/");
-    }
-
-    setToken(window.localStorage["access_token"]);
-    setLoadingToken(false);
-  }, [setToken, router]);
+  const {token, group: _group, loadingToken, logout} = useLogin(router);
 
   /**
    * POLL LOGIC
@@ -81,7 +61,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
   const [pollToVote, setPollToVote] = useState(
     new Map<string, number | undefined>()
   );
-  
+
   const onVoted = (pollId: string, voteIdx: number) => {
     const currentVote = pollToVote.get(pollId);
     if (currentVote !== undefined) {

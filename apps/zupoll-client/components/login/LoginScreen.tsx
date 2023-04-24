@@ -58,7 +58,15 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
   );
 }
 
+const LoginRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
+`;
+
 const Description = styled.div`
+  font-family: OpenSans;
   font-size: 1.2rem;
   margin-bottom: 2rem;
   margin-top: -0.75rem;
@@ -69,11 +77,4 @@ const Body = styled.div`
   background: #eee;
   border-radius: 1rem;
   padding: 2rem;
-`;
-
-const LoginRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 1rem;
 `;

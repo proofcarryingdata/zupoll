@@ -8,6 +8,7 @@ export const Button = styled.button<{ deemph?: boolean }>`
   opacity: 1;
   cursor: pointer;
 
+  font-family: OpenSans;
   font-weight: ${({ deemph }) => (deemph ? "normal" : "bold")};
   background-color: ${({ deemph }) => (deemph ? "#eee" : "#fff")};
 

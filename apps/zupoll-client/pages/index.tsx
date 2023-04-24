@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Head from "next/head";
 import styled from "styled-components";
-import { RippleLoaderLight } from "../components/core/RippleLoader";
+import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
 
@@ -33,11 +33,9 @@ export default function Page() {
     </Head>
     <Wrapper>
       {loading ? (
-        <RippleLoaderLight />
+        <RippleLoaderLightMargin />
       ) : token ? (
         <MainScreen
-          token={token}
-          resetToken={() => setToken(undefined)}
           onLogout={logout}
         />
       ) : (

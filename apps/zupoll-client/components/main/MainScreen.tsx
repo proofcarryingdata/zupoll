@@ -1,52 +1,84 @@
-import { useCallback, useMemo, useState } from "react";
-import { ZupollError } from "../../src/types";
-import { SEMAPHORE_ADMIN_GROUP_URL } from "../../src/util";
-import { Button } from "../core/Button";
-import { CreatePoll } from "./CreatePoll";
-import { ErrorOverlay } from "./ErrorOverlay";
-import { Polls } from "./Polls";
-import { LoggedInHeader } from "../core/Headers";
+import { useRouter } from "next/router";
+import styled from "styled-components";
 import { Center } from "../core";
+import { Button } from "../core/Button";
+import { LoggedInHeader } from "../core/Headers";
 
 export function MainScreen({
-  token,
-  resetToken,
   onLogout,
 }: {
-  token: string;
-  resetToken: () => void;
   onLogout: () => void;
 }) {
-  const [newPoll, setNewPoll] = useState<string>();
-  const [error, setError] = useState<ZupollError>();
-  const group = useMemo(() => parseJwt(token)["groupUrl"] || null, [token]);
-
-  const onError = useCallback((err: ZupollError) => setError(err), []);
-
+  const router = useRouter();
+  
   return (
     <Center>
       <LoggedInHeader onLogout={onLogout} />
-      
-      {group == SEMAPHORE_ADMIN_GROUP_URL && (
-        <CreatePoll onCreated={setNewPoll} onError={onError} />
-      )}
 
-      <Polls
-        accessToken={token}
-        newPoll={newPoll}
-        resetToken={resetToken}
-        onError={onError}
-      />
+      <CreateBallotButton onClick={() => router.push("/create-ballot")}>
+        <h3>Create a new ballot</h3>
+      </CreateBallotButton>
 
-      {error && (
-        <ErrorOverlay error={error} onClose={() => setError(undefined)} />
-      )}
+      <BallotListContainer>
+        <TitleContainer>
+          <H1>Advisory</H1> <H1>Votes</H1>
+        </TitleContainer>
+        <Button>AV #1</Button>
+        <Button>AV #2</Button>
+        <Button>AV #3</Button>
+      </BallotListContainer>
+      <br />
+      <BallotListContainer>
+        <TitleContainer>
+          <H1>Straw</H1> <H1>Polls</H1>
+        </TitleContainer>
+        <Button>SP #1</Button>
+        <Button>SP #2</Button>
+        <Button>SP #3</Button>
+      </BallotListContainer>
     </Center>
   );
 }
 
-function parseJwt(token: string) {
-  const base64Url = token.split(".")[1];
-  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  return JSON.parse(window.atob(base64));
-}
+const H1 = styled.h1`
+  color: black;
+  margin: 0;
+  font-size: 1.4rem;
+  font-family: OpenSans;
+  font-weight: 700;
+  font-style: normal;
+  /* ::first-letter {
+    font-size: 1.6rem;
+  } */
+`;
+
+const BallotListContainer = styled.div`
+  display: flex;
+  background: #eee;
+  width: 100%;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  margin-top: 1rem;
+  border-radius: 1rem;
+  padding: 1.5rem 2rem 2rem 2rem;
+  border: 1px solid #eee;
+  gap: 1rem;
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const CreateBallotButton = styled.div`
+  font-family: OpenSans;
+  background: #52B5A4;
+  border-radius: 1rem;
+  padding: 0.25rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  cursor: pointer;
+`;
