@@ -28,7 +28,7 @@ export function MainScreen({
     const minutes = Math.floor(
       (new Date(expiry).getTime() - Date.now()) / 60000
     );
-    const hours = Math.floor(minutes/60);
+    const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
 
     if (days >= 1) {
@@ -103,7 +103,7 @@ export function MainScreen({
             .filter((ballot) => ballot.ballotType === BallotType.ADVISORYVOTE)
             .map((ballot) => (
               <BallotListButton
-                onClick={() => router.push(`ballot/${ballot.ballotURL}`)}
+                onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
               >
                 <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
                 <div style={{ fontStyle: "italic" }}>
@@ -129,7 +129,7 @@ export function MainScreen({
             .filter((ballot) => ballot.ballotType === BallotType.STRAWPOLL)
             .map((ballot) => (
               <BallotListButton
-                onClick={() => router.push(`ballot/${ballot.ballotURL}`)}
+                onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
               >
                 <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
                 <div style={{ fontStyle: "italic" }}>
