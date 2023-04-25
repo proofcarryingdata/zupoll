@@ -35,7 +35,7 @@ export default function Page() {
         {loading ? (
           <RippleLoaderLightMargin />
         ) : token ? (
-          <MainScreen onLogout={logout} />
+          <MainScreen token={token} onLogout={logout} />
         ) : (
           <LoginScreen onLogin={saveToken} />
         )}

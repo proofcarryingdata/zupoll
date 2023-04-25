@@ -36,6 +36,7 @@ export function initAuthedRoutes(
         ballotTitle: true,
         ballotURL: true,
         expiry: true,
+        ballotType: true,
       },
       orderBy: { expiry: "asc" },
     });

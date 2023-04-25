@@ -35,6 +35,10 @@ export type BallotPollResponse = {
   polls: PollWithCounts[];
 };
 
+export type BallotResponse = {
+  ballots: Ballot[];
+}
+
 export type PollWithCounts = Poll & {
   votes: any[];
 };
