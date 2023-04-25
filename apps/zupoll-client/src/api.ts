@@ -1,10 +1,10 @@
 import { PASSPORT_SERVER_URL, ZUPOLL_SERVER_URL } from "../src/util";
-import { CreatePollRequest, VoteRequest } from "./types";
+import { CreateBallotRequest, MultiVoteRequest } from "./requestTypes";
 
-export async function createPoll(
-  request: CreatePollRequest
+export async function createBallot(
+  request: CreateBallotRequest
 ): Promise<Response | undefined> {
-  const url = `${ZUPOLL_SERVER_URL}create-poll`;
+  const url = `${ZUPOLL_SERVER_URL}create-ballot`;
 
   try {
     const res = fetch(url, {
@@ -22,10 +22,10 @@ export async function createPoll(
   }
 }
 
-export async function doVote(
-  request: VoteRequest
+export async function voteBallot(
+  request: MultiVoteRequest
 ): Promise<Response | undefined> {
-  const url = `${ZUPOLL_SERVER_URL}vote`;
+  const url = `${ZUPOLL_SERVER_URL}vote-ballot`;
 
   try {
     const res = fetch(url, {
@@ -71,16 +71,37 @@ export async function login(
   }
 }
 
-export async function listPolls(
+export async function listBallots(
   accessToken: string | null
 ): Promise<Response | undefined> {
   if (!accessToken) return undefined;
 
-  const url = `${ZUPOLL_SERVER_URL}polls`;
+  const url = `${ZUPOLL_SERVER_URL}ballots`;
 
   try {
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return await res;
+  } catch (e) {
+    console.log(e);
+    return undefined;
+  }
+}
+
+export async function listBallotPolls(
+  accessToken: string | null,
+  ballotURL: string
+): Promise<Response | undefined> {
+  if (!accessToken) return undefined;
+
+  const url = `${ZUPOLL_SERVER_URL}ballot-polls/${ballotURL}`;
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
     return await res;
   } catch (e) {

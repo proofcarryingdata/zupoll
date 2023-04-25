@@ -1,27 +1,17 @@
-import { useMemo, useState } from "react";
 import styled, { css } from "styled-components";
-import { PollDefinition, ZupollError } from "../../src/types";
-import { usePollVote, votedOn } from "../../src/voting";
-import { RippleLoader } from "../core/RippleLoader";
+import { PollWithCounts } from "../../src/requestTypes";
 
-export function Poll({
+export function BallotPoll({
+  canVote,
   poll,
-  onError,
+  voteIdx,
   onVoted,
 }: {
-  poll: PollDefinition;
-  onError: (err: ZupollError) => void;
-  onVoted: (id: string) => void;
+  canVote: boolean;
+  poll: PollWithCounts;
+  voteIdx: number | undefined;
+  onVoted: (pollId: string, voteIdx: number) => void;
 }) {
-  const [serverLoading, setServerLoading] = useState<boolean>(false);
-
-  const voter = usePollVote(poll, onError, onVoted, setServerLoading);
-  const expired = new Date(poll.expiry) < new Date();
-  const canVote = useMemo(() => {
-    return !votedOn(poll.id) && !expired;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expired, poll.id, poll]);
-
   const totalVotes = poll.votes.reduce((a, b) => a + b, 0);
   const maxVote = Math.max(...poll.votes);
 
@@ -29,46 +19,39 @@ export function Poll({
     if (b === 0) {
       return "0%";
     }
-
     const percentVal = ((a / b) * 100).toFixed(1);
     return `${percentVal}%`;
   };
 
   return (
     <PollWrapper>
-      <PollHeader>
-        {poll.body}
-        {serverLoading ? <RippleLoader /> : <></>}
-      </PollHeader>
+      <PollHeader>{poll.body}</PollHeader>
 
       <PollOptions>
         {poll.options.map((opt, idx) => (
           <PollOption
-            canVote={canVote}
             key={idx}
+            canVote={canVote}
+            selected={voteIdx === idx}
             onClick={() => {
-              if (voter && canVote) {
-                if (
-                  confirm(`Are you sure you want to vote for option ${opt}?`)
-                ) {
-                  voter(idx);
-                }
+              if (canVote) {
+                onVoted(poll.id, idx);
               }
             }}
           >
             <PollProgressBar
-              percent={totalVotes === 0 || canVote ? 0 : poll.votes[idx] / totalVotes}
+              percent={
+                totalVotes === 0 || canVote ? 0 : poll.votes[idx] / totalVotes
+              }
               isMax={maxVote === poll.votes[idx]}
             />
-            { 
-              canVote ? (
-                <PollPreResult/>
-              ) : (
-                <PollResult>
-                  {getVoteDisplay(poll.votes[idx], totalVotes)}
-                </PollResult>
-              )
-            }
+            {canVote ? (
+              <PollPreResult />
+            ) : (
+              <PollResult>
+                {getVoteDisplay(poll.votes[idx], totalVotes)}
+              </PollResult>
+            )}
             <OptionString>{opt}</OptionString>
           </PollOption>
         ))}
@@ -76,11 +59,6 @@ export function Poll({
 
       <TotalVotesContainer>
         {totalVotes} vote{totalVotes !== 1 ? "s" : ""}
-        {" · "}
-        {expired
-          ? "Expired"
-          : "Expires " + new Date(poll.expiry).toLocaleString()}
-        {canVote ? " · Can Vote" : ""}
       </TotalVotesContainer>
     </PollWrapper>
   );
@@ -88,26 +66,18 @@ export function Poll({
 
 const PollWrapper = styled.div`
   box-sizing: border-box;
+  font-family: OpenSans;
   border: 1px solid #bbb;
-  border-bottom: none;
-  background-color: #fcfcfc;
+  background-color: #eee;
   width: 100%;
-  padding: 1rem;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 1rem;
   position: relative;
-  font-family: system-ui, sans-serif;
   transition: 200ms;
-
-  &:first-child {
-    border-radius: 4px 4px 0px 0px;
-  }
 
   &:hover {
     background-color: #f8f8f8;
-  }
-
-  &:last-child {
-    border-bottom: 1px solid #bbb;
-    border-radius: 0px 0px 4px 4px;
   }
 `;
 
@@ -118,7 +88,7 @@ const PollHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-  font-weight: 600;
+  font-weight: 700;
 `;
 
 const PollOptions = styled.div`
@@ -132,8 +102,8 @@ const PollOptions = styled.div`
   box-sizing: border-box;
 `;
 
-const PollOption = styled.span<{ canVote: boolean }>`
-  ${({ canVote }) => css`
+const PollOption = styled.span<{ canVote: boolean; selected: boolean }>`
+  ${({ canVote, selected }) => css`
     overflow: hidden;
     position: relative;
     padding: 0.5rem 0.5rem;
@@ -159,6 +129,12 @@ const PollOption = styled.span<{ canVote: boolean }>`
       &:hover:active {
         background-color: #ccc;
       }
+    `}
+
+    ${selected &&
+    css`
+      border: 1px solid #888;
+      background-color: #aaa;
     `}
   `}
 `;

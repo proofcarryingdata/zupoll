@@ -14,10 +14,25 @@ datasource db {
 // If user type is ANON, the PCD is a Semaphore Group PCD which signs the signal. We just check for membership.
 // If user type is NONANON, the PCD is a Semaphore Signature PCD which signs the signal. We extract the commitment
 //    from the verified PCD and then we check that it is part of a valid group.
+enum UserType {
+  ANON
+  NONANON
+}
 
-model Poll {
-  id String @id
+enum BallotType {
+  ADVISORYVOTE
+  STRAWPOLL
+}
+
+model Ballot {
+  ballotId String @default(uuid())
+  ballotURL Int @id @default(autoincrement())
+	ballotTitle String
+  ballotDescription String
   createdAt DateTime @default(now())
+  expiry DateTime
+  proof Json
+
   pollsterType UserType
   pollsterNullifier String @unique
 
@@ -29,14 +44,23 @@ model Poll {
   pollsterUuid String?
   pollsterCommitment String?
 
-  pollType PollType
-  body String
-  expiry DateTime
-  options String[]
   voterSemaphoreGroupUrls String[]
   voterSemaphoreGroupRoots String[]
+	polls Poll[]
+	ballotType BallotType
+}
 
-  proof Json
+model Poll {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  body String
+  options String[]
+  expiry DateTime
+
+  ballot Ballot? @relation(fields: [ballotURL], references: [ballotURL])
+  ballotURL Int?
+
   votes Vote[]
 }
 
@@ -46,7 +70,7 @@ model Vote {
   poll Poll @relation(fields: [pollId], references: [id])
   pollId String
   voterType UserType
-  voterNullifier String @unique
+  voterNullifier String
 
   // ANON
   voterSemaphoreGroupUrl String?
@@ -58,13 +82,4 @@ model Vote {
 
   voteIdx Int
   proof Json
-}
-
-enum UserType {
-  ANON
-  NONANON
-}
-
-enum PollType {
-  REFERENDUM
 }

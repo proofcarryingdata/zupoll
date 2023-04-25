@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
 import Head from "next/head";
+import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
-import { RippleLoaderLight } from "../components/core/RippleLoader";
+import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
 
@@ -27,23 +27,19 @@ export default function Page() {
 
   return (
     <>
-    <Head>
-      <title>Zupoll</title>
-      <link rel="Zupoll icon" href="/zupoll-icon.ico" />
-    </Head>
-    <Wrapper>
-      {loading ? (
-        <RippleLoaderLight />
-      ) : token ? (
-        <MainScreen
-          token={token}
-          resetToken={() => setToken(undefined)}
-          onLogout={logout}
-        />
-      ) : (
-        <LoginScreen onLogin={saveToken} />
-      )}
-    </Wrapper>
+      <Head>
+        <title>Zupoll</title>
+        <link rel="Zupoll icon" href="/zupoll-icon.ico" />
+      </Head>
+      <Wrapper>
+        {loading ? (
+          <RippleLoaderLightMargin />
+        ) : token ? (
+          <MainScreen token={token} onLogout={logout} />
+        ) : (
+          <LoginScreen onLogin={saveToken} />
+        )}
+      </Wrapper>
     </>
   );
 }

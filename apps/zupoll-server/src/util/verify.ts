@@ -35,7 +35,7 @@ export async function verifyGroupProof(
   // check externalNullifier
   if (
     options.claimedExtNullifier &&
-    generateMessageHash(options.claimedExtNullifier).toString() !=
+    generateMessageHash(options.claimedExtNullifier).toString() !==
       pcd.claim.externalNullifier
   ) {
     throw new Error("Invalid external nullifier in proof.");

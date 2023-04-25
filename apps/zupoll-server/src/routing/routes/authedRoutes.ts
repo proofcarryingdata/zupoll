@@ -30,30 +30,79 @@ export function initAuthedRoutes(
     }
   );
 
-  app.get("/polls", authenticateJWT, async (req: Request, res: Response) => {
-    const polls = await prisma.poll.findMany({
-      include: {
-        votes: {
-          select: {
-            voteIdx: true,
-          },
-        },
+  app.get("/ballots", authenticateJWT, async (req: Request, res: Response) => {
+    const ballots = await prisma.ballot.findMany({
+      select: {
+        ballotTitle: true,
+        ballotURL: true,
+        expiry: true,
+        ballotType: true,
       },
-      orderBy: { expiry: "asc" },
-    });
-    polls.forEach((poll) => {
-      const counts = new Array(poll.options.length).fill(0);
-      for (const vote of poll.votes) {
-        counts[vote.voteIdx] += 1;
-      }
-      poll.votes = counts;
+      orderBy: { expiry: "desc" },
     });
 
-    res.status(200).json({ polls });
+    res.status(200).json({ ballots });
   });
+
+  app.get(
+    "/ballot-polls/:ballotURL",
+    authenticateJWT,
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const ballotURL = parseInt(req.params.ballotURL);
+
+        if (isNaN(ballotURL)) {
+          throw new Error("Invalid ballot URL.");
+        }
+
+        const ballot = await prisma.ballot.findUnique({
+          where: {
+            ballotURL: ballotURL,
+          },
+        });
+        if (ballot === null) {
+          throw new Error("Ballot not found.");
+        }
+
+        const polls = await prisma.poll.findMany({
+          where: {
+            ballotURL: ballotURL,
+          },
+          include: {
+            votes: {
+              select: {
+                voteIdx: true,
+              },
+            },
+          },
+          orderBy: { expiry: "asc" },
+        });
+        if (polls === null) {
+          throw new Error("Ballot has no polls.");
+        }
+
+        polls.forEach((poll) => {
+          const counts = new Array(poll.options.length).fill(0);
+          for (const vote of poll.votes) {
+            counts[vote.voteIdx] += 1;
+          }
+          poll.votes = counts;
+        });
+
+        res.status(200).json({ ballot, polls });
+      } catch (e) {
+        console.error(e);
+        next(e);
+      }
+    }
+  );
 }
 
-export interface LoginRequest {
+export type LoginRequest = {
   semaphoreGroupUrl: string;
   proof: string;
-}
+};
+
+export type BallotPollRequest = {
+  ballotURL: number;
+};

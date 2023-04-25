@@ -2,6 +2,8 @@ import { useState } from "react";
 import styled from "styled-components";
 import { ZupollError } from "../../src/types";
 import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../../src/util";
+import { Center } from "../core";
+import { LoggedOutHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "../main/ErrorOverlay";
 import { Login } from "./Login";
@@ -12,9 +14,7 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
 
   return (
     <Center>
-      <Header>
-        <Logo src="/zupoll-logo.png" alt="Zuzalu" />
-      </Header>
+      <LoggedOutHeader />
       <Body>
         <Description>
           <p>
@@ -36,14 +36,14 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
                 onError={setError}
                 setServerLoading={setServerLoading}
                 requestedGroup={SEMAPHORE_GROUP_URL}
-                prompt="Log in to vote"
+                prompt="Resident login"
               />
               <Login
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
                 requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
-                prompt="Log in as an organizer"
+                prompt="Organizer login"
                 deemphasized
               />
             </>
@@ -58,39 +58,23 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
   );
 }
 
-const Logo = styled.img`
-  width: 12rem;
-`;
-
-const Center = styled.div`
-  max-width: 580px;
-  margin: 0 auto;
-  padding: 0 1rem;
+const LoginRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
 `;
 
 const Description = styled.div`
+  font-family: OpenSans;
   font-size: 1.2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   margin-top: -0.75rem;
   text-align: center;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 2rem;
-  margin-bottom: 2em;
 `;
 
 const Body = styled.div`
   background: #eee;
   border-radius: 1rem;
   padding: 2rem;
-`;
-
-const LoginRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 1rem;
 `;

@@ -31,6 +31,8 @@ const ModalBg = styled.div`
 
 const ModalWrap = styled.div`
   background: radial-gradient(circle, var(--bg-lite-gray), var(--bg-dark-gray));
+  color: white;
+  font-family: OpenSans;
   top: 4rem;
   left: 0;
   width: 100%;

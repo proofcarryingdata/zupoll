@@ -1,4 +1,5 @@
 import { ZupollError } from "../../src/types";
+import { Button } from "../core/Button";
 import { Overlay } from "./Overlay";
 
 export function ErrorOverlay({
@@ -22,7 +23,7 @@ export function ErrorOverlay({
         </>
       )}
       <br />
-      <button onClick={onClose}>Close</button>
+      <Button onClick={onClose}>Close</Button>
     </Overlay>
   );
 }

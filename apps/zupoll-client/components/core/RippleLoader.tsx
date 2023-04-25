@@ -42,6 +42,14 @@ export const RippleLoaderWrapper = styled.div`
   height: 100%;
 `;
 
+export const RippleLoaderWrapperMargin = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin-top: 2rem;
+`;
+
 export const RippleLoaderInner = styled.div<{ light: boolean }>`
   display: inline-block;
   position: relative;
@@ -78,5 +86,16 @@ export const RippleLoaderLight = () => {
         <div></div>
       </RippleLoaderInner>
     </RippleLoaderWrapper>
+  );
+};
+
+export const RippleLoaderLightMargin = () => {
+  return (
+    <RippleLoaderWrapperMargin>
+      <RippleLoaderInner light={true}>
+        <div></div>
+        <div></div>
+      </RippleLoaderInner>
+    </RippleLoaderWrapperMargin>
   );
 };
