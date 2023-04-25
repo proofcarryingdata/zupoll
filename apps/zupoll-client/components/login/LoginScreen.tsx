@@ -36,14 +36,14 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
                 onError={setError}
                 setServerLoading={setServerLoading}
                 requestedGroup={SEMAPHORE_GROUP_URL}
-                prompt="Log in to vote"
+                prompt="Resident login"
               />
               <Login
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
                 requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
-                prompt="Log in as an organizer"
+                prompt="Organizer login"
                 deemphasized
               />
             </>
@@ -68,7 +68,7 @@ const LoginRow = styled.div`
 const Description = styled.div`
   font-family: OpenSans;
   font-size: 1.2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   margin-top: -0.75rem;
   text-align: center;
 `;

@@ -6,7 +6,7 @@ import { Ballot, BallotType } from "../../src/prismaTypes";
 import { BallotResponse } from "../../src/requestTypes";
 import { ZupollError } from "../../src/types";
 import { Center } from "../core";
-import { BallotButton, Button } from "../core/Button";
+import { BallotButton } from "../core/Button";
 import { LoggedInHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "./ErrorOverlay";
@@ -23,6 +23,19 @@ export function MainScreen({
   const [loadingBallots, setLoadingBallots] = useState<boolean>(true);
   const [ballots, setBallots] = useState<Ballot[]>([]);
   const [error, setError] = useState<ZupollError>();
+
+  function getTimeBeforeExpiry(expiry: Date) {
+    const hours = Math.floor(
+      (new Date(expiry).getTime() - Date.now()) / 3600000
+    );
+    const days = Math.floor(hours / 24);
+
+    if (days >= 1) {
+      return "Expires in <" + days + " days";
+    } else {
+      return "Expires in <" + hours + " hours";
+    }
+  }
 
   useEffect(() => {
     if (!token) {
@@ -77,16 +90,25 @@ export function MainScreen({
       <BallotListContainer>
         <TitleContainer>
           <H1>Advisory Votes</H1>
+          <p>Official advisory ballots from the Zuzalu organizers</p>
         </TitleContainer>
+
         {loadingBallots || ballots === undefined ? (
           <RippleLoader />
         ) : (
           ballots
             .filter((ballot) => ballot.ballotType === BallotType.ADVISORYVOTE)
             .map((ballot) => (
-              <Button onClick={() => router.push(`ballot/${ballot.ballotURL}`)}>
-                {ballot.ballotTitle}
-              </Button>
+              <BallotListButton
+                onClick={() => router.push(`ballot/${ballot.ballotURL}`)}
+              >
+                <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
+                <div style={{ fontStyle: "italic" }}>
+                  {new Date(ballot.expiry) < new Date()
+                    ? "Expired"
+                    : getTimeBeforeExpiry(ballot.expiry)}
+                </div>
+              </BallotListButton>
             ))
         )}
       </BallotListContainer>
@@ -94,16 +116,25 @@ export function MainScreen({
       <BallotListContainer>
         <TitleContainer>
           <H1>Straw Polls</H1>
+          <p>Unofficial ballots from all Zuzalu residents</p>
         </TitleContainer>
+
         {loadingBallots || ballots === undefined ? (
           <RippleLoader />
         ) : (
           ballots
             .filter((ballot) => ballot.ballotType === BallotType.STRAWPOLL)
             .map((ballot) => (
-              <Button onClick={() => router.push(`ballot/${ballot.ballotURL}`)}>
-                {ballot.ballotTitle}
-              </Button>
+              <BallotListButton
+                onClick={() => router.push(`ballot/${ballot.ballotURL}`)}
+              >
+                <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
+                <div style={{ fontStyle: "italic" }}>
+                  {new Date(ballot.expiry) < new Date()
+                    ? "Expired"
+                    : getTimeBeforeExpiry(ballot.expiry)}
+                </div>
+              </BallotListButton>
             ))
         )}
       </BallotListContainer>
@@ -123,14 +154,11 @@ export function MainScreen({
 
 const H1 = styled.h1`
   color: black;
-  margin: 0;
+  margin-bottom: -0.5rem;
   font-size: 1.4rem;
   font-family: OpenSans;
   font-weight: 700;
   font-style: normal;
-  /* ::first-letter {
-    font-size: 1.6rem;
-  } */
 `;
 
 const BallotListContainer = styled.div`
@@ -139,17 +167,38 @@ const BallotListContainer = styled.div`
   width: 100%;
   justify-content: center;
   flex-direction: column;
-  text-align: center;
   margin-top: 1rem;
   border-radius: 1rem;
-  padding: 1.5rem 2rem 2rem 2rem;
+  padding: 1rem 2rem 1rem 2rem;
   border: 1px solid #eee;
-  gap: 1rem;
 `;
 
 const TitleContainer = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+`;
+
+const BallotListButton = styled.div<{ deemph?: boolean }>`
+  display: flex;
+  justify-content: space-between;
+
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #888;
+  opacity: 1;
+  margin-bottom: 1rem;
+
+  font-family: OpenSans;
+  font-weight: 400;
+  background-color: ${({ deemph }) => (deemph ? "#eee" : "#fff")};
+
+  cursor: pointer;
+  &:hover {
+    background-color: ${({ deemph }) => (deemph ? "#e8e8e8" : "#f8f8f8")};
+  }
+  &:active {
+    background-color: ${({ deemph }) => (deemph ? "#e3e3e3" : "#f3f3f3")};
+  }
 `;

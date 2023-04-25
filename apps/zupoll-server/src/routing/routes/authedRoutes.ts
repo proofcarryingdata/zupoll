@@ -38,7 +38,7 @@ export function initAuthedRoutes(
         expiry: true,
         ballotType: true,
       },
-      orderBy: { expiry: "asc" },
+      orderBy: { expiry: "desc" },
     });
 
     res.status(200).json({ ballots });
