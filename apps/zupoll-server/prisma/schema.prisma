@@ -25,8 +25,8 @@ enum BallotType {
 }
 
 model Ballot {
-  ballotId String @id @default(uuid())
-  ballotURL String @unique
+  ballotId String @default(uuid())
+  ballotURL Int @id @default(autoincrement())
 	ballotTitle String
   ballotDescription String
   createdAt DateTime @default(now())
@@ -59,7 +59,7 @@ model Poll {
   expiry DateTime
 
   ballot Ballot? @relation(fields: [ballotURL], references: [ballotURL])
-  ballotURL String?
+  ballotURL Int?
 
   votes Vote[]
 }

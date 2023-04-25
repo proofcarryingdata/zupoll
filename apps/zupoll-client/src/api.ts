@@ -1,11 +1,32 @@
 import { PASSPORT_SERVER_URL, ZUPOLL_SERVER_URL } from "../src/util";
-import { BallotPollRequest } from "./requestTypes";
+import { BallotPollRequest, CreateBallotRequest } from "./requestTypes";
 import { CreatePollRequest, VoteRequest } from "./types";
 
 export async function createPoll(
   request: CreatePollRequest
 ): Promise<Response | undefined> {
   const url = `${ZUPOLL_SERVER_URL}create-poll`;
+
+  try {
+    const res = fetch(url, {
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+    return await res;
+  } catch (e) {
+    console.log(e);
+    return undefined;
+  }
+}
+
+export async function createBallot(
+  request: CreateBallotRequest
+): Promise<Response | undefined> {
+  const url = `${ZUPOLL_SERVER_URL}create-ballot`;
 
   try {
     const res = fetch(url, {
@@ -97,7 +118,7 @@ export async function listBallotPolls(
   if (!accessToken) return undefined;
 
   const ballotPollRequest: BallotPollRequest = {
-    ballotURL: ballotURL,
+    ballotURL: parseInt(ballotURL),
   };
   const url = `${ZUPOLL_SERVER_URL}ballot-polls`;
 

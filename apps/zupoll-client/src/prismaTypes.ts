@@ -4,7 +4,7 @@
  */
  export type Ballot = {
   ballotId: string
-  ballotURL: string
+  ballotURL: number
   ballotTitle: string
   ballotDescription: string
   createdAt: Date
@@ -31,7 +31,7 @@ export type Poll = {
   body: string
   options: string[]
   expiry: Date
-  ballotURL: string | null
+  ballotURL: number | null
 }
 
 /**

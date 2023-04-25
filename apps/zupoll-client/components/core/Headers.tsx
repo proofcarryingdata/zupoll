@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { useCallback } from "react";
 import styled from "styled-components";
 import { Logo } from ".";
@@ -14,6 +15,23 @@ export function LoggedInHeader({ onLogout }: { onLogout: () => void }) {
     <LoggedInContainer>
       <Logo src="/zupoll-logo.png" alt="Zuzalu" />
       <Button onClick={confirmLogout}>Logout</Button>
+    </LoggedInContainer>
+  );
+}
+
+export function ReturnHeader() {
+  const router = useRouter();
+
+  const confirmExit = useCallback(() => {
+    if (window.confirm("Are you sure you want to exit?")) {
+      router.push("/")
+    }
+  }, [router]);
+
+  return (
+    <LoggedInContainer>
+      <Logo src="/zupoll-logo.png" alt="Zuzalu" />
+      <Button onClick={confirmExit}>Exit</Button>
     </LoggedInContainer>
   );
 }

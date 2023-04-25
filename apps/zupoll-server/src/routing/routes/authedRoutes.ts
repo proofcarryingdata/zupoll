@@ -43,32 +43,41 @@ export function initAuthedRoutes(
     res.status(200).json({ ballots });
   })
 
-  app.get("/ballot-polls", authenticateJWT, async (req: Request, res: Response) => {
+  app.get("/ballot-polls", authenticateJWT, async (req: Request, res: Response, next: NextFunction) => {
     const request = req.body as BallotPollRequest;
 
-    const polls = await prisma.poll.findMany({
-      where: {
-        ballotURL: request.ballotURL,
-      },
-      include: {
-        votes: {
-          select: {
-            voteIdx: true,
+    try {
+      const polls = await prisma.poll.findMany({
+        where: {
+          ballotURL: request.ballotURL,
+        },
+        include: {
+          votes: {
+            select: {
+              voteIdx: true,
+            },
           },
         },
-      },
-      orderBy: { expiry: "asc" },
-    });
-
-    polls.forEach((poll) => {
-      const counts = new Array(poll.options.length).fill(0);
-      for (const vote of poll.votes) {
-        counts[vote.voteIdx] += 1;
+        orderBy: { expiry: "asc" },
+      });
+  
+      if (polls === null) {
+        throw new Error("Ballot not found.");
       }
-      poll.votes = counts;
-    });
-
-    res.status(200).json({ polls });
+  
+      polls.forEach((poll) => {
+        const counts = new Array(poll.options.length).fill(0);
+        for (const vote of poll.votes) {
+          counts[vote.voteIdx] += 1;
+        }
+        poll.votes = counts;
+      });
+  
+      res.status(200).json({ polls });
+    } catch (e) {
+      console.error(e);
+      next(e);
+    }
   });
 }
 
@@ -78,5 +87,5 @@ export type LoginRequest = {
 }
 
 export type BallotPollRequest = {
-  ballotURL: string;
+  ballotURL: number;
 }

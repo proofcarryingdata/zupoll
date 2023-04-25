@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Center } from "../core";
-import { Button } from "../core/Button";
+import { Button, CreateBallotButton } from "../core/Button";
 import { LoggedInHeader } from "../core/Headers";
 
 export function MainScreen({
@@ -21,7 +21,7 @@ export function MainScreen({
 
       <BallotListContainer>
         <TitleContainer>
-          <H1>Advisory</H1> <H1>Votes</H1>
+          <H1>Advisory Votes</H1>
         </TitleContainer>
         <Button>AV #1</Button>
         <Button>AV #2</Button>
@@ -30,7 +30,7 @@ export function MainScreen({
       <br />
       <BallotListContainer>
         <TitleContainer>
-          <H1>Straw</H1> <H1>Polls</H1>
+          <H1>Straw Polls</H1>
         </TitleContainer>
         <Button>SP #1</Button>
         <Button>SP #2</Button>
@@ -71,14 +71,4 @@ const TitleContainer = styled.div`
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-`;
-
-const CreateBallotButton = styled.div`
-  font-family: OpenSans;
-  background: #52B5A4;
-  border-radius: 1rem;
-  padding: 0.25rem;
-  margin-bottom: 2rem;
-  text-align: center;
-  cursor: pointer;
 `;

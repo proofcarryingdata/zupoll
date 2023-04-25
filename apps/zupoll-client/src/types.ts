@@ -7,6 +7,12 @@ export type ZupollError = {
   stack?: string;
 };
 
+export enum PCDState {
+  DEFAULT,
+  AWAITING_PCDSTR,
+  RECEIVED_PCDSTR,
+}
+
 export enum UserType {
   ANON = "ANON",
   NONANON = "NONANON",

@@ -32,13 +32,12 @@ export function initPCDRoutes(
 
       const ballotSignal: BallotSignal = {
         pollSignals: [],
-        ballotURL: request.ballot.ballotURL,
         ballotTitle: request.ballot.ballotTitle,
         ballotDescription: request.ballot.ballotDescription,
         ballotType: request.ballot.ballotType,
         expiry: request.ballot.expiry,
-        voterSemaphoreGroupUrls: request.ballot.voterSemaphoreGroupRoots,
-        voterSemaphoreGroupRoots: request.ballot.voterSemaphoreGroupUrls,
+        voterSemaphoreGroupUrls: request.ballot.voterSemaphoreGroupUrls,
+        voterSemaphoreGroupRoots: request.ballot.voterSemaphoreGroupRoots,
       };
       request.polls.forEach((poll: Poll) => {
         const pollSignal: PollSignal = {
@@ -61,10 +60,10 @@ export function initPCDRoutes(
             }
           );
 
+          console.log("Valid proof with nullifier", nullifier);
+
           const newBallot = await prisma.ballot.create({
             data: {
-              ballotId: signalHash,
-              ballotURL: request.ballot.ballotURL,
               ballotTitle: request.ballot.ballotTitle,
               ballotDescription: request.ballot.ballotDescription,
               expiry: request.ballot.expiry,
@@ -83,7 +82,7 @@ export function initPCDRoutes(
               data: {
                 body: poll.body,
                 options: poll.options,
-                ballotURL: request.ballot.ballotURL,
+                ballotURL: newBallot.ballotURL,
                 expiry: request.ballot.expiry,
               }
             });
@@ -95,8 +94,6 @@ export function initPCDRoutes(
         } else {
           throw new Error("Unknown pollster type.");
         }
-
-        res.send("ok");
       } catch (e) {
         console.error(e);
         next(e);
@@ -160,7 +157,7 @@ export function initPCDRoutes(
           signal: signalHash,
           allowedGroups: ballot.voterSemaphoreGroupUrls,
           allowedRoots: ballot.voterSemaphoreGroupRoots,
-          claimedExtNullifier: ballot.ballotURL,
+          claimedExtNullifier: ballot.ballotURL.toString(),
         }
       );
 
@@ -206,7 +203,6 @@ export type CreateBallotRequest = {
 
 export type BallotSignal = {
   pollSignals: PollSignal[];
-  ballotURL: string;
   ballotTitle: string;
   ballotDescription: string;
   ballotType: BallotType;
@@ -222,7 +218,7 @@ export type PollSignal = {
 
 export type MultiVoteRequest = {
   votes: Vote[];
-  ballotURL: string;
+  ballotURL: number;
   voterSemaphoreGroupUrl: string;
   proof: string;
 };

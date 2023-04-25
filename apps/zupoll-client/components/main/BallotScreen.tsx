@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { listBallotPolls } from "../../src/api";
 import { useLogin } from "../../src/login";
 import { PollResponse, PollWithCounts } from "../../src/requestTypes";
