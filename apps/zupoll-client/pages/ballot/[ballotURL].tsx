@@ -2,10 +2,7 @@ import { useRouter } from "next/router";
 import { RippleLoaderLightMargin } from "../../components/core/RippleLoader";
 import { BallotScreen } from "../../components/main/BallotScreen";
 
-export default function Page() {
-  const router = useRouter();
-  const { ballotURL } = router.query;
-
+export default function Page({ ballotURL }: any) {
   return (
     <>
       {ballotURL === undefined ? (
@@ -15,4 +12,19 @@ export default function Page() {
       )}
     </>
   );
+}
+
+export async function getStaticPaths() {
+  return {
+    paths: [],
+    fallback: true
+  }
+}
+
+export async function getStaticProps({ params } : any) {
+  return {
+    props: {
+      ballotURL: params.ballotURL
+    }
+  }
 }
