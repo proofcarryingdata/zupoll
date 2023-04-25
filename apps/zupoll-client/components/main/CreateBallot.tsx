@@ -3,7 +3,7 @@ import { useCreateBallot } from "../../src/createBallot";
 import { BallotType, Poll } from "../../src/prismaTypes";
 import { ZupollError } from "../../src/types";
 import { SEMAPHORE_ADMIN_GROUP_URL } from "../../src/util";
-import { CreateBallotButton, WideButton } from "../core/Button";
+import { BallotButton, WideButton } from "../core/Button";
 import {
   FormButtonContainer,
   FormContainer,
@@ -21,6 +21,10 @@ export function CreateBallot({
   group: string | undefined;
   onError: (err: ZupollError) => void;
 }) {
+
+  /**
+   * EDITING BALLOT INFO LOGIC
+   */
   const [polls, setPolls] = useState<Poll[]>([
     {
       id: "",
@@ -39,7 +43,6 @@ export function CreateBallot({
   const [ballotType, setBallotType] = useState<BallotType>(
     BallotType.STRAWPOLL
   );
-  const [serverLoading, setServerLoading] = useState(false);
 
   const getDateString = (date: Date) => {
     const newDate = new Date(date);
@@ -59,6 +62,10 @@ export function CreateBallot({
     setPolls(newPolls);
   };
 
+  /**
+   * CREATING BALLOT LOGIC
+   */
+  const [serverLoading, setServerLoading] = useState(false);
   const { loadingVoterGroupUrl, createBallotPCD } = useCreateBallot({
     ballotTitle,
     ballotDescription,
@@ -200,9 +207,9 @@ export function CreateBallot({
       {loadingVoterGroupUrl || serverLoading ? (
         <RippleLoaderLight />
       ) : (
-        <CreateBallotButton onClick={createBallotPCD}>
+        <BallotButton onClick={createBallotPCD}>
           <h3>Create ballot</h3>
-        </CreateBallotButton>
+        </BallotButton>
       )}
     </>
   );

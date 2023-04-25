@@ -43,13 +43,26 @@ export function initAuthedRoutes(
     res.status(200).json({ ballots });
   })
 
-  app.get("/ballot-polls", authenticateJWT, async (req: Request, res: Response, next: NextFunction) => {
-    const request = req.body as BallotPollRequest;
-
+  app.get("/ballot-polls/:ballotURL", authenticateJWT, async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const ballotURL = parseInt(req.params.ballotURL);
+
+      if (isNaN(ballotURL)) {
+        throw new Error("Invalid ballot URL.");
+      }
+
+      const ballot = await prisma.ballot.findUnique({
+        where: {
+          ballotURL: ballotURL,
+        },
+      });
+      if (ballot === null) {
+        throw new Error("Ballot not found.");
+      }
+
       const polls = await prisma.poll.findMany({
         where: {
-          ballotURL: request.ballotURL,
+          ballotURL: ballotURL,
         },
         include: {
           votes: {
@@ -60,9 +73,8 @@ export function initAuthedRoutes(
         },
         orderBy: { expiry: "asc" },
       });
-  
       if (polls === null) {
-        throw new Error("Ballot not found.");
+        throw new Error("Ballot has no polls.");
       }
   
       polls.forEach((poll) => {
@@ -73,7 +85,7 @@ export function initAuthedRoutes(
         poll.votes = counts;
       });
   
-      res.status(200).json({ polls });
+      res.status(200).json({ ballot, polls });
     } catch (e) {
       console.error(e);
       next(e);

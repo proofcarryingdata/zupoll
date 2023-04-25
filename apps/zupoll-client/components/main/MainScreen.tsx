@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Center } from "../core";
-import { Button, CreateBallotButton } from "../core/Button";
+import { Button, BallotButton } from "../core/Button";
 import { LoggedInHeader } from "../core/Headers";
 
 export function MainScreen({
@@ -15,9 +15,9 @@ export function MainScreen({
     <Center>
       <LoggedInHeader onLogout={onLogout} />
 
-      <CreateBallotButton onClick={() => router.push("/create-ballot")}>
+      <BallotButton onClick={() => router.push("/create-ballot")}>
         <h3>Create a new ballot</h3>
-      </CreateBallotButton>
+      </BallotButton>
 
       <BallotListContainer>
         <TitleContainer>

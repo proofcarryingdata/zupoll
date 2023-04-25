@@ -22,6 +22,17 @@ export function LoggedInHeader({ onLogout }: { onLogout: () => void }) {
 export function ReturnHeader() {
   const router = useRouter();
 
+  return (
+    <LoggedInContainer>
+      <Logo src="/zupoll-logo.png" alt="Zuzalu" />
+      <Button onClick={() => router.push("/")}>Return</Button>
+    </LoggedInContainer>
+  );
+}
+
+export function ExitHeader() {
+  const router = useRouter();
+
   const confirmExit = useCallback(() => {
     if (window.confirm("Are you sure you want to exit?")) {
       router.push("/")

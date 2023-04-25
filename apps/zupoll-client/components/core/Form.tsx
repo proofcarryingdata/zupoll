@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const FormContainer = styled.div`
   box-sizing: border-box;
-  font-family: system-ui, sans-serif;
+  font-family: OpenSans;
   border: 1px solid #bbb;
   background-color: #eee;
   width: 100%;

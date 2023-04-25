@@ -1,4 +1,4 @@
-import { Ballot, BallotType, Poll } from "./prismaTypes"
+import { Ballot, BallotType, Poll, Vote } from "./prismaTypes"
 
 export type LoginRequest = {
   semaphoreGroupUrl: string;
@@ -30,10 +30,27 @@ export type BallotPollRequest = {
   ballotURL: number;
 }
 
-export type PollResponse = {
+export type BallotPollResponse = {
+  ballot: Ballot;
   polls: PollWithCounts[];
 }
 
 export type PollWithCounts = Poll & {
   votes: any[];
 }
+
+export type MultiVoteRequest = {
+  votes: Vote[];
+  ballotURL: string;
+  voterSemaphoreGroupUrl: string;
+  proof: string;
+};
+
+export type MultiVoteSignal = {
+  voteSignals: VoteSignal[];
+}
+
+export type VoteSignal = {
+  pollId: string;
+  voteIdx: number;
+};

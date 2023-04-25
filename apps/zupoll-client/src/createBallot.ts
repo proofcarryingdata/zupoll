@@ -16,8 +16,20 @@ import {
   PARTICIPANTS_GROUP_ID,
   PASSPORT_URL,
   SEMAPHORE_ADMIN_GROUP_URL,
+  SEMAPHORE_GROUP_URL,
 } from "./util";
 
+/**
+ * Hook that handles requesting a PCD for creating a ballot.
+ * 
+ * @param ballotTitle title of ballot
+ * @param ballotDescription description of ballot
+ * @param ballotType type of ballot
+ * @param expiry expiry date of ballot
+ * @param polls polls in this ballot
+ * @param onError Error handler to display in ErrorOverlay
+ * @param setServerLoading Passing server loading status to frontend 
+ */
 export function useCreateBallot({
   ballotTitle,
   ballotDescription,
@@ -58,6 +70,11 @@ export function useCreateBallot({
 
     pcdState.current = PCDState.DEFAULT;
 
+    const groupUrl =
+      ballotType === BallotType.STRAWPOLL
+        ? SEMAPHORE_GROUP_URL
+        : SEMAPHORE_ADMIN_GROUP_URL;
+
     const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
     const finalRequest: CreateBallotRequest = {
       ballot: {
@@ -73,7 +90,7 @@ export function useCreateBallot({
         pollsterName: null,
         pollsterUuid: null,
         pollsterCommitment: null,
-        pollsterSemaphoreGroupUrl: SEMAPHORE_ADMIN_GROUP_URL,
+        pollsterSemaphoreGroupUrl: groupUrl,
         voterSemaphoreGroupUrls: [voterGroupUrl],
         voterSemaphoreGroupRoots: [voterGroupRootHash],
         ballotType: ballotType,
@@ -157,10 +174,15 @@ export function useCreateBallot({
     console.log(signalHash);
     const sigHashEnc = generateMessageHash(signalHash).toString();
 
+    const groupUrl =
+      ballotType === BallotType.STRAWPOLL
+        ? SEMAPHORE_GROUP_URL
+        : SEMAPHORE_ADMIN_GROUP_URL;
+
     openZuzaluMembershipPopup(
       PASSPORT_URL,
       window.location.origin + "/popup",
-      SEMAPHORE_ADMIN_GROUP_URL,
+      groupUrl,
       "zupoll",
       sigHashEnc,
       sigHashEnc
@@ -176,5 +198,5 @@ export function useCreateBallot({
     voterGroupRootHash,
   ]);
 
-  return {loadingVoterGroupUrl, createBallotPCD};
+  return { loadingVoterGroupUrl, createBallotPCD };
 }

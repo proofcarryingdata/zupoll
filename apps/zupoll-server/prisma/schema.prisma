@@ -70,7 +70,7 @@ model Vote {
   poll Poll @relation(fields: [pollId], references: [id])
   pollId String
   voterType UserType
-  voterNullifier String @unique
+  voterNullifier String
 
   // ANON
   voterSemaphoreGroupUrl String?
