@@ -86,16 +86,16 @@ export function initPCDRoutes(
             },
           });
 
-          for (const poll of request.polls) {
-            await prisma.poll.create({
+          await Promise.all(request.polls.map(poll => 
+            prisma.poll.create({
               data: {
                 body: poll.body,
                 options: poll.options,
                 ballotURL: newBallot.ballotURL,
                 expiry: request.ballot.expiry,
               },
-            });
-          }
+            })
+          ));
 
           res.json({
             url: newBallot.ballotURL,

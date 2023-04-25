@@ -149,10 +149,14 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
               <p>{ballot.ballotDescription}</p>
               {ballot.expiry &&
                 (new Date(ballot.expiry) < new Date() ? (
-                  <p style={{ color: "red" }}>This ballot has expired.</p>
+                  <p style={{ color: "red" }}>
+                    <i>This ballot has expired.</i>
+                  </p>
                 ) : (
                   <p>
-                    {"Expires at " + new Date(ballot.expiry).toLocaleString()}.
+                    <i>
+                      {"Expires at " + new Date(ballot.expiry).toLocaleString()}
+                    </i>
                   </p>
                 ))}
             </Container>
