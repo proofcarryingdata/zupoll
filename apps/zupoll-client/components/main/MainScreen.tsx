@@ -25,15 +25,18 @@ export function MainScreen({
   const [error, setError] = useState<ZupollError>();
 
   function getTimeBeforeExpiry(expiry: Date) {
-    const hours = Math.floor(
-      (new Date(expiry).getTime() - Date.now()) / 3600000
+    const minutes = Math.floor(
+      (new Date(expiry).getTime() - Date.now()) / 60000
     );
+    const hours = Math.floor(minutes/60);
     const days = Math.floor(hours / 24);
 
     if (days >= 1) {
       return "Expires in <" + days + " days";
-    } else {
+    } else if (hours >= 1) {
       return "Expires in <" + hours + " hours";
+    } else {
+      return "Expires in <" + minutes + " minutes";
     }
   }
 
