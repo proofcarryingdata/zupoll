@@ -21,13 +21,14 @@ export const Button = styled.button<{ deemph?: boolean }>`
   }
 `;
 
-export const WideButton = styled.button`
+export const WideButton = styled.div`
   width: calc(50% - 0.5rem);
   font-size: 1rem;
   border-radius: 0.5rem;
   border: 1px solid #888;
   opacity: 1;
   cursor: pointer;
+  text-align: center;
 
   font-family: OpenSans;
   font-weight: bold;

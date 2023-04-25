@@ -124,7 +124,8 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
     },
     setServerLoading,
     refresh: (id: string) => {
-      setRefresh(id), setPollToVote(new Map());
+      setPollToVote(new Map());
+      setRefresh(id);
     },
   });
 
