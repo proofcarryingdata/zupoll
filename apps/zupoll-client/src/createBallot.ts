@@ -21,14 +21,14 @@ import {
 
 /**
  * Hook that handles requesting a PCD for creating a ballot.
- * 
+ *
  * @param ballotTitle title of ballot
  * @param ballotDescription description of ballot
  * @param ballotType type of ballot
  * @param expiry expiry date of ballot
  * @param polls polls in this ballot
  * @param onError Error handler to display in ErrorOverlay
- * @param setServerLoading Passing server loading status to frontend 
+ * @param setServerLoading Passing server loading status to frontend
  */
 export function useCreateBallot({
   ballotTitle,

@@ -2,11 +2,11 @@ import { useState } from "react";
 import styled from "styled-components";
 import { ZupollError } from "../../src/types";
 import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../../src/util";
+import { Center } from "../core";
+import { LoggedOutHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "../main/ErrorOverlay";
 import { Login } from "./Login";
-import { LoggedOutHeader } from "../core/Headers";
-import { Center } from "../core";
 
 export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
   const [serverLoading, setServerLoading] = useState<boolean>(false);
@@ -14,7 +14,7 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
 
   return (
     <Center>
-      <LoggedOutHeader/>
+      <LoggedOutHeader />
       <Body>
         <Description>
           <p>

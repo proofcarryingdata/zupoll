@@ -1,6 +1,5 @@
 import { PASSPORT_SERVER_URL, ZUPOLL_SERVER_URL } from "../src/util";
 import { CreateBallotRequest, MultiVoteRequest } from "./requestTypes";
-import { VoteRequest } from "./types";
 
 export async function createBallot(
   request: CreateBallotRequest
@@ -27,27 +26,6 @@ export async function voteBallot(
   request: MultiVoteRequest
 ): Promise<Response | undefined> {
   const url = `${ZUPOLL_SERVER_URL}vote-ballot`;
-
-  try {
-    const res = fetch(url, {
-      method: "POST",
-      body: JSON.stringify(request),
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-    return await res;
-  } catch (e) {
-    console.log(e);
-    return undefined;
-  }
-}
-
-export async function doVote(
-  request: VoteRequest
-): Promise<Response | undefined> {
-  const url = `${ZUPOLL_SERVER_URL}vote`;
 
   try {
     const res = fetch(url, {
@@ -93,12 +71,12 @@ export async function login(
   }
 }
 
-export async function listPolls(
+export async function listBallots(
   accessToken: string | null
 ): Promise<Response | undefined> {
   if (!accessToken) return undefined;
 
-  const url = `${ZUPOLL_SERVER_URL}polls`;
+  const url = `${ZUPOLL_SERVER_URL}ballots`;
 
   try {
     const res = await fetch(url, {

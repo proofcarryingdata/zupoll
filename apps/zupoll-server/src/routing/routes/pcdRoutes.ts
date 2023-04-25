@@ -3,7 +3,10 @@ import express, { NextFunction, Request, Response } from "express";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { ApplicationContext } from "../../types";
-import { SEMAPHORE_GROUP_URL, SEMAPHORE_ADMIN_GROUP_URL } from "../../util/auth";
+import {
+  SEMAPHORE_ADMIN_GROUP_URL,
+  SEMAPHORE_GROUP_URL,
+} from "../../util/auth";
 import { prisma } from "../../util/prisma";
 import { verifyGroupProof } from "../../util/verify";
 

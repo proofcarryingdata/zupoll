@@ -1,5 +1,3 @@
-import { PASSPORT_SERVER } from "./auth";
-
 export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(() => {

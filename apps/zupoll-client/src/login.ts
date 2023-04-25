@@ -28,16 +28,13 @@ export function useLogin(router: NextRouter): {
   }, [setToken, router]);
 
   // Retrieve group from JWT
-  const group = useMemo(
-    () => {
-      if (token !== undefined && token !== "") {
-        return parseJwt(token)["groupUrl"] || undefined
-      } else {
-        return undefined;
-      }
-    },
-    [token]
-  );
+  const group = useMemo(() => {
+    if (token !== undefined && token !== "") {
+      return parseJwt(token)["groupUrl"] || undefined;
+    } else {
+      return undefined;
+    }
+  }, [token]);
 
   return { token, group, loadingToken, logout };
 }

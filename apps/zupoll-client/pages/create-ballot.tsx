@@ -14,11 +14,14 @@ export default function Page() {
   const [error, setError] = useState<ZupollError>();
   const router = useRouter();
   const { token: _token, group, loadingToken, logout } = useLogin(router);
-  
+
   // Log them out if they're not in a valid group
   useEffect(() => {
     if (group !== undefined) {
-      if (group !== SEMAPHORE_ADMIN_GROUP_URL && group !== SEMAPHORE_GROUP_URL) {
+      if (
+        group !== SEMAPHORE_ADMIN_GROUP_URL &&
+        group !== SEMAPHORE_GROUP_URL
+      ) {
         logout();
       }
     }
@@ -36,10 +39,7 @@ export default function Page() {
         <Center>
           <ExitHeader />
 
-          <CreateBallot
-            group={group}
-            onError={setError}
-          />
+          <CreateBallot group={group} onError={setError} />
 
           {error && (
             <ErrorOverlay error={error} onClose={() => setError(undefined)} />

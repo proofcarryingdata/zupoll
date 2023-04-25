@@ -35,7 +35,7 @@ export function ExitHeader() {
 
   const confirmExit = useCallback(() => {
     if (window.confirm("Are you sure you want to exit?")) {
-      router.push("/")
+      router.push("/");
     }
   }, [router]);
 

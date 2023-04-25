@@ -93,7 +93,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
   const [canVote, setCanVote] = useState<boolean>(true);
   const [pollToVote, setPollToVote] = useState(
     new Map<string, number | undefined>()
-  );  
+  );
 
   // check voting status
   useEffect(() => {

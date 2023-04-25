@@ -1,15 +1,15 @@
-import { Ballot, BallotType, Poll, Vote } from "./prismaTypes"
+import { Ballot, BallotType, Poll, Vote } from "./prismaTypes";
 
 export type LoginRequest = {
   semaphoreGroupUrl: string;
   proof: string;
-}
+};
 
 export type CreateBallotRequest = {
   ballot: Ballot;
   polls: Poll[];
   proof: string;
-}
+};
 
 export type BallotSignal = {
   pollSignals: PollSignal[];
@@ -19,7 +19,7 @@ export type BallotSignal = {
   expiry: Date;
   voterSemaphoreGroupUrls: string[];
   voterSemaphoreGroupRoots: string[];
-}
+};
 
 export type PollSignal = {
   body: string;
@@ -28,16 +28,16 @@ export type PollSignal = {
 
 export type BallotPollRequest = {
   ballotURL: number;
-}
+};
 
 export type BallotPollResponse = {
   ballot: Ballot;
   polls: PollWithCounts[];
-}
+};
 
 export type PollWithCounts = Poll & {
   votes: any[];
-}
+};
 
 export type MultiVoteRequest = {
   votes: Vote[];
@@ -48,7 +48,7 @@ export type MultiVoteRequest = {
 
 export type MultiVoteSignal = {
   voteSignals: VoteSignal[];
-}
+};
 
 export type VoteSignal = {
   pollId: string;

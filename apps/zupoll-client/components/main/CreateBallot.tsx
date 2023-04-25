@@ -21,7 +21,6 @@ export function CreateBallot({
   group: string | undefined;
   onError: (err: ZupollError) => void;
 }) {
-
   /**
    * EDITING BALLOT INFO LOGIC
    */

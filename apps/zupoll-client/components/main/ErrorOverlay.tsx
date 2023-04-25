@@ -1,6 +1,6 @@
 import { ZupollError } from "../../src/types";
-import { Overlay } from "./Overlay";
 import { Button } from "../core/Button";
+import { Overlay } from "./Overlay";
 
 export function ErrorOverlay({
   error,

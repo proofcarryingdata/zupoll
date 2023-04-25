@@ -1,16 +1,12 @@
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Center } from "../core";
-import { Button, BallotButton } from "../core/Button";
+import { BallotButton, Button } from "../core/Button";
 import { LoggedInHeader } from "../core/Headers";
 
-export function MainScreen({
-  onLogout,
-}: {
-  onLogout: () => void;
-}) {
+export function MainScreen({ onLogout }: { onLogout: () => void }) {
   const router = useRouter();
-  
+
   return (
     <Center>
       <LoggedInHeader onLogout={onLogout} />

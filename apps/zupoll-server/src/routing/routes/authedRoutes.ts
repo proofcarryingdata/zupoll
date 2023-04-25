@@ -41,63 +41,67 @@ export function initAuthedRoutes(
     });
 
     res.status(200).json({ ballots });
-  })
+  });
 
-  app.get("/ballot-polls/:ballotURL", authenticateJWT, async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const ballotURL = parseInt(req.params.ballotURL);
+  app.get(
+    "/ballot-polls/:ballotURL",
+    authenticateJWT,
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const ballotURL = parseInt(req.params.ballotURL);
 
-      if (isNaN(ballotURL)) {
-        throw new Error("Invalid ballot URL.");
-      }
+        if (isNaN(ballotURL)) {
+          throw new Error("Invalid ballot URL.");
+        }
 
-      const ballot = await prisma.ballot.findUnique({
-        where: {
-          ballotURL: ballotURL,
-        },
-      });
-      if (ballot === null) {
-        throw new Error("Ballot not found.");
-      }
+        const ballot = await prisma.ballot.findUnique({
+          where: {
+            ballotURL: ballotURL,
+          },
+        });
+        if (ballot === null) {
+          throw new Error("Ballot not found.");
+        }
 
-      const polls = await prisma.poll.findMany({
-        where: {
-          ballotURL: ballotURL,
-        },
-        include: {
-          votes: {
-            select: {
-              voteIdx: true,
+        const polls = await prisma.poll.findMany({
+          where: {
+            ballotURL: ballotURL,
+          },
+          include: {
+            votes: {
+              select: {
+                voteIdx: true,
+              },
             },
           },
-        },
-        orderBy: { expiry: "asc" },
-      });
-      if (polls === null) {
-        throw new Error("Ballot has no polls.");
-      }
-  
-      polls.forEach((poll) => {
-        const counts = new Array(poll.options.length).fill(0);
-        for (const vote of poll.votes) {
-          counts[vote.voteIdx] += 1;
+          orderBy: { expiry: "asc" },
+        });
+        if (polls === null) {
+          throw new Error("Ballot has no polls.");
         }
-        poll.votes = counts;
-      });
-  
-      res.status(200).json({ ballot, polls });
-    } catch (e) {
-      console.error(e);
-      next(e);
+
+        polls.forEach((poll) => {
+          const counts = new Array(poll.options.length).fill(0);
+          for (const vote of poll.votes) {
+            counts[vote.voteIdx] += 1;
+          }
+          poll.votes = counts;
+        });
+
+        res.status(200).json({ ballot, polls });
+      } catch (e) {
+        console.error(e);
+        next(e);
+      }
     }
-  });
+  );
 }
 
 export type LoginRequest = {
   semaphoreGroupUrl: string;
   proof: string;
-}
+};
 
 export type BallotPollRequest = {
   ballotURL: number;
-}
+};
