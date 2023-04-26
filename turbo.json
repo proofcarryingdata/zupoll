@@ -2,8 +2,12 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ],
       "cache": false
     },
     "lint": {
@@ -26,6 +30,7 @@
   },
   "globalEnv": [
     "NODE_ENV",
+    "STAGING",
     "PORT",
     "ZUPOLL_SERVER_URL",
     "SEMAPHORE_GROUP_URL",

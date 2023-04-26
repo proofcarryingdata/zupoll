@@ -1,9 +1,9 @@
 // prettier-ignore
 import * as dotenv from "dotenv";
 import * as path from "path";
-import { IS_PROD } from "./util/isProd";
+import { IS_DEPLOYED } from "./util/deployment";
 
-const dotEnvPath = IS_PROD
+const dotEnvPath = IS_DEPLOYED
   ? `/etc/secrets/.env`
   : path.join(process.cwd(), ".env");
 
