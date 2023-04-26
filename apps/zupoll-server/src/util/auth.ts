@@ -1,25 +1,21 @@
 import { NextFunction, Request, Response } from "express";
 import { JwtPayload, verify } from "jsonwebtoken";
-import { IS_PROD } from "./isProd";
+import { IS_DEPLOYED } from "./deployment";
 
-export const ACCESS_TOKEN_SECRET = IS_PROD
+export const ACCESS_TOKEN_SECRET = IS_DEPLOYED
   ? process.env.ACCESS_TOKEN_SECRET
   : "secret";
 
 export const PARTICIPANTS_GROUP_ID = "1";
 export const ADMIN_GROUP_ID = "4";
 
-export const SEMAPHORE_GROUP_URL = IS_PROD
+export const SEMAPHORE_GROUP_URL = IS_DEPLOYED
   ? process.env.SEMAPHORE_GROUP_URL
   : `http://localhost:3002/semaphore/${PARTICIPANTS_GROUP_ID}`;
 
-export const SEMAPHORE_ADMIN_GROUP_URL = IS_PROD
+export const SEMAPHORE_ADMIN_GROUP_URL = IS_DEPLOYED
   ? process.env.SEMAPHORE_ADMIN_GROUP_URL
   : `http://localhost:3002/semaphore/${ADMIN_GROUP_ID}`;
-
-export const PASSPORT_SERVER = IS_PROD
-  ? process.env.PASSPORT_SERVER
-  : "http://localhost:3002/";
 
 export interface GroupJwtPayload extends JwtPayload {
   groupUrl: string;
