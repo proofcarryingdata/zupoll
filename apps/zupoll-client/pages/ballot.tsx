@@ -1,17 +1,21 @@
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { BallotScreen } from "../components/main/BallotScreen";
 
 export default function Page() {
   const searchParams = useSearchParams();
-  const ballotURL = searchParams.get("id");
+  const [ballotURL, setBallotURL] = useState<string | null>(null);
 
   useEffect(() => {
-    if (ballotURL === null) {
+    const id = searchParams.get("id");
+
+    if (id === null) {
       window.location.href = "/";
+    } else {
+      setBallotURL(id);
     }
-  }, [ballotURL]);
+  }, [searchParams]);
 
   return (
     <>

@@ -18,7 +18,7 @@ const passportServerURL: Record<DEPLOYMENT_TYPE, string> = {
 
 const zupollServerURL: Record<DEPLOYMENT_TYPE, string> = {
   [DEPLOYMENT_TYPE.PROD]: "https://zupoll-server.onrender.com/",
-  [DEPLOYMENT_TYPE.STAGING]: "https://zupoll-server-staging.onrender.com",
+  [DEPLOYMENT_TYPE.STAGING]: "https://zupoll-server-staging.onrender.com/",
   [DEPLOYMENT_TYPE.LOCAL]: "http://localhost:3005/",
 };
 
