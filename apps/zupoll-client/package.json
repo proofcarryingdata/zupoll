@@ -8,7 +8,7 @@
     "export": "next export",
     "start": "next start -p 3004",
     "lint": "next lint",
-    "write-env-local": "./write-env-local.sh"
+    "staging-env-local": "./staging-env-local.sh"
   },
   "dependencies": {
     "@pcd/passport-interface": "0.4.0",
