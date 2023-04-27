@@ -1,21 +1,22 @@
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { BallotScreen } from "../components/main/BallotScreen";
 
 export default function Page() {
-  const searchParams = useSearchParams();
+  const router = useRouter();
   const [ballotURL, setBallotURL] = useState<string | null>(null);
 
   useEffect(() => {
-    const id = searchParams.get("id");
-
-    if (id === null) {
-      window.location.href = "/";
-    } else {
-      setBallotURL(id);
+    if (router.isReady) {
+      const id = router.query.id;
+      if (id === undefined) {
+        window.location.href = "/";
+      } else {
+        setBallotURL(id.toString());
+      }
     }
-  }, [searchParams]);
+  }, [router.isReady, router.query.id]);
 
   return (
     <>
