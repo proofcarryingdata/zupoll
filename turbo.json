@@ -30,7 +30,7 @@
   },
   "globalEnv": [
     "NODE_ENV",
-    "STAGING",
+    "NEXT_PUBLIC_STAGING",
     "PORT",
     "ZUPOLL_SERVER_URL",
     "SEMAPHORE_GROUP_URL",

@@ -23,7 +23,7 @@ const zupollServerURL: Record<DEPLOYMENT_TYPE, string> = {
 };
 
 export const DEPLOYMENT: DEPLOYMENT_TYPE =
-  process.env.STAGING === "true"
+  process.env.NEXT_PUBLIC_STAGING === "true"
     ? DEPLOYMENT_TYPE.STAGING
     : process.env.NODE_ENV === "production"
     ? DEPLOYMENT_TYPE.PROD
