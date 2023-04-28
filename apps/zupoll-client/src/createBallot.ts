@@ -124,7 +124,9 @@ export function useCreateBallot({
         return;
       }
 
-      router.push("/");
+      const ballotInfo = await res.json();
+      const ballotId = ballotInfo.url;
+      router.push("/ballot?id=" + ballotId);
     }
 
     doRequest();
