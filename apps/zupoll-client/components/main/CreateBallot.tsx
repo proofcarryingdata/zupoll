@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useCreateBallot } from "../../src/createBallot";
 import { BallotType, Poll } from "../../src/prismaTypes";
 import { ZupollError } from "../../src/types";
-import { SEMAPHORE_ADMIN_GROUP_URL } from "../../src/util";
+import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../../src/util";
 import { WideButton } from "../core/Button";
 import {
   FormButtonContainer,
@@ -81,7 +81,11 @@ export function CreateBallot({
     <>
       <FormContainer>
         <StyledForm>
-          <h2>Ballot Info</h2>
+          {group === SEMAPHORE_GROUP_URL ? (
+            <h2>Straw Poll Info</h2>
+          ) : (
+            <h2>Ballot Info</h2>
+          )}
           <StyledLabel htmlFor="body">
             Ballot title&nbsp;
             <StyledInput
@@ -117,22 +121,22 @@ export function CreateBallot({
               required
             />
           </StyledLabel>
-          <StyledLabel htmlFor="expiry">
-            Type of ballot
-            <StyledSelect
-              id="ballotType"
-              value={ballotType}
-              onChange={(e) => setBallotType(e.target.value)}
-              required
-            >
-              <option value={BallotType.STRAWPOLL}>Straw Poll</option>
-              {group === SEMAPHORE_ADMIN_GROUP_URL ? (
+          {group === SEMAPHORE_ADMIN_GROUP_URL ? (
+            <StyledLabel htmlFor="expiry">
+              Type of ballot
+              <StyledSelect
+                id="ballotType"
+                value={ballotType}
+                onChange={(e) => setBallotType(e.target.value)}
+                required
+              >
+                <option value={BallotType.STRAWPOLL}>Straw Poll</option>
                 <option value={BallotType.ADVISORYVOTE}>Advisory Vote</option>
-              ) : (
-                <></>
-              )}
-            </StyledSelect>
-          </StyledLabel>
+              </StyledSelect>
+            </StyledLabel>
+          ) : (
+            <></>
+          )}
         </StyledForm>
         <StyledLabel>
           Questions
