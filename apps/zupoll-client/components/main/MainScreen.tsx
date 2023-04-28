@@ -87,7 +87,7 @@ export function MainScreen({
       <LoggedInHeader onLogout={onLogout} />
 
       <BallotButton onClick={() => router.push("/create-ballot")}>
-        <h3>Create a new ballot</h3>
+        <h3>Create New Ballot</h3>
       </BallotButton>
 
       <BallotListContainer>

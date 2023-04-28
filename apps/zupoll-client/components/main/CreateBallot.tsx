@@ -220,7 +220,7 @@ export function CreateBallot({
           }
           onClick={createBallotPCD}
         >
-          <h3>Create ballot</h3>
+          <h3>Create Ballot</h3>
         </SubmitButton>
       )}
     </>
