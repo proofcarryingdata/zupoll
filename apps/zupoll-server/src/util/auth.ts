@@ -17,6 +17,10 @@ export const SEMAPHORE_ADMIN_GROUP_URL = IS_DEPLOYED
   ? process.env.SEMAPHORE_ADMIN_GROUP_URL
   : `http://localhost:3002/semaphore/${ADMIN_GROUP_ID}`;
 
+export const SEMAPHORE_HISTORIC_URL = IS_DEPLOYED
+  ? process.env.SEMAPHORE_HISTORIC_URL
+  : "http://localhost:3002/semaphore/valid-historic/";
+
 export interface GroupJwtPayload extends JwtPayload {
   groupUrl: string;
 }

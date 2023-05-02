@@ -58,6 +58,8 @@ export function initPCDRoutes(
               ? SEMAPHORE_GROUP_URL!
               : SEMAPHORE_ADMIN_GROUP_URL!;
 
+          // pollsterSemaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
+          // SEMAPHORE_ADMIN_GROUP_URL
           const nullifier = await verifyGroupProof(
             request.ballot.pollsterSemaphoreGroupUrl!,
             request.proof,
@@ -165,6 +167,9 @@ export function initPCDRoutes(
           throw new Error("Invalid ballot id.");
         }
 
+        // Only use of voterSemaphoreGroupUrl is to check if it's in the list of
+        // allowed groups. The proof is verified by checking that the root in the
+        // PCD matches one of the roots in ballot.voterSemaphoreGroupRoots
         const nullifier = await verifyGroupProof(
           request.voterSemaphoreGroupUrl,
           request.proof,
