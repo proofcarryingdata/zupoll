@@ -196,7 +196,6 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
             error={error}
             onClose={() => {
               setError(undefined);
-              router.push("/");
             }}
           />
         )}

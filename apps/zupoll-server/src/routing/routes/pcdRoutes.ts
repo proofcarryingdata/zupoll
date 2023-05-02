@@ -187,6 +187,9 @@ export function initPCDRoutes(
           },
         });
         if (previousBallotVote !== null) {
+          // This error string is used in the frontend to determine whether to 
+          // show the "already voted" message and thus display the vote results.
+          // Do not change without changing the corresponding check in frontend.
           throw new Error("User has already voted on this ballot.");
         }
 
