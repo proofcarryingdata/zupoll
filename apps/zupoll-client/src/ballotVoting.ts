@@ -104,19 +104,22 @@ export function useBallotVoting({
 
       if (!res.ok) {
         const resErr = await res.text();
-        console.error("error posting vote to the server: ", resErr);
         const err: ZupollError = {
           title: "Voting failed",
           message: `Server Error: ${resErr}`,
         };
+        if (resErr === "User has already voted on this ballot.") {
+          err.message = "You have already voted on this ballot!"
+          setVoted(ballotId);
+          refresh(ballotId);
+        }
+        console.error("Error posting vote to the server: ", resErr);
         onError(err);
         return;
       }
 
       await res.json();
-      const newVoted = getVoted();
-      newVoted.push(ballotId);
-      setVoted(newVoted);
+      setVoted(ballotId);
       refresh(ballotId);
     }
 
@@ -178,6 +181,8 @@ export function getVoted(): Array<string> {
   return voted;
 }
 
-export function setVoted(voted: Array<string>) {
-  window.localStorage.setItem("voted", JSON.stringify(voted));
+export function setVoted(ballotId: string) {
+  const newVoted = getVoted();
+  newVoted.push(ballotId);
+  window.localStorage.setItem("voted", JSON.stringify(newVoted));
 }
