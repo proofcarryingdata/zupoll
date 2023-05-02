@@ -76,14 +76,11 @@ export async function verifyGroupProof(
     }
   } else if (semaphoreGroupUrl === SEMAPHORE_GROUP_URL) {
     if (!residentRootCache.has(pcd.claim.merkleRoot)) {
-      const response = await fetch(
-        SEMAPHORE_HISTORIC_URL +
-          PARTICIPANTS_GROUP_ID +
-          "/" +
-          pcd.claim.merkleRoot
+      const validResidentRoot = await verifyRootValidity(
+        PARTICIPANTS_GROUP_ID,
+        pcd.claim.merkleRoot
       );
-      const result = await response.json();
-      if (result.valid) {
+      if (validResidentRoot) {
         residentRootCache.add(pcd.claim.merkleRoot);
       } else {
         throw new Error("Claim root isn't a valid resident root.");
@@ -91,11 +88,11 @@ export async function verifyGroupProof(
     }
   } else if (semaphoreGroupUrl === SEMAPHORE_ADMIN_GROUP_URL) {
     if (!organizerRootCache.has(pcd.claim.merkleRoot)) {
-      const response = await fetch(
-        SEMAPHORE_HISTORIC_URL + ADMIN_GROUP_ID + "/" + pcd.claim.merkleRoot
+      const validOrganizerRoot = await verifyRootValidity(
+        ADMIN_GROUP_ID,
+        pcd.claim.merkleRoot
       );
-      const result = await response.json();
-      if (result.valid) {
+      if (validOrganizerRoot) {
         organizerRootCache.add(pcd.claim.merkleRoot);
       } else {
         throw new Error("Claim root isn't a valid organizer root.");
@@ -147,4 +144,13 @@ export async function verifySignatureProof(
   }
 
   return pcd.claim.nullifierHash;
+}
+
+async function verifyRootValidity(
+  groupId: string,
+  root: string
+): Promise<boolean> {
+  const response = await fetch(SEMAPHORE_HISTORIC_URL + groupId + "/" + root);
+  const result = await response.json();
+  return result.valid;
 }
