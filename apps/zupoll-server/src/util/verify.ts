@@ -14,8 +14,8 @@ import {
   SEMAPHORE_HISTORIC_URL,
 } from "./auth";
 
-const residentRootCache = new Map<string, boolean>();
-const organizerRootCache = new Map<string, boolean>();
+const residentRootCache = new Set<string>();
+const organizerRootCache = new Set<string>();
 
 // Returns nullfier or throws error.
 export async function verifyGroupProof(
@@ -84,7 +84,7 @@ export async function verifyGroupProof(
       );
       const result = await response.json();
       if (result.valid) {
-        residentRootCache.set(pcd.claim.merkleRoot, true);
+        residentRootCache.add(pcd.claim.merkleRoot);
       } else {
         throw new Error("Claim root isn't a valid resident root.");
       }
@@ -96,7 +96,7 @@ export async function verifyGroupProof(
       );
       const result = await response.json();
       if (result.valid) {
-        organizerRootCache.set(pcd.claim.merkleRoot, true);
+        organizerRootCache.add(pcd.claim.merkleRoot);
       } else {
         throw new Error("Claim root isn't a valid organizer root.");
       }

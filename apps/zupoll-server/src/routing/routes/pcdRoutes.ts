@@ -167,8 +167,9 @@ export function initPCDRoutes(
           throw new Error("Invalid ballot id.");
         }
 
-        // This proof always just checks the allowedRoots before the
-        // groupUrl is used
+        // Only use of voterSemaphoreGroupUrl is to check if it's in the list of
+        // allowed groups. The proof is verified by checking that the root in the
+        // PCD matches one of the roots in ballot.voterSemaphoreGroupRoots
         const nullifier = await verifyGroupProof(
           request.voterSemaphoreGroupUrl,
           request.proof,
