@@ -1,5 +1,4 @@
 import {
-  deserializeSemaphoreGroup,
   SemaphoreGroupPCDPackage,
   SerializedSemaphoreGroup,
 } from "@pcd/semaphore-group-pcd";
@@ -7,6 +6,16 @@ import {
   generateMessageHash,
   SemaphoreSignaturePCDPackage,
 } from "@pcd/semaphore-signature-pcd";
+import {
+  ADMIN_GROUP_ID,
+  PARTICIPANTS_GROUP_ID,
+  SEMAPHORE_ADMIN_GROUP_URL,
+  SEMAPHORE_GROUP_URL,
+  SEMAPHORE_HISTORIC_URL,
+} from "./auth";
+
+const residentRootCache = new Map<string, boolean>();
+const organizerRootCache = new Map<string, boolean>();
 
 // Returns nullfier or throws error.
 export async function verifyGroupProof(
@@ -65,16 +74,37 @@ export async function verifyGroupProof(
 
       throw new Error("Current root doesn't match any of the allowed roots");
     }
-  } else {
-    const response = await fetch(semaphoreGroupUrl);
-    const json = await response.text();
-    const serializedGroup = JSON.parse(json) as SerializedSemaphoreGroup;
-    const group = deserializeSemaphoreGroup(serializedGroup);
-    if (pcd.claim.merkleRoot !== group.root.toString()) {
-      throw new Error(
-        "Current root doesn't match claim group merkle tree root."
+  } else if (semaphoreGroupUrl === SEMAPHORE_GROUP_URL) {
+    if (!residentRootCache.has(pcd.claim.merkleRoot)) {
+      const response = await fetch(
+        SEMAPHORE_HISTORIC_URL +
+          PARTICIPANTS_GROUP_ID +
+          "/" +
+          pcd.claim.merkleRoot
       );
+      const result = await response.json();
+      if (result.valid) {
+        residentRootCache.set(pcd.claim.merkleRoot, true);
+      } else {
+        throw new Error("Claim root isn't a valid resident root.");
+      }
     }
+  } else if (semaphoreGroupUrl === SEMAPHORE_ADMIN_GROUP_URL) {
+    if (!organizerRootCache.has(pcd.claim.merkleRoot)) {
+      const response = await fetch(
+        SEMAPHORE_HISTORIC_URL + ADMIN_GROUP_ID + "/" + pcd.claim.merkleRoot
+      );
+      const result = await response.json();
+      if (result.valid) {
+        organizerRootCache.set(pcd.claim.merkleRoot, true);
+      } else {
+        throw new Error("Claim root isn't a valid organizer root.");
+      }
+    }
+  } else {
+    throw new Error(
+      "No allowed roots specified and group is neither the organizer or resident group."
+    );
   }
 
   return pcd.claim.nullifierHash;

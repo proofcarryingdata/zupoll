@@ -15,6 +15,8 @@ export function initAuthedRoutes(
       const request = req.body as LoginRequest;
 
       try {
+        // request.semaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or 
+        // SEMAPHORE_ADMIN_GROUP_URL
         await verifyGroupProof(request.semaphoreGroupUrl, request.proof, {});
 
         const accessToken = sign(
