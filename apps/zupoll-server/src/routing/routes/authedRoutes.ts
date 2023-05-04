@@ -1,13 +1,18 @@
 import express, { NextFunction, Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import { ApplicationContext } from "../../types";
-import { ACCESS_TOKEN_SECRET, authenticateJWT } from "../../util/auth";
+import {
+  ACCESS_TOKEN_SECRET,
+  authenticateJWT,
+  authenticateOrganizerJWT,
+} from "../../util/auth";
 import { prisma } from "../../util/prisma";
 import { verifyGroupProof } from "../../util/verify";
+import { sendMessage } from "../../util/bot";
 
 export function initAuthedRoutes(
   app: express.Application,
-  _context: ApplicationContext
+  context: ApplicationContext
 ): void {
   app.post(
     "/login",
@@ -15,7 +20,7 @@ export function initAuthedRoutes(
       const request = req.body as LoginRequest;
 
       try {
-        // request.semaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or 
+        // request.semaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
         // SEMAPHORE_ADMIN_GROUP_URL
         await verifyGroupProof(request.semaphoreGroupUrl, request.proof, {});
 
@@ -29,6 +34,24 @@ export function initAuthedRoutes(
         console.error(e);
         next(e);
       }
+    }
+  );
+
+  // TODO: test functionality of this endpoint + authentication
+  app.post(
+    "/bot-post",
+    authenticateOrganizerJWT,
+    async (req: Request, res: Response, next: NextFunction) => {
+      const request = req.body as BotPostRequest;
+
+      try {
+        sendMessage(request.message, context.bot)
+      } catch (e) {
+        console.error(e);
+        next(e);
+      }
+
+      res.status(200);
     }
   );
 
@@ -99,6 +122,10 @@ export function initAuthedRoutes(
     }
   );
 }
+
+export type BotPostRequest = {
+  message: string;
+};
 
 export type LoginRequest = {
   semaphoreGroupUrl: string;

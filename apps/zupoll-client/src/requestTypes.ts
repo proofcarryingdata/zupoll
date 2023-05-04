@@ -1,5 +1,9 @@
 import { Ballot, BallotType, Poll, Vote } from "./prismaTypes";
 
+export type BotPostRequest = {
+  message: string;
+};
+
 export type LoginRequest = {
   semaphoreGroupUrl: string;
   proof: string;

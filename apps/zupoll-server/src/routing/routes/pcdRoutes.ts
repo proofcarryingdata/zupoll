@@ -9,6 +9,7 @@ import {
 } from "../../util/auth";
 import { prisma } from "../../util/prisma";
 import { verifyGroupProof } from "../../util/verify";
+import { sendMessage } from "../../util/bot";
 
 /**
  * The endpoints in this function accepts proof (pcd) in the request.
@@ -17,7 +18,7 @@ import { verifyGroupProof } from "../../util/verify";
  */
 export function initPCDRoutes(
   app: express.Application,
-  _context: ApplicationContext
+  context: ApplicationContext
 ): void {
   app.post(
     "/create-ballot",
@@ -88,16 +89,26 @@ export function initPCDRoutes(
             },
           });
 
-          await Promise.all(request.polls.map(poll => 
-            prisma.poll.create({
-              data: {
-                body: poll.body,
-                options: poll.options,
-                ballotURL: newBallot.ballotURL,
-                expiry: request.ballot.expiry,
-              },
-            })
-          ));
+          await Promise.all(
+            request.polls.map((poll) =>
+              prisma.poll.create({
+                data: {
+                  body: poll.body,
+                  options: poll.options,
+                  ballotURL: newBallot.ballotURL,
+                  expiry: request.ballot.expiry,
+                },
+              })
+            )
+          );
+
+          // send message on TG channel, if bot is setup
+          if (newBallot.ballotType === BallotType.STRAWPOLL) {
+            sendMessage(
+              `New ballot created: ${newBallot.ballotTitle}`,
+              context.bot
+            );
+          }
 
           res.json({
             url: newBallot.ballotURL,
@@ -187,7 +198,7 @@ export function initPCDRoutes(
           },
         });
         if (previousBallotVote !== null) {
-          // This error string is used in the frontend to determine whether to 
+          // This error string is used in the frontend to determine whether to
           // show the "already voted" message and thus display the vote results.
           // Do not change without changing the corresponding check in frontend.
           throw new Error("User has already voted on this ballot.");

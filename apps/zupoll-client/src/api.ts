@@ -1,5 +1,5 @@
 import { PASSPORT_SERVER_URL, ZUPOLL_SERVER_URL } from "../src/util";
-import { CreateBallotRequest, MultiVoteRequest } from "./requestTypes";
+import { CreateBallotRequest, MultiVoteRequest, BotPostRequest } from "./requestTypes";
 
 export async function createBallot(
   request: CreateBallotRequest
@@ -62,6 +62,31 @@ export async function login(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+      },
+    });
+    return await res;
+  } catch (e) {
+    console.log(e);
+    return undefined;
+  }
+}
+
+export async function botPost(
+  request: BotPostRequest,
+  accessToken: string | null
+): Promise<Response | undefined> {
+  if (!accessToken) return undefined;
+
+  const url = `${ZUPOLL_SERVER_URL}bot-post`;
+
+  try {
+    const res = fetch(url, {
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`
       },
     });
     return await res;
