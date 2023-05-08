@@ -21,6 +21,8 @@ export const SEMAPHORE_HISTORIC_URL = IS_DEPLOYED
   ? process.env.SEMAPHORE_HISTORIC_URL
   : "http://localhost:3002/semaphore/valid-historic/";
 
+export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
+
 export interface GroupJwtPayload extends JwtPayload {
   groupUrl: string;
 }

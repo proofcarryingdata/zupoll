@@ -6,10 +6,11 @@ import { ApplicationContext } from "../../types";
 import {
   SEMAPHORE_ADMIN_GROUP_URL,
   SEMAPHORE_GROUP_URL,
+  SITE_URL,
 } from "../../util/auth";
 import { prisma } from "../../util/prisma";
 import { verifyGroupProof } from "../../util/verify";
-import { sendMessage } from "../../util/bot";
+import { cleanString, sendMessage } from "../../util/bot";
 
 /**
  * The endpoints in this function accepts proof (pcd) in the request.
@@ -104,11 +105,14 @@ export function initPCDRoutes(
 
           // send message on TG channel, if bot is setup
           if (newBallot.ballotType === BallotType.STRAWPOLL) {
-            console.log(`New ballot created: ${newBallot.ballotTitle}`);
-            await sendMessage(
-              `New ballot created: ${newBallot.ballotTitle}`,
-              context.bot
-            );
+            const ballotPost =
+              "New straw poll posted!" +
+              `\n\nTitle: <b>${cleanString(newBallot.ballotTitle)}</b>` +
+              `\nDescription: ${cleanString(newBallot.ballotDescription)}` +
+              `\nExpiry: ${new Date(newBallot.expiry).toLocaleString()}` +
+              `\n\nLink: ${SITE_URL}ballot?id=${newBallot.ballotURL}`;
+            console.log(ballotPost);
+            await sendMessage(ballotPost, context.bot);
           }
 
           res.json({

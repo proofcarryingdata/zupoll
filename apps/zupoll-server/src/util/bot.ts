@@ -1,5 +1,9 @@
 import { Bot } from "grammy";
 
+export function cleanString(str: string) {
+  return str.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
+}
+
 export async function sendMessage(message: string, bot?: Bot) {
   if (bot !== undefined) {
     const supergroup_id = process.env.BOT_SUPERGROUP_ID;
@@ -12,7 +16,7 @@ export async function sendMessage(message: string, bot?: Bot) {
       if (!isNaN(message_thread_id) && !isNaN(chat_id)) {
         await bot.api.sendMessage(chat_id, message, {
           message_thread_id,
-          parse_mode: "MarkdownV2",
+          parse_mode: "HTML",
         });
       }
     }
