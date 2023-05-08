@@ -104,7 +104,8 @@ export function initPCDRoutes(
 
           // send message on TG channel, if bot is setup
           if (newBallot.ballotType === BallotType.STRAWPOLL) {
-            sendMessage(
+            console.log(`New ballot created: ${newBallot.ballotTitle}`);
+            await sendMessage(
               `New ballot created: ${newBallot.ballotTitle}`,
               context.bot
             );

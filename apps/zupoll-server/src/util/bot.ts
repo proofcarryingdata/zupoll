@@ -12,8 +12,8 @@ export async function sendMessage(message: string, bot?: Bot) {
       if (!isNaN(message_thread_id) && !isNaN(chat_id)) {
         await bot.api.sendMessage(chat_id, message, {
           message_thread_id,
+          parse_mode: "MarkdownV2",
         });
-        // await bot.api.sendMessage("@vivboop", "Yes");
       }
     }
   }

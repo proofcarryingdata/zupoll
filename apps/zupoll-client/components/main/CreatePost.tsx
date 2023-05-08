@@ -1,20 +1,69 @@
+import { useState } from "react";
 import styled from "styled-components";
+import { botPost } from "../../src/api";
+import { BotPostRequest } from "../../src/requestTypes";
 import { ZupollError } from "../../src/types";
+import { Button } from "../core/Button";
 
 export function CreatePost({
+  token,
   onError,
 }: {
+  token: string;
   onError: (err: ZupollError) => void;
 }) {
+  const [text, setText] = useState("");
+
+  const handleChange = (event: any) => {
+    setText(event.target.value);
+  };
+
+  async function doRequest() {
+    if (confirm("Are you sure you want to post this?") === false) return;
+
+    if (text === undefined) return;
+
+    const request: BotPostRequest = {
+      message: text,
+    };
+    const res = await botPost(request, token);
+
+    if (res === undefined) {
+      const serverDownError: ZupollError = {
+        title: "Post failed",
+        message: "Server is down. Contact passport@0xparc.org.",
+      };
+      onError(serverDownError);
+      return;
+    }
+
+    if (!res.ok) {
+      const resErr = await res.text();
+      console.error("error posting: ", resErr);
+      const err: ZupollError = {
+        title: "Posting failed",
+        message: `Server Error: ${resErr}`,
+      };
+      onError(err);
+      return;
+    }
+
+    setText("");
+  }
+
   return (
-    <PollWrapper>
-      <PollHeader>Create post from @zupoll_bot</PollHeader>
-      <input></input>
-    </PollWrapper>
+    <InputWrapper>
+      <InputHeader>Create post from @zupoll_bot</InputHeader>
+      <InputBody
+        value={text}
+        onChange={handleChange}
+      />
+      <Button onClick={doRequest}>Post</Button>
+    </InputWrapper>
   );
 }
 
-const PollWrapper = styled.div`
+const InputWrapper = styled.div`
   box-sizing: border-box;
   font-family: OpenSans;
   border: 1px solid #bbb;
@@ -31,7 +80,7 @@ const PollWrapper = styled.div`
   }
 `;
 
-const PollHeader = styled.div`
+const InputHeader = styled.div`
   padding: 0px;
   margin: 0;
   display: flex;
@@ -39,4 +88,10 @@ const PollHeader = styled.div`
   align-items: center;
   margin-bottom: 1rem;
   font-weight: 700;
+`;
+
+const InputBody = styled.textarea`
+  width: 100%;
+  height: 10rem;
+  margin-bottom: 0.5rem;
 `;
