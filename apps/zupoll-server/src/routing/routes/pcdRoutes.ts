@@ -112,7 +112,7 @@ export function initPCDRoutes(
             ballotPost +
             `\n\nTitle: <b>${cleanString(newBallot.ballotTitle)}</b>` +
             `\nDescription: ${cleanString(newBallot.ballotDescription)}` +
-            `\nExpiry: ${new Date(newBallot.expiry).toLocaleString()}` +
+            `\nExpiry: ${new Date(newBallot.expiry).toLocaleString("en-US", {timeZone: "Europe/Podgorica"})}` +
             `\n\nLink: ${SITE_URL}ballot?id=${newBallot.ballotURL}`;
           console.log(ballotPost);
           await sendMessage(ballotPost, context.bot);
