@@ -12,11 +12,6 @@ export async function startApplication() {
     context = {
       bot: new Bot(botToken),
     };
-    // context.bot?.on("message", (ctx) => {
-    //   console.log("message", ctx);
-    //   console.log(ctx.update.message?.chat);
-    //   console.log(ctx.update.message?.reply_to_message);
-    // });
     context.bot?.start();
   }
   for (const service of services) {
