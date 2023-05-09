@@ -104,16 +104,18 @@ export function initPCDRoutes(
           );
 
           // send message on TG channel, if bot is setup
-          if (newBallot.ballotType === BallotType.STRAWPOLL) {
-            const ballotPost =
-              "New straw poll posted!" +
-              `\n\nTitle: <b>${cleanString(newBallot.ballotTitle)}</b>` +
-              `\nDescription: ${cleanString(newBallot.ballotDescription)}` +
-              `\nExpiry: ${new Date(newBallot.expiry).toLocaleString()}` +
-              `\n\nLink: ${SITE_URL}ballot?id=${newBallot.ballotURL}`;
-            console.log(ballotPost);
-            await sendMessage(ballotPost, context.bot);
-          }
+          let ballotPost =
+            newBallot.ballotType === BallotType.STRAWPOLL
+              ? "New straw poll posted!"
+              : "New advisory vote posted!";              
+          ballotPost =
+            ballotPost +
+            `\n\nTitle: <b>${cleanString(newBallot.ballotTitle)}</b>` +
+            `\nDescription: ${cleanString(newBallot.ballotDescription)}` +
+            `\nExpiry: ${new Date(newBallot.expiry).toLocaleString()}` +
+            `\n\nLink: ${SITE_URL}ballot?id=${newBallot.ballotURL}`;
+          console.log(ballotPost);
+          await sendMessage(ballotPost, context.bot);
 
           res.json({
             url: newBallot.ballotURL,

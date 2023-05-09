@@ -6,9 +6,9 @@ import { ZupollError } from "../../src/types";
 import { Button } from "../core/Button";
 
 /**
- * Page hosted on /create-post to directly post to the @zupoll_bot account. 
- * This is necessary as we can't host two instances of the bot on different 
- * servers, so we directly feed messages into the bot being hosted on 
+ * Page hosted on /create-post to directly post to the @zupoll_bot account.
+ * This is necessary as we can't host two instances of the bot on different
+ * servers, so we directly feed messages into the bot being hosted on
  * zupoll-server.
  */
 export function CreatePost({
@@ -20,11 +20,11 @@ export function CreatePost({
 }) {
   const [text, setText] = useState("");
 
-  const handleChange = (event: any) => {
+  const handleChangeText = (event: any) => {
     setText(event.target.value);
   };
 
-  async function doRequest() {
+  async function doTextRequest() {
     if (confirm("Are you sure you want to post this?") === false) return;
 
     if (text === undefined) return;
@@ -60,11 +60,8 @@ export function CreatePost({
   return (
     <InputWrapper>
       <InputHeader>Create post from @zupoll_bot</InputHeader>
-      <InputBody
-        value={text}
-        onChange={handleChange}
-      />
-      <Button onClick={doRequest}>Post</Button>
+      <InputBody value={text} onChange={handleChangeText} />
+      <Button onClick={doTextRequest}>Post</Button>
     </InputWrapper>
   );
 }
