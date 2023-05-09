@@ -1,5 +1,7 @@
 import { Bot } from "grammy";
 
+// Removing characters that mess up the HTML parsing of Telegram, as per
+// https://core.telegram.org/bots/api#html-style
 export function cleanString(str: string) {
   return str.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
 }

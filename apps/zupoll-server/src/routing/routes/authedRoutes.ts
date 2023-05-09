@@ -37,7 +37,6 @@ export function initAuthedRoutes(
     }
   );
 
-  // TODO: test functionality of this endpoint + authentication
   app.post(
     "/bot-post",
     authenticateOrganizerJWT,
