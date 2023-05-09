@@ -6,9 +6,11 @@ import { ApplicationContext } from "../../types";
 import {
   SEMAPHORE_ADMIN_GROUP_URL,
   SEMAPHORE_GROUP_URL,
+  SITE_URL,
 } from "../../util/auth";
 import { prisma } from "../../util/prisma";
 import { verifyGroupProof } from "../../util/verify";
+import { cleanString, sendMessage } from "../../util/bot";
 
 /**
  * The endpoints in this function accepts proof (pcd) in the request.
@@ -17,7 +19,7 @@ import { verifyGroupProof } from "../../util/verify";
  */
 export function initPCDRoutes(
   app: express.Application,
-  _context: ApplicationContext
+  context: ApplicationContext
 ): void {
   app.post(
     "/create-ballot",
@@ -88,16 +90,32 @@ export function initPCDRoutes(
             },
           });
 
-          await Promise.all(request.polls.map(poll => 
-            prisma.poll.create({
-              data: {
-                body: poll.body,
-                options: poll.options,
-                ballotURL: newBallot.ballotURL,
-                expiry: request.ballot.expiry,
-              },
-            })
-          ));
+          await Promise.all(
+            request.polls.map((poll) =>
+              prisma.poll.create({
+                data: {
+                  body: poll.body,
+                  options: poll.options,
+                  ballotURL: newBallot.ballotURL,
+                  expiry: request.ballot.expiry,
+                },
+              })
+            )
+          );
+
+          // send message on TG channel, if bot is setup
+          let ballotPost =
+            newBallot.ballotType === BallotType.STRAWPOLL
+              ? "New straw poll posted!"
+              : "New advisory vote posted!";              
+          ballotPost =
+            ballotPost +
+            `\n\nTitle: <b>${cleanString(newBallot.ballotTitle)}</b>` +
+            `\nDescription: ${cleanString(newBallot.ballotDescription)}` +
+            `\nExpiry: ${new Date(newBallot.expiry).toLocaleString()}` +
+            `\n\nLink: ${SITE_URL}ballot?id=${newBallot.ballotURL}`;
+          console.log(ballotPost);
+          await sendMessage(ballotPost, context.bot);
 
           res.json({
             url: newBallot.ballotURL,
@@ -187,7 +205,7 @@ export function initPCDRoutes(
           },
         });
         if (previousBallotVote !== null) {
-          // This error string is used in the frontend to determine whether to 
+          // This error string is used in the frontend to determine whether to
           // show the "already voted" message and thus display the vote results.
           // Do not change without changing the corresponding check in frontend.
           throw new Error("User has already voted on this ballot.");
