@@ -135,16 +135,23 @@ export function initPCDRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as MultiVoteRequest;
 
+      const votePollIds = new Set<string>();
       const multiVoteSignal: MultiVoteSignal = {
         voteSignals: [],
       };
-      request.votes.forEach((vote: Vote) => {
+      for (const vote of request.votes) {
+         // To confirm there is at most one vote per poll
+         if (votePollIds.has(vote.pollId)) {
+          throw new Error("Duplicate vote for a poll.");
+        }
+        votePollIds.add(vote.pollId);
+
         const voteSignal: VoteSignal = {
           pollId: vote.pollId,
           voteIdx: vote.voteIdx,
         };
         multiVoteSignal.voteSignals.push(voteSignal);
-      });
+      }
       const signalHash = sha256(stableStringify(multiVoteSignal));
 
       try {
@@ -211,9 +218,8 @@ export function initPCDRoutes(
           throw new Error("User has already voted on this ballot.");
         }
 
-        const voteIds = [];
         for (const vote of request.votes) {
-          const newVote = await prisma.vote.create({
+          await prisma.vote.create({
             data: {
               pollId: vote.pollId,
               voterType: "ANON",
@@ -223,7 +229,6 @@ export function initPCDRoutes(
               proof: request.proof,
             },
           });
-          voteIds.push(newVote.id);
         }
 
         const multiVoteResponse: MultiVoteResponse = {
