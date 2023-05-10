@@ -15,7 +15,6 @@ export function BallotPoll({
   onVoted: (pollId: string, voteIdx: number) => void;
 }) {
   const totalVotes = poll.votes.reduce((a, b) => a + b, 0);
-  const maxVote = Math.max(...poll.votes);
 
   const getVoteDisplay = (a: number, b: number) => {
     if (b === 0) {
@@ -45,11 +44,7 @@ export function BallotPoll({
               percent={
                 totalVotes === 0 || canVote ? 0 : poll.votes[idx] / totalVotes
               }
-              isHighlighted={
-                finalVoteIdx === undefined
-                  ? maxVote === poll.votes[idx]
-                  : finalVoteIdx === idx
-              }
+              isHighlighted={finalVoteIdx === idx}
             />
             {canVote ? (
               <PollPreResult />
