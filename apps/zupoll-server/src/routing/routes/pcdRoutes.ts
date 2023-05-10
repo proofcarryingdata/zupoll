@@ -13,7 +13,7 @@ import { verifyGroupProof } from "../../util/verify";
 import { cleanString, sendMessage } from "../../util/bot";
 
 /**
- * The endpoints in this function accepts proof (PCD) in the request. It verifies 
+ * The endpoints in this function accepts proof (PCD) in the request. It verifies
  * the proof before proceed. So in this case no other type of auth (e.g. JWT)
  * is needed.
  */
@@ -91,28 +91,34 @@ export function initPCDRoutes(
           });
 
           await Promise.all(
-            request.polls.map((poll) =>
-              prisma.poll.create({
+            request.polls.map(async (poll) => {
+              // store poll order in options so we can maintain the same
+              // database schema and maintain data
+              poll.options.push("poll-order-" + poll.id);
+
+              return prisma.poll.create({
                 data: {
                   body: poll.body,
                   options: poll.options,
                   ballotURL: newBallot.ballotURL,
                   expiry: request.ballot.expiry,
                 },
-              })
-            )
+              });
+            })
           );
 
           // send message on TG channel, if bot is setup
           let ballotPost =
             newBallot.ballotType === BallotType.STRAWPOLL
               ? "New straw poll posted!"
-              : "New advisory vote posted!";              
+              : "New advisory vote posted!";
           ballotPost =
             ballotPost +
             `\n\nTitle: <b>${cleanString(newBallot.ballotTitle)}</b>` +
             `\nDescription: ${cleanString(newBallot.ballotDescription)}` +
-            `\nExpiry: ${new Date(newBallot.expiry).toLocaleString("en-US", {timeZone: "Europe/Podgorica"})}` +
+            `\nExpiry: ${new Date(newBallot.expiry).toLocaleString("en-US", {
+              timeZone: "Europe/Podgorica",
+            })}` +
             `\n\nLink: ${SITE_URL}ballot?id=${newBallot.ballotURL}`;
           console.log(ballotPost);
           await sendMessage(ballotPost, context.bot);
@@ -140,8 +146,8 @@ export function initPCDRoutes(
         voteSignals: [],
       };
       for (const vote of request.votes) {
-         // To confirm there is at most one vote per poll
-         if (votePollIds.has(vote.pollId)) {
+        // To confirm there is at most one vote per poll
+        if (votePollIds.has(vote.pollId)) {
           throw new Error("Duplicate vote for a poll.");
         }
         votePollIds.add(vote.pollId);
@@ -232,7 +238,7 @@ export function initPCDRoutes(
         }
 
         const multiVoteResponse: MultiVoteResponse = {
-          userVotes: multiVoteSignal.voteSignals
+          userVotes: multiVoteSignal.voteSignals,
         };
         res.json(multiVoteResponse);
       } catch (e) {
@@ -282,4 +288,4 @@ export type VoteSignal = {
 
 export type MultiVoteResponse = {
   userVotes: VoteSignal[];
-}
+};
