@@ -13,8 +13,8 @@ import { verifyGroupProof } from "../../util/verify";
 import { cleanString, sendMessage } from "../../util/bot";
 
 /**
- * The endpoints in this function accepts proof (pcd) in the request.
- * It verifies the proof before proceed. So in this case no other type of auth (e.g. jwt)
+ * The endpoints in this function accepts proof (PCD) in the request. It verifies 
+ * the proof before proceed. So in this case no other type of auth (e.g. JWT)
  * is needed.
  */
 export function initPCDRoutes(
@@ -226,9 +226,10 @@ export function initPCDRoutes(
           voteIds.push(newVote.id);
         }
 
-        res.json({
-          ids: voteIds,
-        });
+        const multiVoteResponse: MultiVoteResponse = {
+          userVotes: multiVoteSignal.voteSignals
+        };
+        res.json(multiVoteResponse);
       } catch (e) {
         console.error(e);
         next(e);
@@ -273,3 +274,7 @@ export type VoteSignal = {
   pollId: string;
   voteIdx: number;
 };
+
+export type MultiVoteResponse = {
+  userVotes: VoteSignal[];
+}

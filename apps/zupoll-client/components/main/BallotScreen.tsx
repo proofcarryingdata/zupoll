@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { listBallotPolls } from "../../src/api";
-import { useBallotVoting, votedOn } from "../../src/ballotVoting";
+import { getBallotVotes, useBallotVoting, votedOn } from "../../src/ballotVoting";
 import { useLogin } from "../../src/login";
 import { Ballot } from "../../src/prismaTypes";
 import { BallotPollResponse, PollWithCounts } from "../../src/requestTypes";
@@ -166,6 +166,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
                 canVote={canVote}
                 poll={poll}
                 voteIdx={pollToVote.get(poll.id)}
+                finalVoteIdx={getBallotVotes(ballotId)[poll.id]}
                 onVoted={onVoted}
               />
             ))}
