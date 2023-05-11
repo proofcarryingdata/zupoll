@@ -13,8 +13,8 @@ import { verifyGroupProof } from "../../util/verify";
 import { cleanString, sendMessage } from "../../util/bot";
 
 /**
- * The endpoints in this function accepts proof (pcd) in the request.
- * It verifies the proof before proceed. So in this case no other type of auth (e.g. jwt)
+ * The endpoints in this function accepts proof (PCD) in the request. It verifies
+ * the proof before proceed. So in this case no other type of auth (e.g. JWT)
  * is needed.
  */
 export function initPCDRoutes(
@@ -91,28 +91,34 @@ export function initPCDRoutes(
           });
 
           await Promise.all(
-            request.polls.map((poll) =>
-              prisma.poll.create({
+            request.polls.map(async (poll) => {
+              // store poll order in options so we can maintain the same
+              // database schema and maintain data
+              poll.options.push("poll-order-" + poll.id);
+
+              return prisma.poll.create({
                 data: {
                   body: poll.body,
                   options: poll.options,
                   ballotURL: newBallot.ballotURL,
                   expiry: request.ballot.expiry,
                 },
-              })
-            )
+              });
+            })
           );
 
           // send message on TG channel, if bot is setup
           let ballotPost =
             newBallot.ballotType === BallotType.STRAWPOLL
               ? "New straw poll posted!"
-              : "New advisory vote posted!";              
+              : "New advisory vote posted!";
           ballotPost =
             ballotPost +
             `\n\nTitle: <b>${cleanString(newBallot.ballotTitle)}</b>` +
             `\nDescription: ${cleanString(newBallot.ballotDescription)}` +
-            `\nExpiry: ${new Date(newBallot.expiry).toLocaleString("en-US", {timeZone: "Europe/Podgorica"})}` +
+            `\nExpiry: ${new Date(newBallot.expiry).toLocaleString("en-US", {
+              timeZone: "Europe/Podgorica",
+            })}` +
             `\n\nLink: ${SITE_URL}ballot?id=${newBallot.ballotURL}`;
           console.log(ballotPost);
           await sendMessage(ballotPost, context.bot);
@@ -135,16 +141,23 @@ export function initPCDRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as MultiVoteRequest;
 
+      const votePollIds = new Set<string>();
       const multiVoteSignal: MultiVoteSignal = {
         voteSignals: [],
       };
-      request.votes.forEach((vote: Vote) => {
+      for (const vote of request.votes) {
+        // To confirm there is at most one vote per poll
+        if (votePollIds.has(vote.pollId)) {
+          throw new Error("Duplicate vote for a poll.");
+        }
+        votePollIds.add(vote.pollId);
+
         const voteSignal: VoteSignal = {
           pollId: vote.pollId,
           voteIdx: vote.voteIdx,
         };
         multiVoteSignal.voteSignals.push(voteSignal);
-      });
+      }
       const signalHash = sha256(stableStringify(multiVoteSignal));
 
       try {
@@ -211,9 +224,8 @@ export function initPCDRoutes(
           throw new Error("User has already voted on this ballot.");
         }
 
-        const voteIds = [];
         for (const vote of request.votes) {
-          const newVote = await prisma.vote.create({
+          await prisma.vote.create({
             data: {
               pollId: vote.pollId,
               voterType: "ANON",
@@ -223,12 +235,12 @@ export function initPCDRoutes(
               proof: request.proof,
             },
           });
-          voteIds.push(newVote.id);
         }
 
-        res.json({
-          ids: voteIds,
-        });
+        const multiVoteResponse: MultiVoteResponse = {
+          userVotes: multiVoteSignal.voteSignals,
+        };
+        res.json(multiVoteResponse);
       } catch (e) {
         console.error(e);
         next(e);
@@ -272,4 +284,8 @@ export type MultiVoteSignal = {
 export type VoteSignal = {
   pollId: string;
   voteIdx: number;
+};
+
+export type MultiVoteResponse = {
+  userVotes: VoteSignal[];
 };

@@ -10,6 +10,7 @@ import { voteBallot } from "./api";
 import { UserType, Vote } from "./prismaTypes";
 import {
   MultiVoteRequest,
+  MultiVoteResponse,
   MultiVoteSignal,
   PollWithCounts,
   VoteSignal,
@@ -118,8 +119,10 @@ export function useBallotVoting({
         return;
       }
 
-      await res.json();
+      const multiVotesResponse : MultiVoteResponse = await res.json();
+
       setVoted(ballotId);
+      setBallotVotes(ballotId, multiVotesResponse.userVotes)
       refresh(ballotId);
     }
 
@@ -174,15 +177,33 @@ export function votedOn(ballotId: string): boolean {
   return getVoted().includes(ballotId);
 }
 
-export function getVoted(): Array<string> {
+function getVoted(): Array<string> {
   const voted: Array<string> = JSON.parse(
     window.localStorage.getItem("voted") || "[]"
   );
   return voted;
 }
 
-export function setVoted(ballotId: string) {
+function setVoted(ballotId: string) {
   const newVoted = getVoted();
   newVoted.push(ballotId);
   window.localStorage.setItem("voted", JSON.stringify(newVoted));
+}
+
+export function getBallotVotes(ballotId: string) {
+  const allVotes = JSON.parse(
+    window.localStorage.getItem("allVotes") || "{}"
+  );
+  return allVotes[ballotId] || {};
+}
+
+function setBallotVotes(ballotId: string, userVotes: VoteSignal[]) {
+  const allVotes = JSON.parse(
+    window.localStorage.getItem("allVotes") || "{}"
+  );
+  allVotes[ballotId] = {};
+  for (const vote of userVotes) {
+    allVotes[ballotId][vote.pollId] = vote.voteIdx;
+  }
+  window.localStorage.setItem("allVotes", JSON.stringify(allVotes));
 }

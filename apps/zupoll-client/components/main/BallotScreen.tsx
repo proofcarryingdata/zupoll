@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { listBallotPolls } from "../../src/api";
-import { useBallotVoting, votedOn } from "../../src/ballotVoting";
+import { getBallotVotes, useBallotVoting, votedOn } from "../../src/ballotVoting";
 import { useLogin } from "../../src/login";
 import { Ballot } from "../../src/prismaTypes";
 import { BallotPollResponse, PollWithCounts } from "../../src/requestTypes";
@@ -66,7 +66,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
         const resErr = await res.text();
         console.error("error posting vote to the server: ", resErr);
         const err: ZupollError = {
-          title: "Voting failed",
+          title: "Retreiving polls failed",
           message: `Server Error: ${resErr}`,
         };
         setError(err);
@@ -75,7 +75,43 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
 
       const ballotPollResponse: BallotPollResponse = await res.json();
       console.log(ballotPollResponse);
-      setPolls(ballotPollResponse.polls);
+
+      // reorder+reformat polls if there's a poll order in the options
+      if (ballotPollResponse.polls.length > 0) {
+        const firstPollOptions = ballotPollResponse.polls[0].options;
+        if (firstPollOptions[firstPollOptions.length - 1].startsWith("poll-order-")) {
+          const newPolls : PollWithCounts[] = [];
+          
+          // Sorting polls by poll-order-<idx> option
+          for (let idx = 0; idx < ballotPollResponse.polls.length; idx++) {
+            for (let i = 0; i < ballotPollResponse.polls.length; i++) {
+              const poll = ballotPollResponse.polls[i];
+              const lastOption = poll.options[poll.options.length - 1];
+              if (lastOption === `poll-order-${idx}`) {
+                newPolls.push(poll);
+                break;
+              }
+            }
+          }
+
+          // Remove poll-order-<idx> option from polls
+          for (let i = 0; i < newPolls.length; i++) {
+            newPolls[i].options.pop()
+          }
+          setPolls(newPolls);
+        } else {
+          setPolls(ballotPollResponse.polls);
+        }
+      } else {
+        console.error("No polls found in ballot");
+        const err: ZupollError = {
+          title: "Retreiving polls failed",
+          message: `No polls found in ballot`,
+        };
+        setError(err);
+        return;
+      }
+
       setBallot(ballotPollResponse.ballot);
       setBallotId(ballotPollResponse.ballot.ballotId);
       setBallotVoterSemaphoreGroupUrl(
@@ -166,6 +202,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
                 canVote={canVote}
                 poll={poll}
                 voteIdx={pollToVote.get(poll.id)}
+                finalVoteIdx={getBallotVotes(ballotId)[poll.id]}
                 onVoted={onVoted}
               />
             ))}

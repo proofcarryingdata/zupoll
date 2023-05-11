@@ -5,15 +5,16 @@ export function BallotPoll({
   canVote,
   poll,
   voteIdx,
+  finalVoteIdx,
   onVoted,
 }: {
   canVote: boolean;
   poll: PollWithCounts;
   voteIdx: number | undefined;
+  finalVoteIdx: number | undefined;
   onVoted: (pollId: string, voteIdx: number) => void;
 }) {
   const totalVotes = poll.votes.reduce((a, b) => a + b, 0);
-  const maxVote = Math.max(...poll.votes);
 
   const getVoteDisplay = (a: number, b: number) => {
     if (b === 0) {
@@ -43,7 +44,7 @@ export function BallotPoll({
               percent={
                 totalVotes === 0 || canVote ? 0 : poll.votes[idx] / totalVotes
               }
-              isMax={maxVote === poll.votes[idx]}
+              isHighlighted={finalVoteIdx === idx}
             />
             {canVote ? (
               <PollPreResult />
@@ -139,14 +140,17 @@ const PollOption = styled.span<{ canVote: boolean; selected: boolean }>`
   `}
 `;
 
-const PollProgressBar = styled.span<{ percent: number; isMax: boolean }>`
-  ${({ percent, isMax }) => css`
+const PollProgressBar = styled.span<{
+  percent: number;
+  isHighlighted: boolean;
+}>`
+  ${({ percent, isHighlighted }) => css`
     position: absolute;
     top: 0;
     left: 0;
     width: ${100 * percent}%;
     height: 100%;
-    background-color: ${isMax ? "#90ccf1" : "#cce5f3"};
+    background-color: ${isHighlighted ? "#90ccf1" : "#cce5f3"};
   `}
 `;
 

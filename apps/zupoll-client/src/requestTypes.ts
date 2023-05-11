@@ -62,3 +62,7 @@ export type VoteSignal = {
   pollId: string;
   voteIdx: number;
 };
+
+export type MultiVoteResponse = {
+  userVotes: VoteSignal[];
+}

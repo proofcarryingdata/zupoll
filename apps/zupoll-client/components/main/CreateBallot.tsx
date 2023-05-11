@@ -27,7 +27,7 @@ export function CreateBallot({
    */
   const [polls, setPolls] = useState<Poll[]>([
     {
-      id: "",
+      id: "0",
       body: "",
       options: [],
       ballotURL: 0,
@@ -142,7 +142,7 @@ export function CreateBallot({
                 setPolls([
                   ...polls,
                   {
-                    id: "",
+                    id: polls.length.toString(),
                     body: "",
                     options: [],
                     ballotURL: 0,
