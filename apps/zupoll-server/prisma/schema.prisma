@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
   engineType = "binary"
 }
 
@@ -11,9 +8,52 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// If user type is ANON, the PCD is a Semaphore Group PCD which signs the signal. We just check for membership.
-// If user type is NONANON, the PCD is a Semaphore Signature PCD which signs the signal. We extract the commitment
-//    from the verified PCD and then we check that it is part of a valid group.
+model Ballot {
+  ballotId                  String     @default(uuid())
+  ballotURL                 Int        @id @default(autoincrement())
+  ballotTitle               String
+  ballotDescription         String
+  createdAt                 DateTime   @default(now())
+  expiry                    DateTime
+  proof                     Json
+  pollsterType              UserType
+  pollsterNullifier         String     @unique
+  pollsterSemaphoreGroupUrl String?
+  pollsterName              String?
+  pollsterUuid              String?
+  pollsterCommitment        String?
+  voterSemaphoreGroupUrls   String[]
+  voterSemaphoreGroupRoots  String[]
+  ballotType                BallotType
+  polls                     Poll[]
+  expiryNotif               ExpiryNotifStatus? @default(NONE)
+}
+
+model Poll {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  body      String
+  options   String[]
+  expiry    DateTime
+  ballotURL Int?
+  ballot    Ballot?  @relation(fields: [ballotURL], references: [ballotURL])
+  votes     Vote[]
+}
+
+model Vote {
+  id                     String   @id @default(uuid())
+  pollId                 String
+  voterType              UserType
+  voterNullifier         String
+  voterSemaphoreGroupUrl String?
+  voterName              String?
+  voterUuid              String?
+  voterCommitment        String?
+  voteIdx                Int
+  proof                  Json
+  poll                   Poll     @relation(fields: [pollId], references: [id])
+}
+
 enum UserType {
   ANON
   NONANON
@@ -24,62 +64,9 @@ enum BallotType {
   STRAWPOLL
 }
 
-model Ballot {
-  ballotId String @default(uuid())
-  ballotURL Int @id @default(autoincrement())
-	ballotTitle String
-  ballotDescription String
-  createdAt DateTime @default(now())
-  expiry DateTime
-  proof Json
-
-  pollsterType UserType
-  pollsterNullifier String @unique
-
-  // ANON
-  pollsterSemaphoreGroupUrl String?
-
-  // NONANON
-  pollsterName String?
-  pollsterUuid String?
-  pollsterCommitment String?
-
-  voterSemaphoreGroupUrls String[]
-  voterSemaphoreGroupRoots String[]
-	polls Poll[]
-	ballotType BallotType
-}
-
-model Poll {
-  id String @id @default(uuid())
-  createdAt DateTime @default(now())
-
-  body String
-  options String[]
-  expiry DateTime
-
-  ballot Ballot? @relation(fields: [ballotURL], references: [ballotURL])
-  ballotURL Int?
-
-  votes Vote[]
-}
-
-// changed id here to be uuid, no reason it should be a signal hash.
-model Vote {
-  id String @id @default(uuid())
-  poll Poll @relation(fields: [pollId], references: [id])
-  pollId String
-  voterType UserType
-  voterNullifier String
-
-  // ANON
-  voterSemaphoreGroupUrl String?
-
-  // NONANON
-  voterName String?
-  voterUuid String?
-  voterCommitment String?
-
-  voteIdx Int
-  proof Json
+enum ExpiryNotifStatus {
+  NONE
+  WEEK
+  DAY
+  HOUR
 }
