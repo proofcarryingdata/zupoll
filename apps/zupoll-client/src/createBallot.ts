@@ -90,6 +90,7 @@ export function useCreateBallot({
         pollsterName: null,
         pollsterUuid: null,
         pollsterCommitment: null,
+        expiryNotif: null,
         pollsterSemaphoreGroupUrl: groupUrl,
         voterSemaphoreGroupUrls: [voterGroupUrl],
         voterSemaphoreGroupRoots: [voterGroupRootHash],
