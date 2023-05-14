@@ -23,7 +23,7 @@ export async function startApplication() {
 
   // start up cron jobs
   const cronJob = new CronJob(
-    "0,15,30,45 * * * *", // every 15 minutes
+    "0,15,30,45 * * * *", // every 15 minutes, check if any ballots are expiring soon
     async () => {
       const ballots = await prisma.ballot.findMany({
         select: {
@@ -41,7 +41,7 @@ export async function startApplication() {
         );
         const days = Math.ceil(hours / 24);
 
-        const sharedMessage = `\n\nVote at ${SITE_URL}ballot?id=${ballot.ballotURL}`;
+        const pollUrl = `${SITE_URL}ballot?id=${ballot.ballotURL}`;
 
         if (days === 7 && ballot.expiryNotif === "NONE") {
           await prisma.ballot.update({
@@ -55,7 +55,7 @@ export async function startApplication() {
 
           const expiryMessage = `<b>${cleanString(
             ballot.ballotTitle
-          )}</b> will expire in <1 week.${sharedMessage}`;
+          )}</b> will expire in less than 1 week. Vote at ${pollUrl}`;
           await sendMessage(expiryMessage, context.bot);
 
         } else if (
@@ -73,7 +73,7 @@ export async function startApplication() {
 
           const expiryMessage = `<b>${cleanString(
             ballot.ballotTitle
-          )}</b> will expire in <24 hours.${sharedMessage}`;
+          )}</b> will expire in less than 24 hours. Vote at ${pollUrl}`;
           await sendMessage(expiryMessage, context.bot);
 
         } else if (
@@ -91,7 +91,7 @@ export async function startApplication() {
 
           const expiryMessage = `<b>${cleanString(
             ballot.ballotTitle
-          )}</b> will expire in <1 hour!${sharedMessage}`;
+          )}</b> will expire in less than 1 hour! Get your votes in at ${pollUrl}`;
           await sendMessage(expiryMessage, context.bot);
         }
       }
