@@ -36,10 +36,11 @@ export async function startApplication() {
       });
 
       for (const ballot of ballots) {
-        const hours = Math.ceil(
-          (new Date(ballot.expiry).getTime() - Date.now()) / (1000 * 60 * 60)
+        const minutes = Math.ceil(
+          (new Date(ballot.expiry).getTime() - Date.now()) / 60000
         );
-        const days = Math.ceil(hours / 24);
+        const hours = Math.ceil(minutes / 60);
+        const days = Math.ceil(minutes / (24 * 60));
 
         const pollUrl = `${SITE_URL}ballot?id=${ballot.ballotURL}`;
 
@@ -59,7 +60,7 @@ export async function startApplication() {
           await sendMessage(expiryMessage, context.bot);
 
         } else if (
-          days === 1 &&
+          hours === 24 &&
           (ballot.expiryNotif === "WEEK" || ballot.expiryNotif === "NONE")
         ) {
           await prisma.ballot.update({
