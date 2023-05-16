@@ -6,8 +6,7 @@ import { Ballot, BallotType } from "../../src/prismaTypes";
 import { BallotResponse } from "../../src/requestTypes";
 import { ZupollError } from "../../src/types";
 import { Center } from "../core";
-import { BallotButton } from "../core/Button";
-import { LoggedInHeader } from "../core/Headers";
+import { MainScreenHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "./ErrorOverlay";
 
@@ -86,12 +85,10 @@ export function MainScreen({
 
   return (
     <Center>
-      <LoggedInHeader onLogout={onLogout} />
-
-      <BallotButton onClick={() => router.push("/create-ballot")}>
-        <h3>Create a new ballot</h3>
-      </BallotButton>
-
+      <MainScreenHeader
+        onLogout={onLogout}
+        createBallot={() => router.push("/create-ballot")}
+      />
       <BallotListContainer>
         <TitleContainer>
           <H1>Advisory Votes</H1>

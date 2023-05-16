@@ -232,4 +232,5 @@ export const SubmitButton = styled.button`
   padding: 0.25rem;
   margin-bottom: 2rem;
   text-align: center;
+  cursor: pointer;
 `;

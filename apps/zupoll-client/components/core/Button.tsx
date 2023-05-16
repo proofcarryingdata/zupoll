@@ -37,7 +37,7 @@ export const WideButton = styled.div`
 
 export const BallotButton = styled.div`
   font-family: OpenSans;
-  background: #52b5a4;
+  background-color: #52b5a4;
   border-radius: 1rem;
   padding: 0.25rem;
   margin-bottom: 2rem;

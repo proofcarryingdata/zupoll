@@ -3,7 +3,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { listBallotPolls } from "../../src/api";
-import { getBallotVotes, useBallotVoting, votedOn } from "../../src/ballotVoting";
+import {
+  getBallotVotes,
+  useBallotVoting,
+  votedOn,
+} from "../../src/ballotVoting";
 import { useLogin } from "../../src/login";
 import { Ballot } from "../../src/prismaTypes";
 import { BallotPollResponse, PollWithCounts } from "../../src/requestTypes";
@@ -79,9 +83,13 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
       // reorder+reformat polls if there's a poll order in the options
       if (ballotPollResponse.polls.length > 0) {
         const firstPollOptions = ballotPollResponse.polls[0].options;
-        if (firstPollOptions[firstPollOptions.length - 1].startsWith("poll-order-")) {
-          const newPolls : PollWithCounts[] = [];
-          
+        if (
+          firstPollOptions[firstPollOptions.length - 1].startsWith(
+            "poll-order-"
+          )
+        ) {
+          const newPolls: PollWithCounts[] = [];
+
           // Sorting polls by poll-order-<idx> option
           for (let idx = 0; idx < ballotPollResponse.polls.length; idx++) {
             for (let i = 0; i < ballotPollResponse.polls.length; i++) {
@@ -96,7 +104,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
 
           // Remove poll-order-<idx> option from polls
           for (let i = 0; i < newPolls.length; i++) {
-            newPolls[i].options.pop()
+            newPolls[i].options.pop();
           }
           setPolls(newPolls);
         } else {
@@ -180,20 +188,35 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
           <RippleLoaderLight />
         ) : (
           <>
+            {new Date(ballot.expiry) < new Date() ? (
+              <></>
+            ) : (
+              <TextContainer>
+                <p>
+                  🚨 If you reset your passport after this poll was created you
+                  will not be able to vote, to prevent people from
+                  double-voting.
+                </p>
+              </TextContainer>
+            )}
             <Container>
               <h2>{ballot.ballotTitle}</h2>
               <p>{ballot.ballotDescription}</p>
               {ballot.expiry &&
+                ballot.createdAt &&
                 (new Date(ballot.expiry) < new Date() ? (
-                  <p style={{ color: "red" }}>
-                    <i>This ballot has expired.</i>
-                  </p>
+                  <p style={{ color: "red" }}>This ballot has expired.</p>
                 ) : (
-                  <p>
-                    <i>
-                      {"Expires at " + new Date(ballot.expiry).toLocaleString()}
-                    </i>
-                  </p>
+                  <>
+                    <p>
+                      <b>Created</b>{" "}
+                      {" " + new Date(ballot.createdAt).toLocaleString()}
+                    </p>
+                    <p>
+                      <b>Expires</b>{" "}
+                      {" " + new Date(ballot.expiry).toLocaleString()}
+                    </p>
+                  </>
                 ))}
             </Container>
             {polls.map((poll) => (
@@ -240,6 +263,11 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
     </>
   );
 }
+
+const TextContainer = styled.div`
+  color: white;
+  font-size: 1.2rem;
+`;
 
 export const Container = styled.div`
   box-sizing: border-box;
