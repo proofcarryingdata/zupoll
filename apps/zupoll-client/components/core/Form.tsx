@@ -25,6 +25,33 @@ export const StyledInput = styled.input`
   width: 50%;
 `;
 
+export const OptionsLabel = styled.div`
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  text-align: right;
+  font-weight: bold;
+`;
+
+export const OptionContainer = styled.div`
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+export const OptionInput = styled.input`
+  padding: 0.25rem 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.25rem;
+  border: none;
+  border: 1px solid #555;
+  width: 100%;
+`;
+
 export const StyledSelect = styled.select`
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
@@ -33,7 +60,7 @@ export const StyledSelect = styled.select`
   width: 50%;
 `;
 
-export const StyledLabel = styled.label`
+export const StyledLabel = styled.div`
   margin-bottom: 0.5rem;
   font-size: 1rem;
   display: flex;
@@ -47,5 +74,5 @@ export const StyledLabel = styled.label`
 export const FormButtonContainer = styled.div`
   display: flex;
   gap: 1rem;
-  width: 50%;
+  width: 100%;
 `;

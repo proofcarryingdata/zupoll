@@ -187,9 +187,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
           <RippleLoaderLight />
         ) : (
           <>
-            {new Date(ballot.expiry) < new Date() ? (
-              <></>
-            ) : (
+            {canVote ? (
               <TextContainer>
                 <div>🚨</div>
                 <div>
@@ -198,6 +196,8 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
                   double-voting.
                 </div>
               </TextContainer>
+            ) : (
+              <></>
             )}
             <Container>
               <h2>{ballot.ballotTitle}</h2>
