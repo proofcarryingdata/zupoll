@@ -7,6 +7,6 @@ export const Logo = styled.img`
 export const Center = styled.div`
   width: 100%;
   max-width: 580px;
-  padding: 0 1rem;
+  padding: 0 2rem;
   margin: 0 auto;
 `;

@@ -13,7 +13,6 @@ import { Ballot } from "../../src/prismaTypes";
 import { BallotPollResponse, PollWithCounts } from "../../src/requestTypes";
 import { ZupollError } from "../../src/types";
 import { Center } from "../core";
-import { BallotButton } from "../core/Button";
 import { ReturnHeader } from "../core/Headers";
 import {
   RippleLoaderLight,
@@ -192,11 +191,12 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
               <></>
             ) : (
               <TextContainer>
-                <p>
-                  🚨 If you reset your passport after this poll was created you
-                  will not be able to vote, to prevent people from
+                <div>🚨</div>
+                <div>
+                  If you reset your passport after this poll was created you
+                  will not be able to vote. This is to prevent people from
                   double-voting.
-                </p>
+                </div>
               </TextContainer>
             )}
             <Container>
@@ -265,11 +265,14 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
 }
 
 const TextContainer = styled.div`
+  display: flex;
   color: white;
-  font-size: 1.2rem;
+  gap: 1rem;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
 `;
 
-export const Container = styled.div`
+const Container = styled.div`
   box-sizing: border-box;
   font-family: OpenSans;
   border: 1px solid #bbb;
@@ -277,5 +280,15 @@ export const Container = styled.div`
   width: 100%;
   border-radius: 1rem;
   padding: 1rem 2rem 2rem 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+`;
+
+const BallotButton = styled.div`
+  font-family: OpenSans;
+  background-color: #52b5a4;
+  border-radius: 1rem;
+  padding: 0.25rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  cursor: pointer;
 `;

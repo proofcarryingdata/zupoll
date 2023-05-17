@@ -89,6 +89,12 @@ export function MainScreen({
         onLogout={onLogout}
         createBallot={() => router.push("/create-ballot")}
       />
+      <GuarenteeContainer>
+        <Guarentee>🕵️‍♂️🛡️ The server never learns your identity.</Guarentee>
+        <Guarentee>🗳️👤 One vote per Zuzalu participant.</Guarentee>
+        <Guarentee>🚫🔗 Unlinkable votes across ballots/devices. </Guarentee>
+      </GuarenteeContainer>
+
       <BallotListContainer>
         <TitleContainer>
           <H1>Advisory Votes</H1>
@@ -114,7 +120,6 @@ export function MainScreen({
             ))
         )}
       </BallotListContainer>
-      <br />
       <BallotListContainer>
         <TitleContainer>
           <H1>Straw Polls</H1>
@@ -163,13 +168,26 @@ const H1 = styled.h1`
   font-style: normal;
 `;
 
+const GuarenteeContainer = styled.div`
+  background: #eee;
+  width: 100%;
+  margin-bottom: 2rem;
+  border-radius: 1rem;
+  padding: 2rem 2rem 1.5rem 2rem;
+  border: 1px solid #eee;
+`;
+
+const Guarentee = styled.div`
+  margin-bottom: 0.5rem;
+`;
+
 const BallotListContainer = styled.div`
   display: flex;
   background: #eee;
   width: 100%;
   justify-content: center;
   flex-direction: column;
-  margin-top: 1rem;
+  margin-bottom: 2rem;
   border-radius: 1rem;
   padding: 1rem 2rem 1rem 2rem;
   border: 1px solid #eee;

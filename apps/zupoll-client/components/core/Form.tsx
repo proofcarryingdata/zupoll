@@ -8,7 +8,7 @@ export const FormContainer = styled.div`
   width: 100%;
   border-radius: 1rem;
   padding: 1rem 2rem 2rem 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 `;
 
 export const StyledForm = styled.div`

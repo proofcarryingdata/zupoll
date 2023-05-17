@@ -4,7 +4,6 @@ import { useCreateBallot } from "../../src/createBallot";
 import { BallotType, Poll } from "../../src/prismaTypes";
 import { ZupollError } from "../../src/types";
 import { SEMAPHORE_ADMIN_GROUP_URL } from "../../src/util";
-import { WideButton } from "../core/Button";
 import {
   FormButtonContainer,
   FormContainer,
@@ -223,14 +222,28 @@ export function CreateBallot({
   );
 }
 
-export const SubmitButton = styled.button`
+const SubmitButton = styled.button`
   font-family: OpenSans;
   background: #52b5a4;
   width: 100%;
   border-radius: 1rem;
   border: none;
   padding: 0.25rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
   cursor: pointer;
+`;
+
+const WideButton = styled.div`
+  width: calc(50% - 0.5rem);
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #888;
+  opacity: 1;
+  cursor: pointer;
+  text-align: center;
+
+  font-family: OpenSans;
+  font-weight: bold;
+  background-color: #fff;
 `;

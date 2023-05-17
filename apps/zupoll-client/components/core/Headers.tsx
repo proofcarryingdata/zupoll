@@ -18,17 +18,19 @@ export function MainScreenHeader({
   }, [onLogout]);
 
   return (
-    <LoggedInContainer>
-      <Logo src="/zupoll-logo.png" alt="Zuzalu" />
-      <ButtonContainer>
-        <Button deemph={true} onClick={confirmLogout}>
-          Logout
-        </Button>
-        <BallotCreateButton onClick={createBallot}>
-          <b>Create</b>
-        </BallotCreateButton>
-      </ButtonContainer>
-    </LoggedInContainer>
+    <StickyHeader>
+      <MainScreenContainer>
+        <Logo src="/zupoll-logo.png" alt="Zuzalu" />
+        <ButtonContainer>
+          <Button deemph={true} onClick={confirmLogout}>
+            Logout
+          </Button>
+          <BallotCreateButton onClick={createBallot}>
+            <b>Create</b>
+          </BallotCreateButton>
+        </ButtonContainer>
+      </MainScreenContainer>
+    </StickyHeader>
   );
 }
 
@@ -36,13 +38,15 @@ export function ReturnHeader() {
   const router = useRouter();
 
   return (
-    <SecondaryContainer>
-      <Button onClick={() => router.push("/")}>← Back</Button>
-    </SecondaryContainer>
+    <StickyHeader>
+      <SecondaryContainer>
+        <Button onClick={() => router.push("/")}>← Back</Button>
+      </SecondaryContainer>
+    </StickyHeader>
   );
 }
 
-export function ExitHeader() {
+export function CancelPollHeader() {
   const router = useRouter();
 
   const confirmExit = useCallback(() => {
@@ -56,45 +60,53 @@ export function ExitHeader() {
   }, [router]);
 
   return (
-    <SecondaryContainer>
-      <Button onClick={confirmExit}>← Cancel</Button>
-    </SecondaryContainer>
+    <StickyHeader>
+      <SecondaryContainer>
+        <Button onClick={confirmExit}>← Cancel</Button>
+      </SecondaryContainer>
+    </StickyHeader>
   );
 }
 
 export function LoggedOutHeader() {
   return (
-    <HeaderContainer>
+    <LoggedOutContainer>
       <Logo src="/zupoll-logo.png" alt="Zuzalu" />
-    </HeaderContainer>
+    </LoggedOutContainer>
   );
 }
 
-export const SecondaryContainer = styled.div`
+const StickyHeader = styled.div`
+  z-index: 1000;
+  position: sticky;
+  top: 0;
+`;
+
+const MainScreenContainer = styled.div`
   width: 100%;
   font-size: 2em;
-  margin-bottom: 1rem;
-  margin-top: 2rem;
+  padding-bottom: 2rem;
+  padding-top: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-weight: bold;
-  color: #fff;
+  background: rgb(28, 41, 40);
 `;
 
-export const LoggedInContainer = styled.div`
+const SecondaryContainer = styled.div`
   width: 100%;
   font-size: 2em;
-  margin-bottom: 2rem;
-  margin-top: 2rem;
+  padding-bottom: 1.5rem;
+  padding-top: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-weight: bold;
-  color: #fff;
+  background: rgb(28, 41, 40);
 `;
 
-export const HeaderContainer = styled.div`
+const LoggedOutContainer = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2rem;
