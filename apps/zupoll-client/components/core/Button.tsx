@@ -13,10 +13,10 @@ export const Button = styled.button<{ deemph?: boolean }>`
   background-color: ${({ deemph }) => (deemph ? "#eee" : "#fff")};
 
   &:hover {
-    background-color: ${({ deemph }) => (deemph ? "#e8e8e8" : "#f8f8f8")};
+    background-color: ${({ deemph }) => (deemph ? "#c3c1c1" : "#d8d8d8")};
   }
 
   &:active {
-    background-color: ${({ deemph }) => (deemph ? "#e3e3e3" : "#f3f3f3")};
+    background-color: ${({ deemph }) => (deemph ? "#b3b1b1" : "#c3c3c3")};
   }
 `;

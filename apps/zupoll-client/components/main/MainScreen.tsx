@@ -199,7 +199,7 @@ const TitleContainer = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-const BallotListButton = styled.div<{ deemph?: boolean }>`
+const BallotListButton = styled.div`
   display: flex;
   justify-content: space-between;
 
@@ -212,13 +212,13 @@ const BallotListButton = styled.div<{ deemph?: boolean }>`
 
   font-family: OpenSans;
   font-weight: 400;
-  background-color: ${({ deemph }) => (deemph ? "#eee" : "#fff")};
+  background-color:#fff;
 
   cursor: pointer;
   &:hover {
-    background-color: ${({ deemph }) => (deemph ? "#e8e8e8" : "#f8f8f8")};
+    background-color: #d8d8d8;
   }
   &:active {
-    background-color: ${({ deemph }) => (deemph ? "#e3e3e3" : "#f3f3f3")};
+    background-color: #c3c3c3;
   }
 `;

@@ -232,8 +232,8 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
           </>
         )}
 
-        {canVote &&
-          (serverLoading || ballot === undefined ? (
+        {canVote && ballot !== undefined ? (
+          serverLoading ? (
             <RippleLoaderLightMargin />
           ) : (
             <BallotButton
@@ -249,7 +249,10 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
             >
               <h3>Submit ballot</h3>
             </BallotButton>
-          ))}
+          )
+        ) : (
+          <></>
+        )}
 
         {error && (
           <ErrorOverlay
@@ -285,10 +288,18 @@ const Container = styled.div`
 
 const BallotButton = styled.div`
   font-family: OpenSans;
-  background-color: #52b5a4;
   border-radius: 1rem;
   padding: 0.25rem;
   margin-bottom: 1.5rem;
   text-align: center;
   cursor: pointer;
+  background-color: #52b5a4;
+
+  &:hover {
+    background-color: #449c8d;
+  }
+
+  &:active {
+    background-color: #378073;
+  }
 `;

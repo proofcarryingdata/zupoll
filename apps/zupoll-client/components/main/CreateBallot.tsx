@@ -232,6 +232,14 @@ const SubmitButton = styled.button`
   margin-bottom: 1.5rem;
   text-align: center;
   cursor: pointer;
+  
+  &:hover {
+    background-color: #449c8d;
+  }
+
+  &:active {
+    background-color: #378073;
+  }
 `;
 
 const WideButton = styled.div`
@@ -246,4 +254,12 @@ const WideButton = styled.div`
   font-family: OpenSans;
   font-weight: bold;
   background-color: #fff;
+
+  &:hover {
+    background-color: #d8d8d8;
+  }
+
+  &:active {
+    background-color: #c3c3c3;
+  }
 `;
