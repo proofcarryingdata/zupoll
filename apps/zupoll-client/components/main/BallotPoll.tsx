@@ -73,7 +73,7 @@ const PollWrapper = styled.div`
   width: 100%;
   border-radius: 1rem;
   padding: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   position: relative;
   transition: 200ms;
 

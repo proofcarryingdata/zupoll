@@ -6,8 +6,7 @@ import { Ballot, BallotType } from "../../src/prismaTypes";
 import { BallotResponse } from "../../src/requestTypes";
 import { ZupollError } from "../../src/types";
 import { Center } from "../core";
-import { BallotButton } from "../core/Button";
-import { LoggedInHeader } from "../core/Headers";
+import { MainScreenHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "./ErrorOverlay";
 
@@ -86,11 +85,15 @@ export function MainScreen({
 
   return (
     <Center>
-      <LoggedInHeader onLogout={onLogout} />
-
-      <BallotButton onClick={() => router.push("/create-ballot")}>
-        <h3>Create a new ballot</h3>
-      </BallotButton>
+      <MainScreenHeader
+        onLogout={onLogout}
+        createBallot={() => router.push("/create-ballot")}
+      />
+      <GuarenteeContainer>
+        <Guarentee>🕵️‍♂️🛡️ The server never learns your identity.</Guarentee>
+        <Guarentee>🗳️👤 One vote per Zuzalu participant.</Guarentee>
+        <Guarentee>🚫🔗 Unlinkable votes across ballots/devices. </Guarentee>
+      </GuarenteeContainer>
 
       <BallotListContainer>
         <TitleContainer>
@@ -117,7 +120,6 @@ export function MainScreen({
             ))
         )}
       </BallotListContainer>
-      <br />
       <BallotListContainer>
         <TitleContainer>
           <H1>Straw Polls</H1>
@@ -166,13 +168,26 @@ const H1 = styled.h1`
   font-style: normal;
 `;
 
+const GuarenteeContainer = styled.div`
+  background: #eee;
+  width: 100%;
+  margin-bottom: 2rem;
+  border-radius: 1rem;
+  padding: 2rem 2rem 1.5rem 2rem;
+  border: 1px solid #eee;
+`;
+
+const Guarentee = styled.div`
+  margin-bottom: 0.5rem;
+`;
+
 const BallotListContainer = styled.div`
   display: flex;
   background: #eee;
   width: 100%;
   justify-content: center;
   flex-direction: column;
-  margin-top: 1rem;
+  margin-bottom: 2rem;
   border-radius: 1rem;
   padding: 1rem 2rem 1rem 2rem;
   border: 1px solid #eee;
@@ -184,7 +199,7 @@ const TitleContainer = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-const BallotListButton = styled.div<{ deemph?: boolean }>`
+const BallotListButton = styled.div`
   display: flex;
   justify-content: space-between;
 
@@ -197,13 +212,13 @@ const BallotListButton = styled.div<{ deemph?: boolean }>`
 
   font-family: OpenSans;
   font-weight: 400;
-  background-color: ${({ deemph }) => (deemph ? "#eee" : "#fff")};
+  background-color:#fff;
 
   cursor: pointer;
   &:hover {
-    background-color: ${({ deemph }) => (deemph ? "#e8e8e8" : "#f8f8f8")};
+    background-color: #d8d8d8;
   }
   &:active {
-    background-color: ${({ deemph }) => (deemph ? "#e3e3e3" : "#f3f3f3")};
+    background-color: #c3c3c3;
   }
 `;

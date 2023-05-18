@@ -4,10 +4,12 @@ import { useCreateBallot } from "../../src/createBallot";
 import { BallotType, Poll } from "../../src/prismaTypes";
 import { ZupollError } from "../../src/types";
 import { SEMAPHORE_ADMIN_GROUP_URL } from "../../src/util";
-import { WideButton } from "../core/Button";
 import {
   FormButtonContainer,
   FormContainer,
+  OptionContainer,
+  OptionInput,
+  OptionsLabel,
   StyledForm,
   StyledInput,
   StyledLabel,
@@ -29,7 +31,7 @@ export function CreateBallot({
     {
       id: "0",
       body: "",
-      options: [],
+      options: [""],
       ballotURL: 0,
       createdAt: new Date(),
       expiry: new Date(),
@@ -56,9 +58,13 @@ export function CreateBallot({
     setPolls(newPolls);
   };
 
-  const updatePollOptions = (pollOptions: string[], index: number) => {
+  const updatePollOptions = (
+    newOption: string,
+    pollIndex: number,
+    optionIndex: number
+  ) => {
     const newPolls = [...polls];
-    newPolls[index].options = pollOptions;
+    newPolls[pollIndex].options[optionIndex] = newOption;
     setPolls(newPolls);
   };
 
@@ -82,7 +88,7 @@ export function CreateBallot({
       <FormContainer>
         <StyledForm>
           <h2>Ballot Info</h2>
-          <StyledLabel htmlFor="body">
+          <StyledLabel>
             Ballot title&nbsp;
             <StyledInput
               type="text"
@@ -90,11 +96,10 @@ export function CreateBallot({
               autoComplete="off"
               value={ballotTitle}
               onChange={(e) => setBallotTitle(e.target.value)}
-              required
               placeholder="Advisory Vote 04/25"
             />
           </StyledLabel>
-          <StyledLabel htmlFor="options">
+          <StyledLabel >
             Ballot description &nbsp;
             <StyledInput
               type="text"
@@ -102,11 +107,10 @@ export function CreateBallot({
               id="options"
               value={ballotDescription}
               onChange={(e) => setBallotDescription(e.target.value)}
-              required
               placeholder="Advisory vote for 04/25 town hall"
             />
           </StyledLabel>
-          <StyledLabel htmlFor="expiry">
+          <StyledLabel >
             Expiry&nbsp;
             <StyledInput
               type="datetime-local"
@@ -114,16 +118,14 @@ export function CreateBallot({
               id="expiry"
               value={getDateString(ballotExpiry)}
               onChange={(e) => setBallotExpiry(new Date(e.target.value))}
-              required
             />
           </StyledLabel>
-          <StyledLabel htmlFor="expiry">
+          <StyledLabel >
             Type of ballot
             <StyledSelect
               id="ballotType"
               value={ballotType}
               onChange={(e) => setBallotType(e.target.value)}
-              required
             >
               <option value={BallotType.STRAWPOLL}>Straw Poll</option>
               {group === SEMAPHORE_ADMIN_GROUP_URL ? (
@@ -134,39 +136,6 @@ export function CreateBallot({
             </StyledSelect>
           </StyledLabel>
         </StyledForm>
-        <StyledLabel>
-          Questions
-          <FormButtonContainer>
-            <WideButton
-              onClick={() =>
-                setPolls([
-                  ...polls,
-                  {
-                    id: polls.length.toString(),
-                    body: "",
-                    options: [],
-                    ballotURL: 0,
-                    createdAt: new Date(),
-                    expiry: new Date(),
-                  },
-                ])
-              }
-            >
-              +
-            </WideButton>
-            <WideButton
-              onClick={() => {
-                if (polls.length !== 0) {
-                  const newPolls = [...polls];
-                  newPolls.pop();
-                  setPolls(newPolls);
-                }
-              }}
-            >
-              -
-            </WideButton>
-          </FormButtonContainer>
-        </StyledLabel>
       </FormContainer>
 
       {polls.map((poll, i) => {
@@ -174,7 +143,7 @@ export function CreateBallot({
           <FormContainer key={i}>
             <StyledForm>
               <h2>Question {i + 1}</h2>
-              <StyledLabel htmlFor="body">
+              <StyledLabel >
                 Question&nbsp;
                 <StyledInput
                   type="text"
@@ -182,28 +151,83 @@ export function CreateBallot({
                   autoComplete="off"
                   value={poll.body}
                   onChange={(e) => updatePollBody(e.target.value, i)}
-                  required
                   placeholder="Should we do this?"
                 />
               </StyledLabel>
-              <StyledLabel htmlFor="options">
-                Options &nbsp;
-                <StyledInput
-                  type="text"
-                  autoComplete="off"
-                  id="options"
-                  value={poll.options.join(",")}
-                  onChange={(e) =>
-                    updatePollOptions(e.target.value.split(","), i)
-                  }
-                  required
-                  placeholder="Yes,No,Maybe"
-                />
-              </StyledLabel>
+              <OptionsLabel>
+                <div>Options &nbsp;</div>
+                <OptionContainer>
+                  {poll.options.map((option, j) => (
+                    <OptionInput
+                      key={j}
+                      type="text"
+                      autoComplete="off"
+                      id="options"
+                      value={option}
+                      onChange={(e) => updatePollOptions(e.target.value, i, j)}
+                      placeholder="Option text"
+                    />
+                  ))}
+                  <FormButtonContainer>
+                    <WideButton
+                      onClick={() => {
+                        const newPolls = [...polls];
+                        newPolls[i].options.push("");
+                        setPolls(newPolls);
+                      }}
+                    >
+                      +
+                    </WideButton>
+                    <WideButton
+                      onClick={() => {
+                        const newPolls = [...polls];
+                        if (newPolls[i].options.length !== 1) {
+                          newPolls[i].options.pop();
+                          setPolls(newPolls);
+                        }
+                      }}
+                    >
+                      -
+                    </WideButton>
+                  </FormButtonContainer>
+                </OptionContainer>
+              </OptionsLabel>
             </StyledForm>
           </FormContainer>
         );
       })}
+
+      <QuestionContainer>
+        <QuestionChangeButton
+          onClick={() =>
+            setPolls([
+              ...polls,
+              {
+                id: polls.length.toString(),
+                body: "",
+                options: [""],
+                ballotURL: 0,
+                createdAt: new Date(),
+                expiry: new Date(),
+              },
+            ])
+          }
+        >
+          Add question
+        </QuestionChangeButton>
+
+        <QuestionChangeButton
+          onClick={() => {
+            if (polls.length !== 0) {
+              const newPolls = [...polls];
+              newPolls.pop();
+              setPolls(newPolls);
+            }
+          }}
+        >
+          Remove question
+        </QuestionChangeButton>
+      </QuestionContainer>
 
       {loadingVoterGroupUrl || serverLoading ? (
         <RippleLoaderLight />
@@ -223,13 +247,71 @@ export function CreateBallot({
   );
 }
 
-export const SubmitButton = styled.button`
+const SubmitButton = styled.button`
   font-family: OpenSans;
   background: #52b5a4;
   width: 100%;
   border-radius: 1rem;
   border: none;
   padding: 0.25rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #449c8d;
+  }
+
+  &:active {
+    background-color: #378073;
+  }
+`;
+
+const WideButton = styled.button`
+  width: calc(50% - 0.5rem);
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #888;
+  opacity: 1;
+  cursor: pointer;
+  text-align: center;
+
+  font-family: OpenSans;
+  background-color: #fff;
+
+  &:hover {
+    background-color: #d8d8d8;
+  }
+
+  &:active {
+    background-color: #c3c3c3;
+  }
+`;
+
+const QuestionContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+`;
+
+const QuestionChangeButton = styled.button`
+  width: calc(50% - 0.5rem);
+  padding: 0.5rem;
+  border: none;
+  margin-bottom: 1.5rem;
+  border-radius: 0.5rem;
+  opacity: 1;
+  cursor: pointer;
+  text-align: center;
+
+  font-family: OpenSans;
+  background-color: #fff;
+
+  &:hover {
+    background-color: #d8d8d8;
+  }
+
+  &:active {
+    background-color: #c3c3c3;
+  }
 `;

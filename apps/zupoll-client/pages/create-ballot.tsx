@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Center } from "../components/core";
-import { ExitHeader } from "../components/core/Headers";
+import { CancelPollHeader } from "../components/core/Headers";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { CreateBallot } from "../components/main/CreateBallot";
 import { ErrorOverlay } from "../components/main/ErrorOverlay";
@@ -37,7 +37,7 @@ export default function Page() {
         <RippleLoaderLightMargin />
       ) : (
         <Center>
-          <ExitHeader />
+          <CancelPollHeader />
 
           <CreateBallot group={group} onError={setError} />
 
