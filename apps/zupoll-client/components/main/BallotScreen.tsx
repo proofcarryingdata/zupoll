@@ -236,17 +236,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
           serverLoading ? (
             <RippleLoaderLightMargin />
           ) : (
-            <BallotButton
-              onClick={() => {
-                if (
-                  confirm(
-                    "Are you sure you want to submit your votes? You can only submit once per ballot."
-                  )
-                ) {
-                  createBallotVotePCD();
-                }
-              }}
-            >
+            <BallotButton onClick={createBallotVotePCD}>
               <h3>Submit ballot</h3>
             </BallotButton>
           )

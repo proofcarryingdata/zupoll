@@ -299,7 +299,6 @@ const QuestionChangeButton = styled.button`
   padding: 0.5rem;
   border: none;
   margin-bottom: 1.5rem;
-  font-size: 1rem;
   border-radius: 0.5rem;
   opacity: 1;
   cursor: pointer;
