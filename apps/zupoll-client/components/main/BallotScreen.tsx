@@ -284,6 +284,7 @@ const BallotButton = styled.div`
   text-align: center;
   cursor: pointer;
   background-color: #52b5a4;
+  color: rgb(28, 41, 40);
 
   &:hover {
     background-color: #449c8d;

@@ -209,6 +209,7 @@ const BallotListButton = styled.div`
   border: 1px solid #888;
   opacity: 1;
   margin-bottom: 1rem;
+  gap: 0.5rem;
 
   font-family: OpenSans;
   font-weight: 400;

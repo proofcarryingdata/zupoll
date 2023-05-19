@@ -257,6 +257,7 @@ const SubmitButton = styled.button`
   margin-bottom: 1.5rem;
   text-align: center;
   cursor: pointer;
+  color: rgb(28, 41, 40);
 
   &:hover {
     background-color: #449c8d;
@@ -275,6 +276,7 @@ const WideButton = styled.button`
   opacity: 1;
   cursor: pointer;
   text-align: center;
+  color: black;
 
   font-family: OpenSans;
   background-color: #fff;
@@ -303,6 +305,7 @@ const QuestionChangeButton = styled.button`
   opacity: 1;
   cursor: pointer;
   text-align: center;
+  color: black;
 
   font-family: OpenSans;
   background-color: #fff;

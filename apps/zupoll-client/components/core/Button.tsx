@@ -7,6 +7,7 @@ export const Button = styled.button<{ deemph?: boolean }>`
   border: 1px solid #888;
   opacity: 1;
   cursor: pointer;
+  color: black;
 
   font-family: OpenSans;
   font-weight: ${({ deemph }) => (deemph ? "normal" : "bold")};
