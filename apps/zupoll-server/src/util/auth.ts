@@ -18,8 +18,16 @@ export const ZUZALU_ORGANIZERS_GROUP_URL = IS_DEPLOYED
   ? process.env.SEMAPHORE_ADMIN_GROUP_URL
   : `http://localhost:3002/semaphore/${ADMIN_GROUP_ID}`;
 
+export const PCDPASS_USERS_GROUP_URL = IS_DEPLOYED
+  ? process.env.PCDPASS_USERS_GROUP_URL
+  : `http://localhost:3002/semaphore/${PCDPASS_GROUP_ID}`;
+
 export const ZUZALU_HISTORIC_API_URL = IS_DEPLOYED
   ? process.env.SEMAPHORE_HISTORIC_URL
+  : "http://localhost:3002/semaphore/valid-historic/";
+
+export const PCDPASS_HISTORIC_API_URL = IS_DEPLOYED
+  ? process.env.PCDPASS_HISTORIC_API_URL
   : "http://localhost:3002/semaphore/valid-historic/";
 
 export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
@@ -28,7 +36,7 @@ export interface GroupJwtPayload extends JwtPayload {
   groupUrl: string;
 }
 
-export const authenticateJWT = (
+export const authenticateZuzaluJWT = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -50,7 +58,7 @@ export const authenticateJWT = (
   }
 };
 
-export const authenticateOrganizerJWT = (
+export const authenticateZuzaluOrganizerJWT = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -69,6 +77,36 @@ export const authenticateOrganizerJWT = (
       if (
         ZUZALU_PARTICIPANTS_GROUP_URL &&
         payload.groupUrl.includes(ZUZALU_PARTICIPANTS_GROUP_URL)
+      ) {
+        return res.sendStatus(403);
+      }
+
+      next();
+    });
+  } else {
+    res.sendStatus(401);
+  }
+};
+
+export const authenticatePCDPassJWT = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+
+    verify(token, ACCESS_TOKEN_SECRET!, (err, group) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+
+      const payload = group as GroupJwtPayload;
+      if (
+        PCDPASS_USERS_GROUP_URL &&
+        payload.groupUrl.includes(PCDPASS_USERS_GROUP_URL)
       ) {
         return res.sendStatus(403);
       }

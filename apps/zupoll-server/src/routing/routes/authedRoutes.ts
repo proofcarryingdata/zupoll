@@ -3,12 +3,12 @@ import { sign } from "jsonwebtoken";
 import { ApplicationContext } from "../../types";
 import {
   ACCESS_TOKEN_SECRET,
-  authenticateJWT,
-  authenticateOrganizerJWT,
+  authenticateZuzaluJWT,
+  authenticateZuzaluOrganizerJWT,
 } from "../../util/auth";
+import { sendMessage } from "../../util/bot";
 import { prisma } from "../../util/prisma";
 import { verifyGroupProof } from "../../util/verify";
-import { sendMessage } from "../../util/bot";
 
 export function initAuthedRoutes(
   app: express.Application,
@@ -39,12 +39,12 @@ export function initAuthedRoutes(
 
   app.post(
     "/bot-post",
-    authenticateOrganizerJWT,
+    authenticateZuzaluOrganizerJWT,
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as BotPostRequest;
 
       try {
-        sendMessage(request.message, context.bot)
+        sendMessage(request.message, context.bot);
       } catch (e) {
         console.error(e);
         next(e);
@@ -54,23 +54,27 @@ export function initAuthedRoutes(
     }
   );
 
-  app.get("/ballots", authenticateJWT, async (req: Request, res: Response) => {
-    const ballots = await prisma.ballot.findMany({
-      select: {
-        ballotTitle: true,
-        ballotURL: true,
-        expiry: true,
-        ballotType: true,
-      },
-      orderBy: { expiry: "desc" },
-    });
+  app.get(
+    "/ballots",
+    authenticateZuzaluJWT,
+    async (req: Request, res: Response) => {
+      const ballots = await prisma.ballot.findMany({
+        select: {
+          ballotTitle: true,
+          ballotURL: true,
+          expiry: true,
+          ballotType: true,
+        },
+        orderBy: { expiry: "desc" },
+      });
 
-    res.status(200).json({ ballots });
-  });
+      res.status(200).json({ ballots });
+    }
+  );
 
   app.get(
     "/ballot-polls/:ballotURL",
-    authenticateJWT,
+    authenticateZuzaluJWT,
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const ballotURL = parseInt(req.params.ballotURL);

@@ -2,12 +2,8 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist/**"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"],
       "cache": false
     },
     "lint": {
@@ -41,6 +37,8 @@
     "BOT_TOKEN",
     "BOT_SUPERGROUP_ID",
     "BOT_CHANNEL_ID",
-    "SITE_URL"
+    "SITE_URL",
+    "PCDPASS_USERS_GROUP_URL",
+    "PCDPASS_HISTORIC_API_URL"
   ]
 }

@@ -9,6 +9,8 @@ import {
 import {
   ADMIN_GROUP_ID,
   PARTICIPANTS_GROUP_ID,
+  PCDPASS_GROUP_ID,
+  PCDPASS_HISTORIC_API_URL,
   ZUZALU_HISTORIC_API_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
@@ -16,6 +18,7 @@ import {
 
 const residentRootCache = new Set<string>();
 const organizerRootCache = new Set<string>();
+const pcdpassUserRootCache = new Set<string>();
 
 // Returns nullfier or throws error.
 export async function verifyGroupProof(
@@ -98,6 +101,19 @@ export async function verifyGroupProof(
         throw new Error("Claim root isn't a valid organizer root.");
       }
     }
+  } else if (semaphoreGroupUrl === PCDPASS_GROUP_ID) {
+    if (!pcdpassUserRootCache.has(pcd.claim.merkleRoot)) {
+      const validPcdpassRoot = await verifyRootValidity(
+        PCDPASS_GROUP_ID,
+        pcd.claim.merkleRoot,
+        PCDPASS_HISTORIC_API_URL
+      );
+      if (validPcdpassRoot) {
+        pcdpassUserRootCache.add(pcd.claim.merkleRoot);
+      } else {
+        throw new Error("Claim root isn't a valid organizer root.");
+      }
+    }
   } else {
     throw new Error(
       "No allowed roots specified and group is neither the organizer or resident group."
@@ -148,9 +164,12 @@ export async function verifySignatureProof(
 
 async function verifyRootValidity(
   groupId: string,
-  root: string
+  root: string,
+  historicAPI?: string
 ): Promise<boolean> {
-  const response = await fetch(ZUZALU_HISTORIC_API_URL + groupId + "/" + root);
+  const response = await fetch(
+    historicAPI ?? ZUZALU_HISTORIC_API_URL + groupId + "/" + root
+  );
   const result = await response.json();
   return result.valid;
 }
