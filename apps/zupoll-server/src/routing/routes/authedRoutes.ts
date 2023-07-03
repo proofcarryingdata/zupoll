@@ -21,7 +21,7 @@ export function initAuthedRoutes(
 
       try {
         // request.semaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
-        // SEMAPHORE_ADMIN_GROUP_URL
+        // SEMAPHORE_ADMIN_GROUP_URL or PCDPASS_USERS_GROUP_URL
         await verifyGroupProof(request.semaphoreGroupUrl, request.proof, {});
 
         const accessToken = sign(

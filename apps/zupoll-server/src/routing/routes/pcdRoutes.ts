@@ -61,7 +61,7 @@ export function initPCDRoutes(
               : ZUZALU_ORGANIZERS_GROUP_URL!;
 
           // pollsterSemaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
-          // SEMAPHORE_ADMIN_GROUP_URL
+          // SEMAPHORE_ADMIN_GROUP_URL or PCDPASS_USERS_GROUP_URL
           const nullifier = await verifyGroupProof(
             request.ballot.pollsterSemaphoreGroupUrl!,
             request.proof,
