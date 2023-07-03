@@ -14,9 +14,9 @@ import { PCDState, ZupollError } from "./types";
 import { useHistoricSemaphoreUrl } from "./useHistoricSemaphoreUrl";
 import {
   PARTICIPANTS_GROUP_ID,
-  PASSPORT_URL,
   SEMAPHORE_ADMIN_GROUP_URL,
   SEMAPHORE_GROUP_URL,
+  ZUPASS_URL,
 } from "./util";
 
 /**
@@ -181,7 +181,7 @@ export function useCreateBallot({
         : SEMAPHORE_ADMIN_GROUP_URL;
 
     openZuzaluMembershipPopup(
-      PASSPORT_URL,
+      ZUPASS_URL,
       window.location.origin + "/popup",
       groupUrl,
       "zupoll",

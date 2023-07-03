@@ -11,6 +11,7 @@ import {
   PARTICIPANTS_GROUP_ID,
   PCDPASS_GROUP_ID,
   PCDPASS_HISTORIC_API_URL,
+  PCDPASS_USERS_GROUP_URL,
   ZUZALU_HISTORIC_API_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
@@ -101,7 +102,7 @@ export async function verifyGroupProof(
         throw new Error("Claim root isn't a valid organizer root.");
       }
     }
-  } else if (semaphoreGroupUrl === PCDPASS_GROUP_ID) {
+  } else if (semaphoreGroupUrl === PCDPASS_USERS_GROUP_URL) {
     if (!pcdpassUserRootCache.has(pcd.claim.merkleRoot)) {
       const validPcdpassRoot = await verifyRootValidity(
         PCDPASS_GROUP_ID,
@@ -167,9 +168,8 @@ async function verifyRootValidity(
   root: string,
   historicAPI?: string
 ): Promise<boolean> {
-  const response = await fetch(
-    historicAPI ?? ZUZALU_HISTORIC_API_URL + groupId + "/" + root
-  );
+  const url = (historicAPI ?? ZUZALU_HISTORIC_API_URL) + groupId + "/" + root;
+  const response = await fetch(url);
   const result = await response.json();
   return result.valid;
 }

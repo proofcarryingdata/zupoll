@@ -5,7 +5,6 @@ import {
 import { useEffect, useState } from "react";
 import { login } from "../../src/api";
 import { ZupollError } from "../../src/types";
-import { PASSPORT_URL } from "../../src/util";
 import { Button } from "../core/Button";
 
 /**
@@ -19,6 +18,7 @@ export function Login({
   onLogin,
   onError,
   setServerLoading,
+  passportAppUrl,
   requestedGroup,
   prompt,
   deemphasized,
@@ -26,6 +26,7 @@ export function Login({
   onLogin: (token: string) => void;
   onError: (error: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
+  passportAppUrl: string;
   requestedGroup: string;
   prompt: string;
   deemphasized?: boolean;
@@ -62,7 +63,7 @@ export function Login({
         onClick={() => {
           setLoggingIn(true);
           openZuzaluMembershipPopup(
-            PASSPORT_URL,
+            passportAppUrl,
             window.location.origin + "/popup",
             requestedGroup,
             "zupoll"

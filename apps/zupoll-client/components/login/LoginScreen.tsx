@@ -1,7 +1,13 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { ZupollError } from "../../src/types";
-import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../../src/util";
+import {
+  PCDPASS_URL,
+  PCDPASS_USERS_GROUP_URL,
+  SEMAPHORE_ADMIN_GROUP_URL,
+  SEMAPHORE_GROUP_URL,
+  ZUPASS_URL,
+} from "../../src/util";
 import { Center } from "../core";
 import { LoggedOutHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
@@ -35,6 +41,15 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
+                passportAppUrl={PCDPASS_URL}
+                requestedGroup={PCDPASS_USERS_GROUP_URL}
+                prompt="PCDPass login"
+              />
+              <Login
+                onLogin={onLogin}
+                onError={setError}
+                setServerLoading={setServerLoading}
+                passportAppUrl={ZUPASS_URL}
                 requestedGroup={SEMAPHORE_GROUP_URL}
                 prompt="Resident login"
               />
@@ -42,6 +57,7 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
+                passportAppUrl={PCDPASS_URL}
                 requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
                 prompt="Organizer login"
                 deemphasized

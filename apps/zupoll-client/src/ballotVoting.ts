@@ -16,7 +16,7 @@ import {
   VoteSignal,
 } from "./requestTypes";
 import { PCDState, ZupollError } from "./types";
-import { PASSPORT_URL } from "./util";
+import { ZUPASS_URL } from "./util";
 
 /**
  * Hook that handles requesting a PCD for voting on a set of polls on a ballot.
@@ -110,7 +110,7 @@ export function useBallotVoting({
           message: `Server Error: ${resErr}`,
         };
         if (resErr === "User has already voted on this ballot.") {
-          err.message = "You have already voted on this ballot!"
+          err.message = "You have already voted on this ballot!";
           setVoted(ballotId);
           refresh(ballotId);
         }
@@ -119,10 +119,10 @@ export function useBallotVoting({
         return;
       }
 
-      const multiVotesResponse : MultiVoteResponse = await res.json();
+      const multiVotesResponse: MultiVoteResponse = await res.json();
 
       setVoted(ballotId);
-      setBallotVotes(ballotId, multiVotesResponse.userVotes)
+      setBallotVotes(ballotId, multiVotesResponse.userVotes);
       refresh(ballotId);
     }
 
@@ -161,7 +161,7 @@ export function useBallotVoting({
     const externalNullifier = generateMessageHash(ballotId).toString();
 
     openZuzaluMembershipPopup(
-      PASSPORT_URL,
+      ZUPASS_URL,
       window.location.origin + "/popup",
       ballotVoterSemaphoreGroupUrl,
       "zupoll",
@@ -191,16 +191,12 @@ function setVoted(ballotId: string) {
 }
 
 export function getBallotVotes(ballotId: string) {
-  const allVotes = JSON.parse(
-    window.localStorage.getItem("allVotes") || "{}"
-  );
+  const allVotes = JSON.parse(window.localStorage.getItem("allVotes") || "{}");
   return allVotes[ballotId] || {};
 }
 
 function setBallotVotes(ballotId: string, userVotes: VoteSignal[]) {
-  const allVotes = JSON.parse(
-    window.localStorage.getItem("allVotes") || "{}"
-  );
+  const allVotes = JSON.parse(window.localStorage.getItem("allVotes") || "{}");
   allVotes[ballotId] = {};
   for (const vote of userVotes) {
     allVotes[ballotId][vote.pollId] = vote.voteIdx;

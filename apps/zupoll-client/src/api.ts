@@ -1,5 +1,9 @@
-import { PASSPORT_SERVER_URL, ZUPOLL_SERVER_URL } from "../src/util";
-import { CreateBallotRequest, MultiVoteRequest, BotPostRequest } from "./requestTypes";
+import { ZUPASS_SERVER_URL, ZUPOLL_SERVER_URL } from "../src/util";
+import {
+  BotPostRequest,
+  CreateBallotRequest,
+  MultiVoteRequest,
+} from "./requestTypes";
 
 export async function createBallot(
   request: CreateBallotRequest
@@ -86,7 +90,7 @@ export async function botPost(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return await res;
@@ -138,7 +142,7 @@ export async function listBallotPolls(
 export async function getLatestSemaphoreGroupHash(
   groupId: string
 ): Promise<string | null> {
-  const url = `${PASSPORT_SERVER_URL}semaphore/latest-root/${encodeURIComponent(
+  const url = `${ZUPASS_SERVER_URL}semaphore/latest-root/${encodeURIComponent(
     groupId
   )}`;
   const res = await fetch(url);
@@ -152,5 +156,5 @@ export async function getLatestSemaphoreGroupHash(
 }
 
 export function getHistoricGroupUrl(groupId: string, rootHash: string): string {
-  return `${PASSPORT_SERVER_URL}semaphore/historic/${groupId}/${rootHash}`;
+  return `${ZUPASS_SERVER_URL}semaphore/historic/${groupId}/${rootHash}`;
 }
