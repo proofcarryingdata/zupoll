@@ -8,16 +8,17 @@ export const ACCESS_TOKEN_SECRET = IS_DEPLOYED
 
 export const PARTICIPANTS_GROUP_ID = "1";
 export const ADMIN_GROUP_ID = "4";
+export const PCDPASS_GROUP_ID = "5";
 
-export const SEMAPHORE_GROUP_URL = IS_DEPLOYED
+export const ZUZALU_PARTICIPANTS_GROUP_URL = IS_DEPLOYED
   ? process.env.SEMAPHORE_GROUP_URL
   : `http://localhost:3002/semaphore/${PARTICIPANTS_GROUP_ID}`;
 
-export const SEMAPHORE_ADMIN_GROUP_URL = IS_DEPLOYED
+export const ZUZALU_ORGANIZERS_GROUP_URL = IS_DEPLOYED
   ? process.env.SEMAPHORE_ADMIN_GROUP_URL
   : `http://localhost:3002/semaphore/${ADMIN_GROUP_ID}`;
 
-export const SEMAPHORE_HISTORIC_URL = IS_DEPLOYED
+export const ZUZALU_HISTORIC_API_URL = IS_DEPLOYED
   ? process.env.SEMAPHORE_HISTORIC_URL
   : "http://localhost:3002/semaphore/valid-historic/";
 
@@ -66,8 +67,8 @@ export const authenticateOrganizerJWT = (
 
       const payload = group as GroupJwtPayload;
       if (
-        SEMAPHORE_GROUP_URL &&
-        payload.groupUrl.includes(SEMAPHORE_GROUP_URL)
+        ZUZALU_PARTICIPANTS_GROUP_URL &&
+        payload.groupUrl.includes(ZUZALU_PARTICIPANTS_GROUP_URL)
       ) {
         return res.sendStatus(403);
       }

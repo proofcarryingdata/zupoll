@@ -9,9 +9,9 @@ import {
 import {
   ADMIN_GROUP_ID,
   PARTICIPANTS_GROUP_ID,
-  SEMAPHORE_ADMIN_GROUP_URL,
-  SEMAPHORE_GROUP_URL,
-  SEMAPHORE_HISTORIC_URL,
+  ZUZALU_HISTORIC_API_URL,
+  ZUZALU_ORGANIZERS_GROUP_URL,
+  ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "./auth";
 
 const residentRootCache = new Set<string>();
@@ -74,7 +74,7 @@ export async function verifyGroupProof(
 
       throw new Error("Current root doesn't match any of the allowed roots");
     }
-  } else if (semaphoreGroupUrl === SEMAPHORE_GROUP_URL) {
+  } else if (semaphoreGroupUrl === ZUZALU_PARTICIPANTS_GROUP_URL) {
     if (!residentRootCache.has(pcd.claim.merkleRoot)) {
       const validResidentRoot = await verifyRootValidity(
         PARTICIPANTS_GROUP_ID,
@@ -86,7 +86,7 @@ export async function verifyGroupProof(
         throw new Error("Claim root isn't a valid resident root.");
       }
     }
-  } else if (semaphoreGroupUrl === SEMAPHORE_ADMIN_GROUP_URL) {
+  } else if (semaphoreGroupUrl === ZUZALU_ORGANIZERS_GROUP_URL) {
     if (!organizerRootCache.has(pcd.claim.merkleRoot)) {
       const validOrganizerRoot = await verifyRootValidity(
         ADMIN_GROUP_ID,
@@ -150,7 +150,7 @@ async function verifyRootValidity(
   groupId: string,
   root: string
 ): Promise<boolean> {
-  const response = await fetch(SEMAPHORE_HISTORIC_URL + groupId + "/" + root);
+  const response = await fetch(ZUZALU_HISTORIC_API_URL + groupId + "/" + root);
   const result = await response.json();
   return result.valid;
 }

@@ -4,13 +4,13 @@ import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { ApplicationContext } from "../../types";
 import {
-  SEMAPHORE_ADMIN_GROUP_URL,
-  SEMAPHORE_GROUP_URL,
   SITE_URL,
+  ZUZALU_ORGANIZERS_GROUP_URL,
+  ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../../util/auth";
+import { cleanString, sendMessage } from "../../util/bot";
 import { prisma } from "../../util/prisma";
 import { verifyGroupProof } from "../../util/verify";
-import { cleanString, sendMessage } from "../../util/bot";
 
 /**
  * The endpoints in this function accepts proof (PCD) in the request. It verifies
@@ -57,8 +57,8 @@ export function initPCDRoutes(
         if (request.ballot.pollsterType == UserType.ANON) {
           const groupUrl =
             request.ballot.ballotType === BallotType.STRAWPOLL
-              ? SEMAPHORE_GROUP_URL!
-              : SEMAPHORE_ADMIN_GROUP_URL!;
+              ? ZUZALU_PARTICIPANTS_GROUP_URL!
+              : ZUZALU_ORGANIZERS_GROUP_URL!;
 
           // pollsterSemaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
           // SEMAPHORE_ADMIN_GROUP_URL
