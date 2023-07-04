@@ -97,8 +97,6 @@ export function CreateBallot({
   const [serverLoading, setServerLoading] = useState(false);
 
   const { loadingVoterGroupUrl, createBallotPCD } = useCreateBallot({
-    groupId: urlToGroupId(groupUrl),
-    groupUrl,
     ballotTitle,
     ballotDescription,
     ballotType,

@@ -8,10 +8,9 @@ import stableStringify from "json-stable-stringify";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef } from "react";
 import { createBallot } from "./api";
+import { ballotConfigs } from "./ballotConfig";
 import {
-  PCDPASS_URL,
   PCDPASS_USERS_GROUP_URL,
-  ZUPASS_URL,
   ZUZALU_ADMINS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "./env";
@@ -19,18 +18,6 @@ import { BallotType, Poll, UserType } from "./prismaTypes";
 import { BallotSignal, CreateBallotRequest, PollSignal } from "./requestTypes";
 import { PCDState, ZupollError } from "./types";
 import { useHistoricSemaphoreUrl } from "./useHistoricSemaphoreUrl";
-
-function groupUrlToPassportUrl(groupUrl: string | undefined): string {
-  if (groupUrl === ZUZALU_ADMINS_GROUP_URL) {
-    return ZUPASS_URL;
-  } else if (groupUrl === ZUZALU_PARTICIPANTS_GROUP_URL) {
-    return ZUPASS_URL;
-  } else if (groupUrl === PCDPASS_USERS_GROUP_URL) {
-    return PCDPASS_URL;
-  }
-
-  throw new Error(`unknown group url ${groupUrl}`);
-}
 
 /**
  * Hook that handles requesting a PCD for creating a ballot.
@@ -44,7 +31,6 @@ function groupUrlToPassportUrl(groupUrl: string | undefined): string {
  * @param setServerLoading Passing server loading status to frontend
  */
 export function useCreateBallot({
-  groupId,
   ballotTitle,
   ballotDescription,
   ballotType,
@@ -54,7 +40,6 @@ export function useCreateBallot({
   setServerLoading,
   token,
 }: {
-  groupId: string;
   ballotTitle: string;
   ballotDescription: string;
   ballotType: BallotType;
@@ -63,16 +48,21 @@ export function useCreateBallot({
   onError: (err: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
   token: string;
-  groupUrl: string | undefined;
 }) {
   const router = useRouter();
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
+  const ballotConfig = ballotConfigs[ballotType];
+
   const {
     loading: loadingVoterGroupUrl,
     rootHash: voterGroupRootHash,
     groupUrl: voterGroupUrl,
-  } = useHistoricSemaphoreUrl(groupId, onError);
+  } = useHistoricSemaphoreUrl(
+    ballotConfig.passportServerUrl,
+    ballotConfig.voterGroupId,
+    onError
+  );
 
   // only accept pcdStr if we were expecting one
   useEffect(() => {
@@ -200,34 +190,25 @@ export function useCreateBallot({
     console.log(signalHash);
     const sigHashEnc = generateMessageHash(signalHash).toString();
 
-    let groupUrl: string = ZUZALU_PARTICIPANTS_GROUP_URL;
-
-    if (
-      ballotType === BallotType.ORGANIZERONLY ||
-      ballotType === BallotType.ADVISORYVOTE
-    ) {
-      groupUrl = ZUZALU_ADMINS_GROUP_URL;
-    } else if (ballotType === BallotType.PCDPASSUSER) {
-      groupUrl = PCDPASS_USERS_GROUP_URL;
-    }
-
     openZuzaluMembershipPopup(
-      groupUrlToPassportUrl(groupUrl),
+      ballotConfig.passportAppUrl,
       window.location.origin + "/popup",
-      groupUrl,
+      ballotConfig.creatorGroupUrl,
       "zupoll",
       sigHashEnc,
       sigHashEnc
     );
   }, [
-    ballotDescription,
+    voterGroupUrl,
+    voterGroupRootHash,
     ballotTitle,
+    ballotDescription,
     ballotType,
     expiry,
     polls,
+    ballotConfig.passportAppUrl,
+    ballotConfig.creatorGroupUrl,
     onError,
-    voterGroupUrl,
-    voterGroupRootHash,
   ]);
 
   return { loadingVoterGroupUrl, createBallotPCD };

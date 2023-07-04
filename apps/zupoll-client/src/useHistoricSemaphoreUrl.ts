@@ -1,26 +1,17 @@
 import { useEffect, useState } from "react";
 import { getHistoricGroupUrl, getLatestSemaphoreGroupHash } from "./api";
-import {
-  PCDPASS_SERVER_URL,
-  PCDPASS_USERS_GROUP_ID,
-  ZUPASS_SERVER_URL,
-} from "./env";
 import { ZupollError } from "./types";
 
 export function useHistoricSemaphoreUrl(
+  semaphoreGroupServer: string,
   semaphoreGroupId: string,
   onError: (error: ZupollError) => void
 ) {
   const [loading, setLoading] = useState(true);
   const [rootHash, setRootHash] = useState<string | null>(null);
 
-  let serverUrl = ZUPASS_SERVER_URL;
-  if (semaphoreGroupId === PCDPASS_USERS_GROUP_ID) {
-    serverUrl = PCDPASS_SERVER_URL;
-  }
-
   useEffect(() => {
-    getLatestSemaphoreGroupHash(semaphoreGroupId, serverUrl)
+    getLatestSemaphoreGroupHash(semaphoreGroupId, semaphoreGroupServer)
       .then((hash) => setRootHash(hash))
       .catch((e: Error) => {
         console.log(e);
@@ -32,12 +23,13 @@ export function useHistoricSemaphoreUrl(
       .finally(() => {
         setLoading(false);
       });
-  }, [onError, semaphoreGroupId, serverUrl]);
+  }, [onError, semaphoreGroupId, semaphoreGroupServer]);
 
   return {
     loading,
     rootHash,
     groupUrl:
-      rootHash && getHistoricGroupUrl(semaphoreGroupId, rootHash, serverUrl),
+      rootHash &&
+      getHistoricGroupUrl(semaphoreGroupId, rootHash, semaphoreGroupServer),
   };
 }

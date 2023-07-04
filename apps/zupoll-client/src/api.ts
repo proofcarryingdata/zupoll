@@ -168,9 +168,7 @@ export async function getLatestSemaphoreGroupHash(
 export function getHistoricGroupUrl(
   groupId: string,
   rootHash: string,
-  serverUrl?: string
+  serverUrl: string
 ): string {
-  return `${
-    serverUrl ?? ZUPASS_SERVER_URL
-  }semaphore/historic/${groupId}/${rootHash}`;
+  return `${serverUrl}semaphore/historic/${groupId}/${rootHash}`;
 }
