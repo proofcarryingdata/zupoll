@@ -1,13 +1,10 @@
 import express, { NextFunction, Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import { ApplicationContext } from "../../types";
-import {
-  ACCESS_TOKEN_SECRET,
-  authenticateZuzaluJWT,
-  authenticateZuzaluOrganizerJWT,
-} from "../../util/auth";
+import { ACCESS_TOKEN_SECRET, authenticateJWT } from "../../util/auth";
 import { sendMessage } from "../../util/bot";
 import { prisma } from "../../util/prisma";
+import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
 
 export function initAuthedRoutes(
@@ -39,9 +36,18 @@ export function initAuthedRoutes(
 
   app.post(
     "/bot-post",
-    authenticateZuzaluOrganizerJWT,
+    authenticateJWT,
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as BotPostRequest;
+
+      if (
+        ![AuthType.ZUZALU_ORGANIZER, AuthType.ZUZALU_PARTICIPANT].includes(
+          req.authUserType as any
+        )
+      ) {
+        res.sendStatus(403);
+        return;
+      }
 
       try {
         sendMessage(request.message, context.bot);
@@ -54,28 +60,46 @@ export function initAuthedRoutes(
     }
   );
 
-  app.get(
-    "/ballots",
-    authenticateZuzaluJWT,
-    async (req: Request, res: Response) => {
-      const ballots = await prisma.ballot.findMany({
-        select: {
-          ballotTitle: true,
-          ballotURL: true,
-          expiry: true,
-          ballotType: true,
-        },
-        orderBy: { expiry: "desc" },
-      });
-
-      res.status(200).json({ ballots });
+  app.get("/ballots", authenticateJWT, async (req: Request, res: Response) => {
+    if (
+      ![
+        AuthType.ZUZALU_ORGANIZER,
+        AuthType.ZUZALU_PARTICIPANT,
+        AuthType.PCDPASS,
+      ].includes(req.authUserType as any)
+    ) {
+      res.sendStatus(403);
+      return;
     }
-  );
+
+    const ballots = await prisma.ballot.findMany({
+      select: {
+        ballotTitle: true,
+        ballotURL: true,
+        expiry: true,
+        ballotType: true,
+      },
+      orderBy: { expiry: "desc" },
+    });
+
+    res.status(200).json({ ballots });
+  });
 
   app.get(
     "/ballot-polls/:ballotURL",
-    authenticateZuzaluJWT,
+    authenticateJWT,
     async (req: Request, res: Response, next: NextFunction) => {
+      if (
+        ![
+          AuthType.ZUZALU_ORGANIZER,
+          AuthType.ZUZALU_PARTICIPANT,
+          AuthType.PCDPASS,
+        ].includes(req.authUserType as any)
+      ) {
+        res.sendStatus(403);
+        return;
+      }
+
       try {
         const ballotURL = parseInt(req.params.ballotURL);
 
