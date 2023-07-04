@@ -8,7 +8,11 @@ import { CreateBallot } from "../components/main/CreateBallot";
 import { ErrorOverlay } from "../components/main/ErrorOverlay";
 import { useLogin } from "../src/login";
 import { ZupollError } from "../src/types";
-import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../src/util";
+import {
+  PCDPASS_USERS_GROUP_URL,
+  SEMAPHORE_ADMIN_GROUP_URL,
+  SEMAPHORE_GROUP_URL,
+} from "../src/util";
 
 export default function Page() {
   const [error, setError] = useState<ZupollError>();
@@ -20,7 +24,8 @@ export default function Page() {
     if (group !== undefined) {
       if (
         group !== SEMAPHORE_ADMIN_GROUP_URL &&
-        group !== SEMAPHORE_GROUP_URL
+        group !== SEMAPHORE_GROUP_URL &&
+        group !== PCDPASS_USERS_GROUP_URL
       ) {
         logout();
       }
