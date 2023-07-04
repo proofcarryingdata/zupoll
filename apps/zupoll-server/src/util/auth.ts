@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { JwtPayload, verify } from "jsonwebtoken";
 import { IS_DEPLOYED } from "./deployment";
+import { AuthType } from "./types";
 
 export const ACCESS_TOKEN_SECRET = IS_DEPLOYED
   ? process.env.ACCESS_TOKEN_SECRET
@@ -35,6 +36,52 @@ export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
 export interface GroupJwtPayload extends JwtPayload {
   groupUrl: string;
 }
+export const authenticateJWT = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+
+    verify(token, ACCESS_TOKEN_SECRET!, (err, group) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+
+      const payload = group as GroupJwtPayload;
+
+      if (
+        ZUZALU_PARTICIPANTS_GROUP_URL &&
+        payload.groupUrl.includes(ZUZALU_PARTICIPANTS_GROUP_URL)
+      ) {
+        req.authUserType = AuthType.ZUZALU_PARTICIPANT;
+        next();
+        return;
+      } else if (
+        ZUZALU_ORGANIZERS_GROUP_URL &&
+        payload.groupUrl.includes(ZUZALU_ORGANIZERS_GROUP_URL)
+      ) {
+        req.authUserType = AuthType.ZUZALU_PARTICIPANT;
+        next();
+        return;
+      } else if (
+        PCDPASS_USERS_GROUP_URL &&
+        payload.groupUrl.includes(PCDPASS_USERS_GROUP_URL)
+      ) {
+        req.authUserType = AuthType.ZUZALU_PARTICIPANT;
+        next();
+        return;
+      }
+
+      return res.sendStatus(403);
+    });
+  } else {
+    res.sendStatus(401);
+  }
+};
 
 export const authenticateZuzaluJWT = (
   req: Request,
