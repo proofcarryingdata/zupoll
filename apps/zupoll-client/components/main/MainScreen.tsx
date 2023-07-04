@@ -145,6 +145,34 @@ export function MainScreen({
             ))
         )}
       </BallotListContainer>
+      <BallotListContainer>
+        <TitleContainer>
+          <H1>PCDPass Polls</H1>
+          <p>
+            Ballots created by users of PCDPass. These are not visible to Zuzalu
+            participants.
+          </p>
+        </TitleContainer>
+
+        {loadingBallots || ballots === undefined ? (
+          <RippleLoader />
+        ) : (
+          ballots
+            .filter((ballot) => ballot.ballotType === BallotType.PCDPASSUSER)
+            .map((ballot) => (
+              <BallotListButton
+                onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
+              >
+                <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
+                <div style={{ fontStyle: "italic" }}>
+                  {new Date(ballot.expiry) < new Date()
+                    ? "Expired"
+                    : getTimeBeforeExpiry(ballot.expiry)}
+                </div>
+              </BallotListButton>
+            ))
+        )}
+      </BallotListContainer>
 
       {error && (
         <ErrorOverlay
@@ -213,7 +241,7 @@ const BallotListButton = styled.div`
 
   font-family: OpenSans;
   font-weight: 400;
-  background-color:#fff;
+  background-color: #fff;
 
   cursor: pointer;
   &:hover {
