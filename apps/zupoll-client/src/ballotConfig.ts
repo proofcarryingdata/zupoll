@@ -13,7 +13,7 @@ import {
 import { BallotType } from "./prismaTypes";
 import { BallotConfig } from "./types";
 
-export const strawpollConfiguration: BallotConfig = {
+export const STRAWPOLL_BALLOT_CONFIG: BallotConfig = {
   voterGroupId: ZUZALU_PARTICIPANTS_GROUP_ID,
   voterGroupUrl: ZUZALU_PARTICIPANTS_GROUP_URL,
   creatorGroupId: ZUZALU_PARTICIPANTS_GROUP_ID,
@@ -23,7 +23,7 @@ export const strawpollConfiguration: BallotConfig = {
   name: BallotType.STRAWPOLL,
 };
 
-export const advisoryVoteConfiguration: BallotConfig = {
+export const ADVISORY_VOTE_BALLOT_CONFIG: BallotConfig = {
   voterGroupId: ZUZALU_PARTICIPANTS_GROUP_ID,
   voterGroupUrl: ZUZALU_PARTICIPANTS_GROUP_URL,
   creatorGroupId: ZUZALU_ADMINS_GROUP_ID,
@@ -33,7 +33,7 @@ export const advisoryVoteConfiguration: BallotConfig = {
   name: BallotType.ADVISORYVOTE,
 };
 
-export const organizerOnlyConfiguration: BallotConfig = {
+export const ORGANIZER_ONLY_BALLOT_CONFIG: BallotConfig = {
   voterGroupId: ZUZALU_ADMINS_GROUP_ID,
   voterGroupUrl: ZUZALU_ADMINS_GROUP_URL,
   creatorGroupId: ZUZALU_ADMINS_GROUP_ID,
@@ -43,7 +43,7 @@ export const organizerOnlyConfiguration: BallotConfig = {
   name: BallotType.ORGANIZERONLY,
 };
 
-export const pcdpassUserConfiguration: BallotConfig = {
+export const PCDPASS_BALLOT_CONFIG: BallotConfig = {
   voterGroupId: PCDPASS_USERS_GROUP_ID,
   voterGroupUrl: PCDPASS_USERS_GROUP_URL,
   creatorGroupId: PCDPASS_USERS_GROUP_ID,
@@ -53,9 +53,9 @@ export const pcdpassUserConfiguration: BallotConfig = {
   name: BallotType.PCDPASSUSER,
 };
 
-export const ballotConfigs = {
-  [BallotType.ADVISORYVOTE]: advisoryVoteConfiguration,
-  [BallotType.ORGANIZERONLY]: organizerOnlyConfiguration,
-  [BallotType.PCDPASSUSER]: pcdpassUserConfiguration,
-  [BallotType.STRAWPOLL]: strawpollConfiguration,
+export const BALLOT_CONFIGS = {
+  [BallotType.ADVISORYVOTE]: ADVISORY_VOTE_BALLOT_CONFIG,
+  [BallotType.ORGANIZERONLY]: ORGANIZER_ONLY_BALLOT_CONFIG,
+  [BallotType.PCDPASSUSER]: PCDPASS_BALLOT_CONFIG,
+  [BallotType.STRAWPOLL]: STRAWPOLL_BALLOT_CONFIG,
 };

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { BallotScreen } from "../components/main/BallotScreen";
 
-export default function Page() {
+export default function BallotPage() {
   const router = useRouter();
   const [ballotURL, setBallotURL] = useState<string | null>(null);
 

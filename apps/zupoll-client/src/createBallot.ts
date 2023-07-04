@@ -8,12 +8,7 @@ import stableStringify from "json-stable-stringify";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef } from "react";
 import { createBallot } from "./api";
-import { ballotConfigs } from "./ballotConfig";
-import {
-  PCDPASS_USERS_GROUP_URL,
-  ZUZALU_ADMINS_GROUP_URL,
-  ZUZALU_PARTICIPANTS_GROUP_URL,
-} from "./env";
+import { BALLOT_CONFIGS } from "./ballotConfig";
 import { BallotType, Poll, UserType } from "./prismaTypes";
 import { BallotSignal, CreateBallotRequest, PollSignal } from "./requestTypes";
 import { PCDState, ZupollError } from "./types";
@@ -52,7 +47,7 @@ export function useCreateBallot({
   const router = useRouter();
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
-  const ballotConfig = ballotConfigs[ballotType];
+  const ballotConfig = BALLOT_CONFIGS[ballotType];
 
   const {
     loading: loadingVoterGroupUrl,
@@ -78,17 +73,6 @@ export function useCreateBallot({
 
     pcdState.current = PCDState.DEFAULT;
 
-    let pollsterGroupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
-    if (ballotType === BallotType.ADVISORYVOTE) {
-      pollsterGroupUrl = ZUZALU_ADMINS_GROUP_URL;
-    } else if (ballotType === BallotType.ORGANIZERONLY) {
-      pollsterGroupUrl = ZUZALU_ADMINS_GROUP_URL;
-    } else if (ballotType === BallotType.PCDPASSUSER) {
-      pollsterGroupUrl = PCDPASS_USERS_GROUP_URL;
-    } else if (ballotType === BallotType.STRAWPOLL) {
-      pollsterGroupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
-    }
-
     const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
     const finalRequest: CreateBallotRequest = {
       ballot: {
@@ -105,7 +89,7 @@ export function useCreateBallot({
         pollsterUuid: null,
         pollsterCommitment: null,
         expiryNotif: null,
-        pollsterSemaphoreGroupUrl: pollsterGroupUrl,
+        pollsterSemaphoreGroupUrl: ballotConfig.creatorGroupUrl,
         voterSemaphoreGroupUrls: [voterGroupUrl],
         voterSemaphoreGroupRoots: [voterGroupRootHash],
         ballotType: ballotType,
@@ -156,6 +140,7 @@ export function useCreateBallot({
     voterGroupRootHash,
     voterGroupUrl,
     token,
+    ballotConfig.creatorGroupUrl,
   ]);
 
   // ran after ballot is submitted by user

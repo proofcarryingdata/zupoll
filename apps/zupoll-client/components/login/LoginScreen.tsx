@@ -1,11 +1,11 @@
 import { useState } from "react";
 import styled from "styled-components";
 import {
-  pcdpassUserConfiguration,
-  zuzaluOrganizerConfiguration,
-  zuzaluParticipantConfiguration,
+  PCDPASS_USER_CONFIG,
+  ZUZALU_ORGANIZER_LOGIN_CONFIG,
+  ZUZALU_PARTICIPANT_LOGIN_CONFIG,
 } from "../../src/loginConfig";
-import { LoginConfiguration, ZupollError } from "../../src/types";
+import { LoginConfig, ZupollError } from "../../src/types";
 import { Center } from "../core";
 import { LoggedOutHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
@@ -15,7 +15,7 @@ import { Login } from "./Login";
 export function LoginScreen({
   onLogin,
 }: {
-  onLogin: (token: string, configuration: LoginConfiguration) => void;
+  onLogin: (token: string, configuration: LoginConfig) => void;
 }) {
   const [serverLoading, setServerLoading] = useState<boolean>(false);
   const [error, setError] = useState<ZupollError>();
@@ -44,20 +44,20 @@ export function LoginScreen({
                 onError={setError}
                 setServerLoading={setServerLoading}
                 prompt="PCDPass login"
-                configuration={pcdpassUserConfiguration}
+                configuration={PCDPASS_USER_CONFIG}
               />
               <Login
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
-                configuration={zuzaluParticipantConfiguration}
+                configuration={ZUZALU_PARTICIPANT_LOGIN_CONFIG}
                 prompt="Resident login"
               />
               <Login
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
-                configuration={zuzaluOrganizerConfiguration}
+                configuration={ZUZALU_ORGANIZER_LOGIN_CONFIG}
                 prompt="Organizer login"
                 deemphasized
               />

@@ -4,16 +4,16 @@ import styled from "styled-components";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
-import { LoginConfiguration } from "../src/types";
+import { LoginConfig } from "../src/types";
 
 export default function Page() {
   const [token, setToken] = useState<string>();
-  const [config, setConfig] = useState<LoginConfiguration>();
+  const [config, setConfig] = useState<LoginConfig>();
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const savedConfig = window.localStorage["configuration"];
-    let parsedConfig: LoginConfiguration | undefined;
+    let parsedConfig: LoginConfig | undefined;
 
     if (!savedConfig) {
       setLoading(false);
@@ -40,7 +40,7 @@ export default function Page() {
   }, [setToken]);
 
   const saveLoginDetails = useCallback(
-    (token: string | undefined, config: LoginConfiguration | undefined) => {
+    (token: string | undefined, config: LoginConfig | undefined) => {
       setToken(token);
       setConfig(config);
 

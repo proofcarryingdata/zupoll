@@ -5,7 +5,7 @@ import { listBallots } from "../../src/api";
 import { Ballot, BallotType } from "../../src/prismaTypes";
 import { BallotResponse } from "../../src/requestTypes";
 import {
-  LoginConfiguration,
+  LoginConfig,
   LoginConfigurationName,
   ZupollError,
 } from "../../src/types";
@@ -20,7 +20,7 @@ export function MainScreen({
   onLogout,
 }: {
   token: string;
-  config: LoginConfiguration;
+  config: LoginConfig;
   onLogout: () => void;
 }) {
   const router = useRouter();

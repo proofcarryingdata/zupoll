@@ -14,7 +14,7 @@ import {
 import { useLogin } from "../src/login";
 import { ZupollError } from "../src/types";
 
-export default function Page() {
+export default function CreateBallotPage() {
   const [error, setError] = useState<ZupollError>();
   const router = useRouter();
   const { token, group, loadingToken, logout } = useLogin(router);

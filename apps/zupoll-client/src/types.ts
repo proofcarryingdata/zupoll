@@ -21,7 +21,7 @@ export enum LoginConfigurationName {
   PCDPASS_USER = "PCDPASS_USER",
 }
 
-export interface LoginConfiguration {
+export interface LoginConfig {
   groupId: string;
   groupUrl: string;
   passportServerUrl: string;

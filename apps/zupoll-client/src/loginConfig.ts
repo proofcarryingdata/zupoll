@@ -10,9 +10,9 @@ import {
   ZUZALU_PARTICIPANTS_GROUP_ID,
   ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "./env";
-import { LoginConfiguration, LoginConfigurationName } from "./types";
+import { LoginConfig, LoginConfigurationName } from "./types";
 
-export const zuzaluOrganizerConfiguration: LoginConfiguration = {
+export const ZUZALU_ORGANIZER_LOGIN_CONFIG: LoginConfig = {
   groupId: ZUZALU_ADMINS_GROUP_ID,
   groupUrl: ZUZALU_ADMINS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
@@ -20,7 +20,7 @@ export const zuzaluOrganizerConfiguration: LoginConfiguration = {
   name: LoginConfigurationName.ZUZALU_ORGANIZER,
 };
 
-export const zuzaluParticipantConfiguration: LoginConfiguration = {
+export const ZUZALU_PARTICIPANT_LOGIN_CONFIG: LoginConfig = {
   groupId: ZUZALU_PARTICIPANTS_GROUP_ID,
   groupUrl: ZUZALU_PARTICIPANTS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
@@ -28,7 +28,7 @@ export const zuzaluParticipantConfiguration: LoginConfiguration = {
   name: LoginConfigurationName.ZUZALU_PARTICIPANT,
 };
 
-export const pcdpassUserConfiguration: LoginConfiguration = {
+export const PCDPASS_USER_CONFIG: LoginConfig = {
   groupId: PCDPASS_USERS_GROUP_ID,
   groupUrl: PCDPASS_USERS_GROUP_URL,
   passportServerUrl: PCDPASS_SERVER_URL,

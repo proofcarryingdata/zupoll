@@ -4,7 +4,7 @@ import {
   CreateBallotRequest,
   MultiVoteRequest,
 } from "./requestTypes";
-import { LoginConfiguration } from "./types";
+import { LoginConfig } from "./types";
 
 export async function createBallot(
   request: CreateBallotRequest,
@@ -57,7 +57,7 @@ export async function voteBallot(
 }
 
 export async function login(
-  configuration: LoginConfiguration,
+  configuration: LoginConfig,
   pcdStr: string
 ): Promise<Response | undefined> {
   const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));

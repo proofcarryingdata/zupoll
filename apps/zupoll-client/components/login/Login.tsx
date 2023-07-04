@@ -4,7 +4,7 @@ import {
 } from "@pcd/passport-interface";
 import { useEffect, useState } from "react";
 import { login } from "../../src/api";
-import { LoginConfiguration, ZupollError } from "../../src/types";
+import { LoginConfig, ZupollError } from "../../src/types";
 import { Button } from "../core/Button";
 
 /**
@@ -22,12 +22,12 @@ export function Login({
   deemphasized,
   configuration,
 }: {
-  onLogin: (token: string, configuration: LoginConfiguration) => void;
+  onLogin: (token: string, configuration: LoginConfig) => void;
   onError: (error: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
   prompt: string;
   deemphasized?: boolean;
-  configuration: LoginConfiguration;
+  configuration: LoginConfig;
 }) {
   const [loggingIn, setLoggingIn] = useState(false);
 
@@ -75,10 +75,7 @@ export function Login({
   );
 }
 
-async function fetchLoginToken(
-  configuration: LoginConfiguration,
-  pcdStr: string
-) {
+async function fetchLoginToken(configuration: LoginConfig, pcdStr: string) {
   const res = await login(configuration, pcdStr);
   if (res === undefined) {
     throw new Error("Server is down. Contact passport@0xparc.org.");
