@@ -3,7 +3,11 @@ import styled from "styled-components";
 import { useCreateBallot } from "../../src/createBallot";
 import { BallotType, Poll } from "../../src/prismaTypes";
 import { ZupollError } from "../../src/types";
-import { SEMAPHORE_ADMIN_GROUP_URL } from "../../src/util";
+import {
+  PCDPASS_USERS_GROUP_URL,
+  SEMAPHORE_ADMIN_GROUP_URL,
+  SEMAPHORE_GROUP_URL,
+} from "../../src/util";
 import {
   FormButtonContainer,
   FormContainer,
@@ -99,7 +103,7 @@ export function CreateBallot({
               placeholder="Advisory Vote 04/25"
             />
           </StyledLabel>
-          <StyledLabel >
+          <StyledLabel>
             Ballot description &nbsp;
             <StyledInput
               type="text"
@@ -110,7 +114,7 @@ export function CreateBallot({
               placeholder="Advisory vote for 04/25 town hall"
             />
           </StyledLabel>
-          <StyledLabel >
+          <StyledLabel>
             Expiry&nbsp;
             <StyledInput
               type="datetime-local"
@@ -120,18 +124,29 @@ export function CreateBallot({
               onChange={(e) => setBallotExpiry(new Date(e.target.value))}
             />
           </StyledLabel>
-          <StyledLabel >
+          <StyledLabel>
             Type of ballot
             <StyledSelect
               id="ballotType"
               value={ballotType}
               onChange={(e) => setBallotType(e.target.value)}
             >
-              <option value={BallotType.STRAWPOLL}>Straw Poll</option>
-              {group === SEMAPHORE_ADMIN_GROUP_URL ? (
-                <option value={BallotType.ADVISORYVOTE}>Advisory Vote</option>
-              ) : (
-                <></>
+              {group === SEMAPHORE_GROUP_URL && (
+                <>
+                  <option value={BallotType.STRAWPOLL}>Straw Poll</option>
+                </>
+              )}
+              {group === SEMAPHORE_ADMIN_GROUP_URL && (
+                <>
+                  <option value={BallotType.STRAWPOLL}>Straw Poll</option>
+                  <option value={BallotType.ADVISORYVOTE}>Advisory Vote</option>
+                  <option value={BallotType.ORGANIZERONLY}>
+                    Organizer Only
+                  </option>
+                </>
+              )}
+              {group === PCDPASS_USERS_GROUP_URL && (
+                <option value={BallotType.PCDPASSUSER}>PCDPass Poll</option>
               )}
             </StyledSelect>
           </StyledLabel>
@@ -143,7 +158,7 @@ export function CreateBallot({
           <FormContainer key={i}>
             <StyledForm>
               <h2>Question {i + 1}</h2>
-              <StyledLabel >
+              <StyledLabel>
                 Question&nbsp;
                 <StyledInput
                   type="text"
