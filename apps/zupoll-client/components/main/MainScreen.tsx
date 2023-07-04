@@ -108,6 +108,7 @@ export function MainScreen({
             .filter((ballot) => ballot.ballotType === BallotType.ADVISORYVOTE)
             .map((ballot) => (
               <BallotListButton
+                key={ballot.ballotId}
                 onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
               >
                 <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
@@ -133,6 +134,7 @@ export function MainScreen({
             .filter((ballot) => ballot.ballotType === BallotType.STRAWPOLL)
             .map((ballot) => (
               <BallotListButton
+                key={ballot.ballotId}
                 onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
               >
                 <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
@@ -161,6 +163,7 @@ export function MainScreen({
             .filter((ballot) => ballot.ballotType === BallotType.PCDPASSUSER)
             .map((ballot) => (
               <BallotListButton
+                key={ballot.ballotId}
                 onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
               >
                 <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
