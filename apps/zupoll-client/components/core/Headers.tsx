@@ -22,9 +22,7 @@ export function MainScreenHeader({
       <MainScreenContainer>
         <Logo src="/zupoll-logo.png" alt="Zuzalu" />
         <ButtonContainer>
-          <LogoutButton onClick={confirmLogout}>
-            Logout
-          </LogoutButton>
+          <LogoutButton onClick={confirmLogout}>Logout</LogoutButton>
           <BallotCreateButton onClick={createBallot}>
             <b>Create</b>
           </BallotCreateButton>
@@ -126,7 +124,7 @@ const BallotCreateButton = styled.button`
   border-radius: 0.5rem;
   border: none;
   cursor: pointer;
-  font-weight: "bold";
+  font-weight: bold;
   color: rgb(28, 41, 40);
 
   &:hover {
@@ -148,6 +146,6 @@ const LogoutButton = styled.button`
   border-width: 1px;
   border-radius: 0.5rem;
   cursor: pointer;
-  font-weight: "bold";
+  font-weight: bold;
   color: #52b5a4;
 `;
