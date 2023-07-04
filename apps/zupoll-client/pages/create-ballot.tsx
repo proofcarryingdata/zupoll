@@ -10,8 +10,8 @@ import { useLogin } from "../src/login";
 import { ZupollError } from "../src/types";
 import {
   PCDPASS_USERS_GROUP_URL,
-  SEMAPHORE_ADMIN_GROUP_URL,
-  SEMAPHORE_GROUP_URL,
+  ZUZALU_ADMINS_GROUP_URL,
+  ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../src/util";
 
 export default function Page() {
@@ -23,8 +23,8 @@ export default function Page() {
   useEffect(() => {
     if (group !== undefined) {
       if (
-        group !== SEMAPHORE_ADMIN_GROUP_URL &&
-        group !== SEMAPHORE_GROUP_URL &&
+        group !== ZUZALU_ADMINS_GROUP_URL &&
+        group !== ZUZALU_PARTICIPANTS_GROUP_URL &&
         group !== PCDPASS_USERS_GROUP_URL
       ) {
         logout();

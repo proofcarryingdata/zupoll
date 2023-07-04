@@ -13,11 +13,11 @@ export const ADMIN_GROUP_ID = "4";
 export const PCDPASS_GROUP_ID = "5";
 
 export const ZUZALU_PARTICIPANTS_GROUP_URL = IS_DEPLOYED
-  ? process.env.SEMAPHORE_GROUP_URL
+  ? process.env.ZUZALU_PARTICIPANTS_GROUP_URL
   : `http://localhost:3002/semaphore/${PARTICIPANTS_GROUP_ID}`;
 
 export const ZUZALU_ORGANIZERS_GROUP_URL = IS_DEPLOYED
-  ? process.env.SEMAPHORE_ADMIN_GROUP_URL
+  ? process.env.ZUZALU_ORGANIZERS_GROUP_URL
   : `http://localhost:3002/semaphore/${ADMIN_GROUP_ID}`;
 
 export const PCDPASS_USERS_GROUP_URL = IS_DEPLOYED
@@ -65,14 +65,14 @@ export const authenticateJWT = (
         ZUZALU_ORGANIZERS_GROUP_URL &&
         payload.groupUrl.includes(ZUZALU_ORGANIZERS_GROUP_URL)
       ) {
-        req.authUserType = AuthType.ZUZALU_PARTICIPANT;
+        req.authUserType = AuthType.ZUZALU_ORGANIZER;
         next();
         return;
       } else if (
         PCDPASS_USERS_GROUP_URL &&
         payload.groupUrl.includes(PCDPASS_USERS_GROUP_URL)
       ) {
-        req.authUserType = AuthType.ZUZALU_PARTICIPANT;
+        req.authUserType = AuthType.PCDPASS;
         next();
         return;
       }

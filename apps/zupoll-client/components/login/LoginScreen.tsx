@@ -4,9 +4,9 @@ import { ZupollError } from "../../src/types";
 import {
   PCDPASS_URL,
   PCDPASS_USERS_GROUP_URL,
-  SEMAPHORE_ADMIN_GROUP_URL,
-  SEMAPHORE_GROUP_URL,
   ZUPASS_URL,
+  ZUZALU_ADMINS_GROUP_URL,
+  ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../../src/util";
 import { Center } from "../core";
 import { LoggedOutHeader } from "../core/Headers";
@@ -50,7 +50,7 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
                 onError={setError}
                 setServerLoading={setServerLoading}
                 passportAppUrl={ZUPASS_URL}
-                requestedGroup={SEMAPHORE_GROUP_URL}
+                requestedGroup={ZUZALU_PARTICIPANTS_GROUP_URL}
                 prompt="Resident login"
               />
               <Login
@@ -58,7 +58,7 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
                 onError={setError}
                 setServerLoading={setServerLoading}
                 passportAppUrl={ZUPASS_URL}
-                requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
+                requestedGroup={ZUZALU_ADMINS_GROUP_URL}
                 prompt="Organizer login"
                 deemphasized
               />

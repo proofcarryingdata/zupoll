@@ -15,15 +15,15 @@ import { useHistoricSemaphoreUrl } from "./useHistoricSemaphoreUrl";
 import {
   PCDPASS_URL,
   PCDPASS_USERS_GROUP_URL,
-  SEMAPHORE_ADMIN_GROUP_URL,
-  SEMAPHORE_GROUP_URL,
   ZUPASS_URL,
+  ZUZALU_ADMINS_GROUP_URL,
+  ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "./util";
 
 function groupUrlToPassportUrl(groupUrl: string | undefined): string {
-  if (groupUrl === SEMAPHORE_ADMIN_GROUP_URL) {
+  if (groupUrl === ZUZALU_ADMINS_GROUP_URL) {
     return ZUPASS_URL;
-  } else if (groupUrl === SEMAPHORE_GROUP_URL) {
+  } else if (groupUrl === ZUZALU_PARTICIPANTS_GROUP_URL) {
     return ZUPASS_URL;
   } else if (groupUrl === PCDPASS_USERS_GROUP_URL) {
     return PCDPASS_URL;
@@ -89,8 +89,8 @@ export function useCreateBallot({
 
     const groupUrl =
       ballotType === BallotType.STRAWPOLL
-        ? SEMAPHORE_GROUP_URL
-        : SEMAPHORE_ADMIN_GROUP_URL;
+        ? ZUZALU_PARTICIPANTS_GROUP_URL
+        : ZUZALU_ADMINS_GROUP_URL;
 
     const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
     const finalRequest: CreateBallotRequest = {
@@ -193,13 +193,13 @@ export function useCreateBallot({
     console.log(signalHash);
     const sigHashEnc = generateMessageHash(signalHash).toString();
 
-    let groupUrl: string = SEMAPHORE_GROUP_URL;
+    let groupUrl: string = ZUZALU_PARTICIPANTS_GROUP_URL;
 
     if (
       ballotType === BallotType.ORGANIZERONLY ||
       ballotType === BallotType.ADVISORYVOTE
     ) {
-      groupUrl = SEMAPHORE_ADMIN_GROUP_URL;
+      groupUrl = ZUZALU_ADMINS_GROUP_URL;
     } else if (ballotType === BallotType.PCDPASSUSER) {
       groupUrl = PCDPASS_USERS_GROUP_URL;
     }

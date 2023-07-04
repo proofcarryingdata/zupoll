@@ -8,7 +8,10 @@ import { CreatePost } from "../components/main/CreatePost";
 import { ErrorOverlay } from "../components/main/ErrorOverlay";
 import { useLogin } from "../src/login";
 import { ZupollError } from "../src/types";
-import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../src/util";
+import {
+  ZUZALU_ADMINS_GROUP_URL,
+  ZUZALU_PARTICIPANTS_GROUP_URL,
+} from "../src/util";
 
 export default function Page() {
   const [error, setError] = useState<ZupollError>();
@@ -20,13 +23,13 @@ export default function Page() {
   useEffect(() => {
     if (group !== undefined) {
       if (
-        group !== SEMAPHORE_ADMIN_GROUP_URL &&
-        group !== SEMAPHORE_GROUP_URL
+        group !== ZUZALU_ADMINS_GROUP_URL &&
+        group !== ZUZALU_PARTICIPANTS_GROUP_URL
       ) {
         logout();
       }
 
-      if (group !== SEMAPHORE_ADMIN_GROUP_URL) {
+      if (group !== ZUZALU_ADMINS_GROUP_URL) {
         router.push("/");
       } else {
         setLoadingGroup(false);

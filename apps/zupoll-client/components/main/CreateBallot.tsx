@@ -4,12 +4,12 @@ import { useCreateBallot } from "../../src/createBallot";
 import { BallotType, Poll } from "../../src/prismaTypes";
 import { ZupollError } from "../../src/types";
 import {
-  ADMIN_GROUP_ID,
-  PARTICIPANTS_GROUP_ID,
   PCDPASS_USERS_GROUP_ID,
   PCDPASS_USERS_GROUP_URL,
-  SEMAPHORE_ADMIN_GROUP_URL,
-  SEMAPHORE_GROUP_URL,
+  ZUZALU_ADMINS_GROUP_ID,
+  ZUZALU_ADMINS_GROUP_URL,
+  ZUZALU_PARTICIPANTS_GROUP_ID,
+  ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../../src/util";
 import {
   FormButtonContainer,
@@ -25,10 +25,10 @@ import {
 import { RippleLoaderLight } from "../core/RippleLoader";
 
 function urlToGroupId(groupUrl: string | undefined): string {
-  if (groupUrl === SEMAPHORE_ADMIN_GROUP_URL) {
-    return ADMIN_GROUP_ID;
-  } else if (groupUrl === SEMAPHORE_GROUP_URL) {
-    return PARTICIPANTS_GROUP_ID;
+  if (groupUrl === ZUZALU_ADMINS_GROUP_URL) {
+    return ZUZALU_ADMINS_GROUP_ID;
+  } else if (groupUrl === ZUZALU_PARTICIPANTS_GROUP_URL) {
+    return ZUZALU_PARTICIPANTS_GROUP_ID;
   } else if (groupUrl === PCDPASS_USERS_GROUP_URL) {
     return PCDPASS_USERS_GROUP_ID;
   }
@@ -152,12 +152,12 @@ export function CreateBallot({
               value={ballotType}
               onChange={(e) => setBallotType(e.target.value)}
             >
-              {groupUrl === SEMAPHORE_GROUP_URL && (
+              {groupUrl === ZUZALU_PARTICIPANTS_GROUP_URL && (
                 <>
                   <option value={BallotType.STRAWPOLL}>Straw Poll</option>
                 </>
               )}
-              {groupUrl === SEMAPHORE_ADMIN_GROUP_URL && (
+              {groupUrl === ZUZALU_ADMINS_GROUP_URL && (
                 <>
                   <option value={BallotType.STRAWPOLL}>Straw Poll</option>
                   <option value={BallotType.ADVISORYVOTE}>Advisory Vote</option>
