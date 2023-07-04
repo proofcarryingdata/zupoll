@@ -5,6 +5,7 @@ import stableStringify from "json-stable-stringify";
 import { ApplicationContext } from "../../types";
 import {
   authenticateJWT,
+  getVisibleBallotTypesForUser,
   SITE_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
@@ -217,13 +218,17 @@ export function initPCDRoutes(
         if (isNaN(ballotURL)) {
           throw new Error("Invalid ballot URL.");
         }
-        const ballot = await prisma.ballot.findUnique({
+        const ballot = await prisma.ballot.findFirst({
           where: {
             ballotURL: ballotURL,
+            ballotType: {
+              in: getVisibleBallotTypesForUser(req.authUserType),
+            },
           },
         });
+
         if (ballot === null) {
-          throw new Error("Invalid ballot id.");
+          throw new Error("Can't find the given ballot.");
         }
 
         // Only use of voterSemaphoreGroupUrl is to check if it's in the list of

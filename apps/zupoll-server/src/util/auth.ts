@@ -85,7 +85,7 @@ export const authenticateJWT = (
 };
 
 export function getVisibleBallotTypesForUser(
-  userAuth?: AuthType
+  userAuth: AuthType | undefined
 ): BallotType[] {
   let relevantBallots: BallotType[] = [];
 
