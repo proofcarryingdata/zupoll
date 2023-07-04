@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { getHistoricGroupUrl, getLatestSemaphoreGroupHash } from "./api";
-import { ZupollError } from "./types";
 import {
   PCDPASS_SERVER_URL,
   PCDPASS_USERS_GROUP_ID,
   ZUPASS_SERVER_URL,
-} from "./util";
+} from "./env";
+import { ZupollError } from "./types";
 
 export function useHistoricSemaphoreUrl(
   semaphoreGroupId: string,

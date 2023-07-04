@@ -7,6 +7,7 @@ import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { useCallback, useEffect, useRef } from "react";
 import { voteBallot } from "./api";
+import { ZUPASS_URL } from "./env";
 import { UserType, Vote } from "./prismaTypes";
 import {
   MultiVoteRequest,
@@ -16,7 +17,6 @@ import {
   VoteSignal,
 } from "./requestTypes";
 import { PCDState, ZupollError } from "./types";
-import { ZUPASS_URL } from "./util";
 
 /**
  * Hook that handles requesting a PCD for voting on a set of polls on a ballot.

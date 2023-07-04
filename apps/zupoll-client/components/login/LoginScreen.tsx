@@ -1,13 +1,13 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { ZupollError } from "../../src/types";
 import {
   PCDPASS_URL,
   PCDPASS_USERS_GROUP_URL,
   ZUPASS_URL,
   ZUZALU_ADMINS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
-} from "../../src/util";
+} from "../../src/env";
+import { ZupollError } from "../../src/types";
 import { Center } from "../core";
 import { LoggedOutHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";

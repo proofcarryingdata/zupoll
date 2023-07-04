@@ -6,13 +6,13 @@ import { CancelPollHeader } from "../components/core/Headers";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { CreateBallot } from "../components/main/CreateBallot";
 import { ErrorOverlay } from "../components/main/ErrorOverlay";
-import { useLogin } from "../src/login";
-import { ZupollError } from "../src/types";
 import {
   PCDPASS_USERS_GROUP_URL,
   ZUZALU_ADMINS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
-} from "../src/util";
+} from "../src/env";
+import { useLogin } from "../src/login";
+import { ZupollError } from "../src/types";
 
 export default function Page() {
   const [error, setError] = useState<ZupollError>();

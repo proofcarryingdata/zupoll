@@ -1,4 +1,4 @@
-import { ZUPASS_SERVER_URL, ZUPOLL_SERVER_URL } from "../src/util";
+import { ZUPASS_SERVER_URL, ZUPOLL_SERVER_URL } from "./env";
 import {
   BotPostRequest,
   CreateBallotRequest,
