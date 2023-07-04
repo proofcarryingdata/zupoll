@@ -97,6 +97,33 @@ export function MainScreen({
 
       <BallotListContainer>
         <TitleContainer>
+          <H1>Organizer-only ballots</H1>
+          <p>Ballots visible and voteable only by Zuzalu organizers.</p>
+        </TitleContainer>
+
+        {loadingBallots || ballots === undefined ? (
+          <RippleLoader />
+        ) : (
+          ballots
+            .filter((ballot) => ballot.ballotType === BallotType.ORGANIZERONLY)
+            .map((ballot) => (
+              <BallotListButton
+                key={ballot.ballotId}
+                onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
+              >
+                <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
+                <div style={{ fontStyle: "italic" }}>
+                  {new Date(ballot.expiry) < new Date()
+                    ? "Expired"
+                    : getTimeBeforeExpiry(ballot.expiry)}
+                </div>
+              </BallotListButton>
+            ))
+        )}
+      </BallotListContainer>
+
+      <BallotListContainer>
+        <TitleContainer>
           <H1>Advisory Votes</H1>
           <p>Official advisory ballots from the Zuzalu organizers</p>
         </TitleContainer>
