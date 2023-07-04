@@ -4,7 +4,11 @@ import styled from "styled-components";
 import { listBallots } from "../../src/api";
 import { Ballot, BallotType } from "../../src/prismaTypes";
 import { BallotResponse } from "../../src/requestTypes";
-import { LoginConfiguration, ZupollError } from "../../src/types";
+import {
+  LoginConfiguration,
+  LoginConfigurationName,
+  ZupollError,
+} from "../../src/types";
 import { Center } from "../core";
 import { MainScreenHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
@@ -97,114 +101,127 @@ export function MainScreen({
         <Guarentee>🚫🔗 Unlinkable votes across ballots/devices. </Guarentee>
       </GuarenteeContainer>
 
-      <BallotListContainer>
-        <TitleContainer>
-          <H1>Organizer-only ballots</H1>
-          <p>Ballots visible and voteable only by Zuzalu organizers.</p>
-        </TitleContainer>
+      {config.name === LoginConfigurationName.ZUZALU_ORGANIZER && (
+        <BallotListContainer>
+          <TitleContainer>
+            <H1>Organizer-only ballots</H1>
+            <p>Ballots visible and voteable only by Zuzalu organizers.</p>
+          </TitleContainer>
 
-        {loadingBallots || ballots === undefined ? (
-          <RippleLoader />
-        ) : (
-          ballots
-            .filter((ballot) => ballot.ballotType === BallotType.ORGANIZERONLY)
-            .map((ballot) => (
-              <BallotListButton
-                key={ballot.ballotId}
-                onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-              >
-                <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                <div style={{ fontStyle: "italic" }}>
-                  {new Date(ballot.expiry) < new Date()
-                    ? "Expired"
-                    : getTimeBeforeExpiry(ballot.expiry)}
-                </div>
-              </BallotListButton>
-            ))
-        )}
-      </BallotListContainer>
+          {loadingBallots || ballots === undefined ? (
+            <RippleLoader />
+          ) : (
+            ballots
+              .filter(
+                (ballot) => ballot.ballotType === BallotType.ORGANIZERONLY
+              )
+              .map((ballot) => (
+                <BallotListButton
+                  key={ballot.ballotId}
+                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
+                >
+                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
+                  <div style={{ fontStyle: "italic" }}>
+                    {new Date(ballot.expiry) < new Date()
+                      ? "Expired"
+                      : getTimeBeforeExpiry(ballot.expiry)}
+                  </div>
+                </BallotListButton>
+              ))
+          )}
+        </BallotListContainer>
+      )}
 
-      <BallotListContainer>
-        <TitleContainer>
-          <H1>Advisory Votes</H1>
-          <p>Official advisory ballots from the Zuzalu organizers</p>
-        </TitleContainer>
+      {(config.name === LoginConfigurationName.ZUZALU_ORGANIZER ||
+        config.name === LoginConfigurationName.ZUZALU_PARTICIPANT) && (
+        <BallotListContainer>
+          <TitleContainer>
+            <H1>Advisory Votes</H1>
+            <p>Official advisory ballots from the Zuzalu organizers</p>
+          </TitleContainer>
 
-        {loadingBallots || ballots === undefined ? (
-          <RippleLoader />
-        ) : (
-          ballots
-            .filter((ballot) => ballot.ballotType === BallotType.ADVISORYVOTE)
-            .map((ballot) => (
-              <BallotListButton
-                key={ballot.ballotId}
-                onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-              >
-                <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                <div style={{ fontStyle: "italic" }}>
-                  {new Date(ballot.expiry) < new Date()
-                    ? "Expired"
-                    : getTimeBeforeExpiry(ballot.expiry)}
-                </div>
-              </BallotListButton>
-            ))
-        )}
-      </BallotListContainer>
-      <BallotListContainer>
-        <TitleContainer>
-          <H1>Straw Polls</H1>
-          <p>Unofficial ballots from all Zuzalu residents</p>
-        </TitleContainer>
+          {loadingBallots || ballots === undefined ? (
+            <RippleLoader />
+          ) : (
+            ballots
+              .filter((ballot) => ballot.ballotType === BallotType.ADVISORYVOTE)
+              .map((ballot) => (
+                <BallotListButton
+                  key={ballot.ballotId}
+                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
+                >
+                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
+                  <div style={{ fontStyle: "italic" }}>
+                    {new Date(ballot.expiry) < new Date()
+                      ? "Expired"
+                      : getTimeBeforeExpiry(ballot.expiry)}
+                  </div>
+                </BallotListButton>
+              ))
+          )}
+        </BallotListContainer>
+      )}
+      {(config.name === LoginConfigurationName.ZUZALU_ORGANIZER ||
+        config.name === LoginConfigurationName.ZUZALU_PARTICIPANT) && (
+        <BallotListContainer>
+          <TitleContainer>
+            <H1>Straw Polls</H1>
+            <p>Unofficial ballots from all Zuzalu residents</p>
+          </TitleContainer>
 
-        {loadingBallots || ballots === undefined ? (
-          <RippleLoader />
-        ) : (
-          ballots
-            .filter((ballot) => ballot.ballotType === BallotType.STRAWPOLL)
-            .map((ballot) => (
-              <BallotListButton
-                key={ballot.ballotId}
-                onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-              >
-                <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                <div style={{ fontStyle: "italic" }}>
-                  {new Date(ballot.expiry) < new Date()
-                    ? "Expired"
-                    : getTimeBeforeExpiry(ballot.expiry)}
-                </div>
-              </BallotListButton>
-            ))
-        )}
-      </BallotListContainer>
-      <BallotListContainer>
-        <TitleContainer>
-          <H1>PCDPass Polls</H1>
-          <p>
-            Ballots created by users of PCDPass. These are not visible to Zuzalu
-            participants.
-          </p>
-        </TitleContainer>
+          {loadingBallots || ballots === undefined ? (
+            <RippleLoader />
+          ) : (
+            ballots
+              .filter((ballot) => ballot.ballotType === BallotType.STRAWPOLL)
+              .map((ballot) => (
+                <BallotListButton
+                  key={ballot.ballotId}
+                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
+                >
+                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
+                  <div style={{ fontStyle: "italic" }}>
+                    {new Date(ballot.expiry) < new Date()
+                      ? "Expired"
+                      : getTimeBeforeExpiry(ballot.expiry)}
+                  </div>
+                </BallotListButton>
+              ))
+          )}
+        </BallotListContainer>
+      )}
 
-        {loadingBallots || ballots === undefined ? (
-          <RippleLoader />
-        ) : (
-          ballots
-            .filter((ballot) => ballot.ballotType === BallotType.PCDPASSUSER)
-            .map((ballot) => (
-              <BallotListButton
-                key={ballot.ballotId}
-                onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-              >
-                <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                <div style={{ fontStyle: "italic" }}>
-                  {new Date(ballot.expiry) < new Date()
-                    ? "Expired"
-                    : getTimeBeforeExpiry(ballot.expiry)}
-                </div>
-              </BallotListButton>
-            ))
-        )}
-      </BallotListContainer>
+      {config.name === LoginConfigurationName.PCDPASS_USER && (
+        <BallotListContainer>
+          <TitleContainer>
+            <H1>PCDPass Polls</H1>
+            <p>
+              Ballots created by users of PCDPass. These are not visible to
+              Zuzalu participants.
+            </p>
+          </TitleContainer>
+
+          {loadingBallots || ballots === undefined ? (
+            <RippleLoader />
+          ) : (
+            ballots
+              .filter((ballot) => ballot.ballotType === BallotType.PCDPASSUSER)
+              .map((ballot) => (
+                <BallotListButton
+                  key={ballot.ballotId}
+                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
+                >
+                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
+                  <div style={{ fontStyle: "italic" }}>
+                    {new Date(ballot.expiry) < new Date()
+                      ? "Expired"
+                      : getTimeBeforeExpiry(ballot.expiry)}
+                  </div>
+                </BallotListButton>
+              ))
+          )}
+        </BallotListContainer>
+      )}
 
       {error && (
         <ErrorOverlay

@@ -15,6 +15,11 @@ export default function Page() {
     const savedConfig = window.localStorage["configuration"];
     let parsedConfig: LoginConfiguration | undefined;
 
+    if (!savedConfig) {
+      setLoading(false);
+      return;
+    }
+
     try {
       parsedConfig = JSON.parse(savedConfig);
     } catch (e) {
@@ -22,7 +27,10 @@ export default function Page() {
     }
 
     if (!parsedConfig) {
+      delete window.localStorage["access_token"];
+      delete window.localStorage["configuration"];
       setToken(undefined);
+      setLoading(false);
       return;
     }
 
