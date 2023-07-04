@@ -98,6 +98,7 @@ export function CreateBallot({
 
   const { loadingVoterGroupUrl, createBallotPCD } = useCreateBallot({
     groupId: urlToGroupId(groupUrl),
+    groupUrl,
     ballotTitle,
     ballotDescription,
     ballotType,

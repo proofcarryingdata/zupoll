@@ -30,7 +30,8 @@ export function useLogin(router: NextRouter): {
   // Retrieve group from JWT
   const group = useMemo(() => {
     if (token !== undefined && token !== "") {
-      return parseJwt(token)["groupUrl"] || undefined;
+      const groupUrl = parseJwt(token)["groupUrl"] || undefined;
+      return groupUrl;
     } else {
       return undefined;
     }

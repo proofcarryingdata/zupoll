@@ -63,6 +63,7 @@ export function useCreateBallot({
   onError: (err: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
   token: string;
+  groupUrl: string | undefined;
 }) {
   const router = useRouter();
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
@@ -87,10 +88,16 @@ export function useCreateBallot({
 
     pcdState.current = PCDState.DEFAULT;
 
-    const groupUrl =
-      ballotType === BallotType.STRAWPOLL
-        ? ZUZALU_PARTICIPANTS_GROUP_URL
-        : ZUZALU_ADMINS_GROUP_URL;
+    let pollsterGroupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
+    if (ballotType === BallotType.ADVISORYVOTE) {
+      pollsterGroupUrl = ZUZALU_ADMINS_GROUP_URL;
+    } else if (ballotType === BallotType.ORGANIZERONLY) {
+      pollsterGroupUrl = ZUZALU_ADMINS_GROUP_URL;
+    } else if (ballotType === BallotType.PCDPASSUSER) {
+      pollsterGroupUrl = PCDPASS_USERS_GROUP_URL;
+    } else if (ballotType === BallotType.STRAWPOLL) {
+      pollsterGroupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
+    }
 
     const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
     const finalRequest: CreateBallotRequest = {
@@ -108,7 +115,7 @@ export function useCreateBallot({
         pollsterUuid: null,
         pollsterCommitment: null,
         expiryNotif: null,
-        pollsterSemaphoreGroupUrl: groupUrl,
+        pollsterSemaphoreGroupUrl: pollsterGroupUrl,
         voterSemaphoreGroupUrls: [voterGroupUrl],
         voterSemaphoreGroupRoots: [voterGroupRootHash],
         ballotType: ballotType,

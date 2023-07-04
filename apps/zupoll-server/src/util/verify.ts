@@ -112,7 +112,7 @@ export async function verifyGroupProof(
       if (validPcdpassRoot) {
         pcdpassUserRootCache.add(pcd.claim.merkleRoot);
       } else {
-        throw new Error("Claim root isn't a valid organizer root.");
+        throw new Error("Claim root isn't a valid pcdpass root.");
       }
     }
   } else {

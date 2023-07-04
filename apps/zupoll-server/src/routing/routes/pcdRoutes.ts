@@ -6,6 +6,7 @@ import { ApplicationContext } from "../../types";
 import {
   authenticateJWT,
   getVisibleBallotTypesForUser,
+  PCDPASS_USERS_GROUP_URL,
   SITE_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
@@ -73,6 +74,7 @@ export function initPCDRoutes(
         voterSemaphoreGroupUrls: request.ballot.voterSemaphoreGroupUrls,
         voterSemaphoreGroupRoots: request.ballot.voterSemaphoreGroupRoots,
       };
+
       request.polls.forEach((poll: Poll) => {
         const pollSignal: PollSignal = {
           body: poll.body,
@@ -80,14 +82,21 @@ export function initPCDRoutes(
         };
         ballotSignal.pollSignals.push(pollSignal);
       });
+
       const signalHash = sha256(stableStringify(ballotSignal));
 
       try {
         if (request.ballot.pollsterType == UserType.ANON) {
-          const groupUrl =
-            request.ballot.ballotType === BallotType.STRAWPOLL
-              ? ZUZALU_PARTICIPANTS_GROUP_URL!
-              : ZUZALU_ORGANIZERS_GROUP_URL!;
+          let groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
+          if (request.ballot.ballotType === BallotType.ADVISORYVOTE) {
+            groupUrl = ZUZALU_ORGANIZERS_GROUP_URL;
+          } else if (request.ballot.ballotType === BallotType.ORGANIZERONLY) {
+            groupUrl = ZUZALU_ORGANIZERS_GROUP_URL;
+          } else if (request.ballot.ballotType === BallotType.STRAWPOLL) {
+            groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
+          } else if (request.ballot.ballotType === BallotType.PCDPASSUSER) {
+            groupUrl = PCDPASS_USERS_GROUP_URL;
+          }
 
           // pollsterSemaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
           // SEMAPHORE_ADMIN_GROUP_URL or PCDPASS_USERS_GROUP_URL
@@ -96,7 +105,7 @@ export function initPCDRoutes(
             request.proof,
             {
               signal: signalHash,
-              allowedGroups: [groupUrl],
+              allowedGroups: [groupUrl!],
               claimedExtNullifier: signalHash,
             }
           );
