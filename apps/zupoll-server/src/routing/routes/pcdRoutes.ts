@@ -11,6 +11,7 @@ import {
 } from "../../util/auth";
 import { cleanString, sendMessage } from "../../util/bot";
 import { prisma } from "../../util/prisma";
+import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
 
 /**
@@ -33,8 +34,33 @@ export function initPCDRoutes(
           ballotURL: request.ballot.ballotURL,
         },
       });
+
       if (prevBallot !== null) {
         throw new Error("Ballot already exists with this URL.");
+      }
+
+      if (req.authUserType === AuthType.PCDPASS) {
+        if (request.ballot.ballotType !== BallotType.PCDPASSUSER) {
+          throw new Error(
+            `${req.authUserType} user can't create this ballot type`
+          );
+        }
+      } else if (req.authUserType === AuthType.ZUZALU_PARTICIPANT) {
+        if (
+          request.ballot.ballotType === BallotType.PCDPASSUSER ||
+          request.ballot.ballotType === BallotType.ADVISORYVOTE ||
+          request.ballot.ballotType === BallotType.ORGANIZERONLY
+        ) {
+          throw new Error(
+            `${req.authUserType} user can't create this ballot type`
+          );
+        }
+      } else if (req.authUserType === AuthType.ZUZALU_ORGANIZER) {
+        if (request.ballot.ballotType === BallotType.PCDPASSUSER) {
+          throw new Error(
+            `${req.authUserType} user can't create this ballot type`
+          );
+        }
       }
 
       const ballotSignal: BallotSignal = {
