@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { listBallots } from "../../src/api";
 import { Ballot, BallotType } from "../../src/prismaTypes";
 import { BallotResponse } from "../../src/requestTypes";
-import { ZupollError } from "../../src/types";
+import { LoginConfiguration, ZupollError } from "../../src/types";
 import { Center } from "../core";
 import { MainScreenHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
@@ -12,9 +12,11 @@ import { ErrorOverlay } from "./ErrorOverlay";
 
 export function MainScreen({
   token,
+  config,
   onLogout,
 }: {
   token: string;
+  config: LoginConfiguration;
   onLogout: () => void;
 }) {
   const router = useRouter();
