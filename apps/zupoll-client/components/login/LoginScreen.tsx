@@ -1,13 +1,11 @@
 import { useState } from "react";
 import styled from "styled-components";
-import {
-  PCDPASS_URL,
-  PCDPASS_USERS_GROUP_URL,
-  ZUPASS_URL,
-  ZUZALU_ADMINS_GROUP_URL,
-  ZUZALU_PARTICIPANTS_GROUP_URL,
-} from "../../src/env";
 import { ZupollError } from "../../src/types";
+import {
+  pcdpassUserConfiguration,
+  zuzaluOrganizerConfiguration,
+  zuzaluParticipantConfiguration,
+} from "../../src/util";
 import { Center } from "../core";
 import { LoggedOutHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
@@ -41,24 +39,21 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
-                passportAppUrl={PCDPASS_URL}
-                requestedGroup={PCDPASS_USERS_GROUP_URL}
                 prompt="PCDPass login"
+                configuration={pcdpassUserConfiguration}
               />
               <Login
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
-                passportAppUrl={ZUPASS_URL}
-                requestedGroup={ZUZALU_PARTICIPANTS_GROUP_URL}
+                configuration={zuzaluParticipantConfiguration}
                 prompt="Resident login"
               />
               <Login
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
-                passportAppUrl={ZUPASS_URL}
-                requestedGroup={ZUZALU_ADMINS_GROUP_URL}
+                configuration={zuzaluOrganizerConfiguration}
                 prompt="Organizer login"
                 deemphasized
               />

@@ -4,7 +4,7 @@ import {
 } from "@pcd/passport-interface";
 import { useEffect, useState } from "react";
 import { login } from "../../src/api";
-import { ZupollError } from "../../src/types";
+import { LoginConfiguration, ZupollError } from "../../src/types";
 import { Button } from "../core/Button";
 
 /**
@@ -18,18 +18,16 @@ export function Login({
   onLogin,
   onError,
   setServerLoading,
-  passportAppUrl,
-  requestedGroup,
   prompt,
   deemphasized,
+  configuration,
 }: {
   onLogin: (token: string) => void;
   onError: (error: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
-  passportAppUrl: string;
-  requestedGroup: string;
   prompt: string;
   deemphasized?: boolean;
+  configuration: LoginConfiguration;
 }) {
   const [loggingIn, setLoggingIn] = useState(false);
 
@@ -42,7 +40,7 @@ export function Login({
     (async () => {
       try {
         setServerLoading(true);
-        const token = await fetchLoginToken(requestedGroup, pcdStr);
+        const token = await fetchLoginToken(configuration, pcdStr);
         onLogin(token);
       } catch (err: any) {
         const loginError: ZupollError = {
@@ -54,7 +52,7 @@ export function Login({
       setLoggingIn(false);
       setServerLoading(false);
     })();
-  }, [pcdStr, loggingIn, requestedGroup, onLogin, onError, setServerLoading]);
+  }, [pcdStr, loggingIn, onLogin, onError, setServerLoading, configuration]);
 
   return (
     <>
@@ -63,9 +61,9 @@ export function Login({
         onClick={() => {
           setLoggingIn(true);
           openZuzaluMembershipPopup(
-            passportAppUrl,
+            configuration.passportAppUrl,
             window.location.origin + "/popup",
-            requestedGroup,
+            configuration.groupUrl,
             "zupoll"
           );
         }}
@@ -77,8 +75,11 @@ export function Login({
   );
 }
 
-async function fetchLoginToken(requestedGroup: string, pcdStr: string) {
-  const res = await login(requestedGroup, pcdStr);
+async function fetchLoginToken(
+  configuration: LoginConfiguration,
+  pcdStr: string
+) {
+  const res = await login(configuration, pcdStr);
   if (res === undefined) {
     throw new Error("Server is down. Contact passport@0xparc.org.");
   }

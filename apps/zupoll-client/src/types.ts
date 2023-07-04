@@ -12,3 +12,17 @@ export enum PCDState {
   AWAITING_PCDSTR,
   RECEIVED_PCDSTR,
 }
+
+export enum LoginConfigurationName {
+  ZUZALU_PARTICIPANT = "ZUZALU_PARTICIPANT",
+  ZUZALU_ORGANIZER = "ZUZALU_ORGANIZER",
+  PCDPASS_USER = "PCDPASS_USER",
+}
+
+export interface LoginConfiguration {
+  groupId: string;
+  groupUrl: string;
+  passportServerUrl: string;
+  passportAppUrl: string;
+  name: LoginConfigurationName;
+}

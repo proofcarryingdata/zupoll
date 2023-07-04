@@ -4,6 +4,7 @@ import {
   CreateBallotRequest,
   MultiVoteRequest,
 } from "./requestTypes";
+import { LoginConfiguration } from "./types";
 
 export async function createBallot(
   request: CreateBallotRequest,
@@ -56,13 +57,13 @@ export async function voteBallot(
 }
 
 export async function login(
-  semaphoreGroupUrl: string,
+  configuration: LoginConfiguration,
   pcdStr: string
 ): Promise<Response | undefined> {
   const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
 
   const request = {
-    semaphoreGroupUrl,
+    semaphoreGroupUrl: configuration.groupUrl,
     proof: parsedPcd.pcd,
   };
   const url = `${ZUPOLL_SERVER_URL}login`;
