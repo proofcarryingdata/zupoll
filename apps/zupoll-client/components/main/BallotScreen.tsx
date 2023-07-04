@@ -8,10 +8,10 @@ import {
   useBallotVoting,
   votedOn,
 } from "../../src/ballotVoting";
-import { useLogin } from "../../src/login";
 import { Ballot } from "../../src/prismaTypes";
 import { BallotPollResponse, PollWithCounts } from "../../src/requestTypes";
 import { ZupollError } from "../../src/types";
+import { useSavedLoginState } from "../../src/useLoginState";
 import { Center } from "../core";
 import { ReturnHeader } from "../core/Headers";
 import {
@@ -25,7 +25,12 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
   const router = useRouter();
   const [error, setError] = useState<ZupollError>();
   const [serverLoading, setServerLoading] = useState<boolean>(false);
-  const { token, group: _group, loadingToken, logout } = useLogin(router);
+  const {
+    token,
+    group: _group,
+    isLoaded: loadingToken,
+    logout,
+  } = useSavedLoginState(router);
 
   /**
    * BALLOT/POLL LOGIC

@@ -10,13 +10,18 @@ import {
   ZUZALU_ADMINS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../src/env";
-import { useLogin } from "../src/login";
 import { ZupollError } from "../src/types";
+import { useSavedLoginState } from "../src/useLoginState";
 
 export default function CreateBotPostPage() {
   const [error, setError] = useState<ZupollError>();
   const router = useRouter();
-  const { token, group, loadingToken, logout } = useLogin(router);
+  const {
+    token,
+    group,
+    isLoaded: loadingToken,
+    logout,
+  } = useSavedLoginState(router);
   const [loadingGroup, setLoadingGroup] = useState(true);
 
   // Log them out if they're not in a valid group

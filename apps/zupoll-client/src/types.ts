@@ -38,3 +38,15 @@ export interface BallotConfig {
   passportAppUrl: string;
   name: BallotType;
 }
+
+export interface LoginState {
+  token: string | undefined;
+  config: LoginConfig | undefined;
+  isLoaded: boolean;
+  logout: () => void;
+}
+
+export interface SavedLogin {
+  token: string;
+  config: LoginConfig;
+}
