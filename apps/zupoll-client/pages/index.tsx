@@ -4,26 +4,57 @@ import styled from "styled-components";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
+import { LoginConfiguration } from "../src/types";
 
 export default function Page() {
   const [token, setToken] = useState<string>();
+  const [config, setConfig] = useState<LoginConfiguration>();
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    const savedConfig = window.localStorage["configuration"];
+    let parsedConfig: LoginConfiguration | undefined;
+
+    try {
+      parsedConfig = JSON.parse(savedConfig);
+    } catch (e) {
+      console.log(e);
+    }
+
+    if (!parsedConfig) {
+      setToken(undefined);
+      return;
+    }
+
     setToken(window.localStorage["access_token"]);
+    setConfig(parsedConfig);
     setLoading(false);
   }, [setToken]);
 
-  const saveToken = useCallback(
-    (token: string | undefined) => {
+  const saveLoginDetails = useCallback(
+    (token: string | undefined, config: LoginConfiguration | undefined) => {
       setToken(token);
-      if (token) window.localStorage["access_token"] = token;
-      else delete window.localStorage["access_token"];
+      setConfig(config);
+
+      if (token) {
+        window.localStorage["access_token"] = token;
+      } else {
+        delete window.localStorage["access_token"];
+      }
+
+      if (config) {
+        window.localStorage["configuration"] = JSON.stringify(config);
+      } else {
+        delete window.localStorage["configuration"];
+      }
     },
     [setToken]
   );
 
-  const logout = useCallback(() => saveToken(undefined), [saveToken]);
+  const logout = useCallback(
+    () => saveLoginDetails(undefined, undefined),
+    [saveLoginDetails]
+  );
 
   return (
     <>
@@ -37,7 +68,7 @@ export default function Page() {
         ) : token ? (
           <MainScreen token={token} onLogout={logout} />
         ) : (
-          <LoginScreen onLogin={saveToken} />
+          <LoginScreen onLogin={saveLoginDetails} />
         )}
       </Wrapper>
     </>

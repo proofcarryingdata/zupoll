@@ -22,7 +22,7 @@ export function Login({
   deemphasized,
   configuration,
 }: {
-  onLogin: (token: string) => void;
+  onLogin: (token: string, configuration: LoginConfiguration) => void;
   onError: (error: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
   prompt: string;
@@ -41,7 +41,7 @@ export function Login({
       try {
         setServerLoading(true);
         const token = await fetchLoginToken(configuration, pcdStr);
-        onLogin(token);
+        onLogin(token, configuration);
       } catch (err: any) {
         const loginError: ZupollError = {
           title: "Login failed",

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { ZupollError } from "../../src/types";
+import { LoginConfiguration, ZupollError } from "../../src/types";
 import {
   pcdpassUserConfiguration,
   zuzaluOrganizerConfiguration,
@@ -12,7 +12,11 @@ import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "../main/ErrorOverlay";
 import { Login } from "./Login";
 
-export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
+export function LoginScreen({
+  onLogin,
+}: {
+  onLogin: (token: string, configuration: LoginConfiguration) => void;
+}) {
   const [serverLoading, setServerLoading] = useState<boolean>(false);
   const [error, setError] = useState<ZupollError>();
 
