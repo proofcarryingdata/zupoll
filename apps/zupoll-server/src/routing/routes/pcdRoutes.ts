@@ -4,6 +4,7 @@ import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { ApplicationContext } from "../../types";
 import {
+  authenticateJWT,
   SITE_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
@@ -23,6 +24,7 @@ export function initPCDRoutes(
 ): void {
   app.post(
     "/create-ballot",
+    authenticateJWT,
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as CreateBallotRequest;
 
