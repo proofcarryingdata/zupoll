@@ -13,11 +13,24 @@ import { BallotSignal, CreateBallotRequest, PollSignal } from "./requestTypes";
 import { PCDState, ZupollError } from "./types";
 import { useHistoricSemaphoreUrl } from "./useHistoricSemaphoreUrl";
 import {
-  PARTICIPANTS_GROUP_ID,
+  PCDPASS_URL,
+  PCDPASS_USERS_GROUP_URL,
   SEMAPHORE_ADMIN_GROUP_URL,
   SEMAPHORE_GROUP_URL,
   ZUPASS_URL,
 } from "./util";
+
+function groupUrlToPassportUrl(groupUrl: string | undefined): string {
+  if (groupUrl === SEMAPHORE_ADMIN_GROUP_URL) {
+    return ZUPASS_URL;
+  } else if (groupUrl === SEMAPHORE_GROUP_URL) {
+    return ZUPASS_URL;
+  } else if (groupUrl === PCDPASS_USERS_GROUP_URL) {
+    return PCDPASS_URL;
+  }
+
+  throw new Error(`unknown group url ${groupUrl}`);
+}
 
 /**
  * Hook that handles requesting a PCD for creating a ballot.
@@ -31,6 +44,7 @@ import {
  * @param setServerLoading Passing server loading status to frontend
  */
 export function useCreateBallot({
+  groupId,
   ballotTitle,
   ballotDescription,
   ballotType,
@@ -38,7 +52,9 @@ export function useCreateBallot({
   polls,
   onError,
   setServerLoading,
+  token,
 }: {
+  groupId: string;
   ballotTitle: string;
   ballotDescription: string;
   ballotType: BallotType;
@@ -46,6 +62,7 @@ export function useCreateBallot({
   polls: Poll[];
   onError: (err: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
+  token: string;
 }) {
   const router = useRouter();
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
@@ -54,7 +71,7 @@ export function useCreateBallot({
     loading: loadingVoterGroupUrl,
     rootHash: voterGroupRootHash,
     groupUrl: voterGroupUrl,
-  } = useHistoricSemaphoreUrl(PARTICIPANTS_GROUP_ID, onError);
+  } = useHistoricSemaphoreUrl(groupId, onError);
 
   // only accept pcdStr if we were expecting one
   useEffect(() => {
@@ -102,7 +119,7 @@ export function useCreateBallot({
 
     async function doRequest() {
       setServerLoading(true);
-      const res = await createBallot(finalRequest);
+      const res = await createBallot(finalRequest, token);
       setServerLoading(false);
 
       if (res === undefined) {
@@ -141,6 +158,7 @@ export function useCreateBallot({
     setServerLoading,
     voterGroupRootHash,
     voterGroupUrl,
+    token,
   ]);
 
   // ran after ballot is submitted by user
@@ -175,13 +193,19 @@ export function useCreateBallot({
     console.log(signalHash);
     const sigHashEnc = generateMessageHash(signalHash).toString();
 
-    const groupUrl =
-      ballotType === BallotType.STRAWPOLL
-        ? SEMAPHORE_GROUP_URL
-        : SEMAPHORE_ADMIN_GROUP_URL;
+    let groupUrl: string = SEMAPHORE_GROUP_URL;
+
+    if (
+      ballotType === BallotType.ORGANIZERONLY ||
+      ballotType === BallotType.ADVISORYVOTE
+    ) {
+      groupUrl = SEMAPHORE_ADMIN_GROUP_URL;
+    } else if (ballotType === BallotType.PCDPASSUSER) {
+      groupUrl = PCDPASS_USERS_GROUP_URL;
+    }
 
     openZuzaluMembershipPopup(
-      ZUPASS_URL,
+      groupUrlToPassportUrl(groupUrl),
       window.location.origin + "/popup",
       groupUrl,
       "zupoll",

@@ -4,6 +4,9 @@ import { useCreateBallot } from "../../src/createBallot";
 import { BallotType, Poll } from "../../src/prismaTypes";
 import { ZupollError } from "../../src/types";
 import {
+  ADMIN_GROUP_ID,
+  PARTICIPANTS_GROUP_ID,
+  PCDPASS_USERS_GROUP_ID,
   PCDPASS_USERS_GROUP_URL,
   SEMAPHORE_ADMIN_GROUP_URL,
   SEMAPHORE_GROUP_URL,
@@ -21,12 +24,26 @@ import {
 } from "../core/Form";
 import { RippleLoaderLight } from "../core/RippleLoader";
 
+function urlToGroupId(groupUrl: string | undefined): string {
+  if (groupUrl === SEMAPHORE_ADMIN_GROUP_URL) {
+    return ADMIN_GROUP_ID;
+  } else if (groupUrl === SEMAPHORE_GROUP_URL) {
+    return PARTICIPANTS_GROUP_ID;
+  } else if (groupUrl === PCDPASS_USERS_GROUP_URL) {
+    return PCDPASS_USERS_GROUP_ID;
+  }
+
+  throw new Error(`unknown group id ${groupUrl}`);
+}
+
 export function CreateBallot({
-  group,
+  groupUrl,
   onError,
+  token,
 }: {
-  group: string | undefined;
+  groupUrl: string | undefined;
   onError: (err: ZupollError) => void;
+  token: string;
 }) {
   /**
    * EDITING BALLOT INFO LOGIC
@@ -47,7 +64,9 @@ export function CreateBallot({
     new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
   );
   const [ballotType, setBallotType] = useState<BallotType>(
-    BallotType.STRAWPOLL
+    urlToGroupId(groupUrl) === PCDPASS_USERS_GROUP_ID
+      ? BallotType.PCDPASSUSER
+      : BallotType.STRAWPOLL
   );
 
   const getDateString = (date: Date) => {
@@ -78,6 +97,7 @@ export function CreateBallot({
   const [serverLoading, setServerLoading] = useState(false);
 
   const { loadingVoterGroupUrl, createBallotPCD } = useCreateBallot({
+    groupId: urlToGroupId(groupUrl),
     ballotTitle,
     ballotDescription,
     ballotType,
@@ -85,6 +105,7 @@ export function CreateBallot({
     polls,
     onError,
     setServerLoading,
+    token,
   });
 
   return (
@@ -131,12 +152,12 @@ export function CreateBallot({
               value={ballotType}
               onChange={(e) => setBallotType(e.target.value)}
             >
-              {group === SEMAPHORE_GROUP_URL && (
+              {groupUrl === SEMAPHORE_GROUP_URL && (
                 <>
                   <option value={BallotType.STRAWPOLL}>Straw Poll</option>
                 </>
               )}
-              {group === SEMAPHORE_ADMIN_GROUP_URL && (
+              {groupUrl === SEMAPHORE_ADMIN_GROUP_URL && (
                 <>
                   <option value={BallotType.STRAWPOLL}>Straw Poll</option>
                   <option value={BallotType.ADVISORYVOTE}>Advisory Vote</option>
@@ -145,7 +166,7 @@ export function CreateBallot({
                   </option>
                 </>
               )}
-              {group === PCDPASS_USERS_GROUP_URL && (
+              {groupUrl === PCDPASS_USERS_GROUP_URL && (
                 <option value={BallotType.PCDPASSUSER}>PCDPass Poll</option>
               )}
             </StyledSelect>

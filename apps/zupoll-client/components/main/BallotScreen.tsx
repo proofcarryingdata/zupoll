@@ -170,6 +170,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
       setPollToVote(new Map());
       setRefresh(id);
     },
+    token,
   });
 
   return (
@@ -191,9 +192,9 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
               <TextContainer>
                 <div>🚨</div>
                 <div>
-                  If you created or reset your passport after this poll was created 
-                  you will not be able to vote 😢. This is to prevent people from
-                  double-voting.
+                  If you created or reset your passport after this poll was
+                  created you will not be able to vote 😢. This is to prevent
+                  people from double-voting.
                 </div>
               </TextContainer>
             ) : (

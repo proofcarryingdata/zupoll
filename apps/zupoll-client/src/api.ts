@@ -6,8 +6,11 @@ import {
 } from "./requestTypes";
 
 export async function createBallot(
-  request: CreateBallotRequest
+  request: CreateBallotRequest,
+  accessToken: string
 ): Promise<Response | undefined> {
+  if (!accessToken) return undefined;
+
   const url = `${ZUPOLL_SERVER_URL}create-ballot`;
 
   try {
@@ -17,6 +20,7 @@ export async function createBallot(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return await res;
@@ -27,8 +31,11 @@ export async function createBallot(
 }
 
 export async function voteBallot(
-  request: MultiVoteRequest
+  request: MultiVoteRequest,
+  accessToken: string
 ): Promise<Response | undefined> {
+  if (!accessToken) return undefined;
+
   const url = `${ZUPOLL_SERVER_URL}vote-ballot`;
 
   try {
@@ -38,6 +45,7 @@ export async function voteBallot(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return await res;
@@ -140,11 +148,12 @@ export async function listBallotPolls(
 }
 
 export async function getLatestSemaphoreGroupHash(
-  groupId: string
+  groupId: string,
+  serverUrl?: string
 ): Promise<string | null> {
-  const url = `${ZUPASS_SERVER_URL}semaphore/latest-root/${encodeURIComponent(
-    groupId
-  )}`;
+  const url = `${
+    serverUrl ?? ZUPASS_SERVER_URL
+  }semaphore/latest-root/${encodeURIComponent(groupId)}`;
   const res = await fetch(url);
 
   if (!res.ok) {
@@ -155,6 +164,12 @@ export async function getLatestSemaphoreGroupHash(
   return rootHash;
 }
 
-export function getHistoricGroupUrl(groupId: string, rootHash: string): string {
-  return `${ZUPASS_SERVER_URL}semaphore/historic/${groupId}/${rootHash}`;
+export function getHistoricGroupUrl(
+  groupId: string,
+  rootHash: string,
+  serverUrl?: string
+): string {
+  return `${
+    serverUrl ?? ZUPASS_SERVER_URL
+  }semaphore/historic/${groupId}/${rootHash}`;
 }

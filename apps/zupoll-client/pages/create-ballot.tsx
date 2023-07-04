@@ -17,7 +17,7 @@ import {
 export default function Page() {
   const [error, setError] = useState<ZupollError>();
   const router = useRouter();
-  const { token: _token, group, loadingToken, logout } = useLogin(router);
+  const { token, group, loadingToken, logout } = useLogin(router);
 
   // Log them out if they're not in a valid group
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function Page() {
         <Center>
           <CancelPollHeader />
 
-          <CreateBallot group={group} onError={setError} />
+          <CreateBallot groupUrl={group} onError={setError} token={token} />
 
           {error && (
             <ErrorOverlay error={error} onClose={() => setError(undefined)} />
