@@ -176,6 +176,7 @@ export function initPCDRoutes(
 
   app.post(
     "/vote-ballot",
+    authenticateJWT,
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as MultiVoteRequest;
 
