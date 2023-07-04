@@ -1,11 +1,11 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { LoginConfiguration, ZupollError } from "../../src/types";
 import {
   pcdpassUserConfiguration,
   zuzaluOrganizerConfiguration,
   zuzaluParticipantConfiguration,
-} from "../../src/util";
+} from "../../src/loginConfig";
+import { LoginConfiguration, ZupollError } from "../../src/types";
 import { Center } from "../core";
 import { LoggedOutHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";

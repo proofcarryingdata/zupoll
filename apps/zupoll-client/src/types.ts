@@ -1,3 +1,5 @@
+import { BallotType } from "./prismaTypes";
+
 export type ZupollError = {
   /** Big title, should be under 40 chars */
   title: string;
@@ -25,4 +27,14 @@ export interface LoginConfiguration {
   passportServerUrl: string;
   passportAppUrl: string;
   name: LoginConfigurationName;
+}
+
+export interface BallotConfig {
+  voterGroupId: string;
+  voterGroupUrl: string;
+  creatorGroupId: string;
+  creatorGroupUrl: string;
+  passportServerUrl: string;
+  passportAppUrl: string;
+  name: BallotType;
 }
