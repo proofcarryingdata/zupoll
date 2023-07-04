@@ -57,7 +57,7 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
-                passportAppUrl={PCDPASS_URL}
+                passportAppUrl={ZUPASS_URL}
                 requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
                 prompt="Organizer login"
                 deemphasized
