@@ -1,3 +1,4 @@
+import { BallotType } from ".prisma/client";
 import { NextFunction, Request, Response } from "express";
 import { JwtPayload, verify } from "jsonwebtoken";
 import { IS_DEPLOYED } from "./deployment";
@@ -82,3 +83,23 @@ export const authenticateJWT = (
     res.sendStatus(401);
   }
 };
+
+export function getVisibleBallotTypesForUser(
+  userAuth?: AuthType
+): BallotType[] {
+  let relevantBallots: BallotType[] = [];
+
+  if (userAuth === AuthType.PCDPASS) {
+    relevantBallots = [BallotType.PCDPASSUSER];
+  } else if (userAuth === AuthType.ZUZALU_ORGANIZER) {
+    relevantBallots = [
+      BallotType.ADVISORYVOTE,
+      BallotType.STRAWPOLL,
+      BallotType.ORGANIZERONLY,
+    ];
+  } else if (userAuth === AuthType.ZUZALU_PARTICIPANT) {
+    relevantBallots = [BallotType.ADVISORYVOTE, BallotType.STRAWPOLL];
+  }
+
+  return relevantBallots;
+}

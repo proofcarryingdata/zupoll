@@ -1,7 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import { ApplicationContext } from "../../types";
-import { ACCESS_TOKEN_SECRET, authenticateJWT } from "../../util/auth";
+import {
+  ACCESS_TOKEN_SECRET,
+  authenticateJWT,
+  getVisibleBallotTypesForUser,
+} from "../../util/auth";
 import { sendMessage } from "../../util/bot";
 import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
@@ -80,6 +84,11 @@ export function initAuthedRoutes(
         ballotType: true,
       },
       orderBy: { expiry: "desc" },
+      where: {
+        ballotType: {
+          in: getVisibleBallotTypesForUser(req.authUserType),
+        },
+      },
     });
 
     res.status(200).json({ ballots });
@@ -107,9 +116,12 @@ export function initAuthedRoutes(
           throw new Error("Invalid ballot URL.");
         }
 
-        const ballot = await prisma.ballot.findUnique({
+        const ballot = await prisma.ballot.findFirst({
           where: {
             ballotURL: ballotURL,
+            ballotType: {
+              in: getVisibleBallotTypesForUser(req.authUserType),
+            },
           },
         });
         if (ballot === null) {
