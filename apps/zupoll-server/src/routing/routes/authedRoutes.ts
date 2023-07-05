@@ -44,11 +44,7 @@ export function initAuthedRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as BotPostRequest;
 
-      if (
-        ![AuthType.ZUZALU_ORGANIZER, AuthType.ZUZALU_PARTICIPANT].includes(
-          req.authUserType as any
-        )
-      ) {
+      if (![AuthType.ZUZALU_ORGANIZER].includes(req.authUserType as any)) {
         res.sendStatus(403);
         return;
       }
