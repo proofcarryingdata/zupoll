@@ -101,6 +101,5 @@ export function getVisibleBallotTypesForUser(
     relevantBallots = [BallotType.ADVISORYVOTE, BallotType.STRAWPOLL];
   }
 
-  console.log("ballot types", userAuth, relevantBallots);
   return relevantBallots;
 }
