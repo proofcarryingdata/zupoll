@@ -57,13 +57,13 @@ export async function voteBallot(
 }
 
 export async function login(
-  configuration: LoginConfig,
+  config: LoginConfig,
   pcdStr: string
 ): Promise<Response | undefined> {
   const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
 
   const request = {
-    semaphoreGroupUrl: configuration.groupUrl,
+    semaphoreGroupUrl: config.groupUrl,
     proof: parsedPcd.pcd,
   };
   const url = `${ZUPOLL_SERVER_URL}login`;

@@ -21,14 +21,6 @@ export enum LoginConfigurationName {
   PCDPASS_USER = "PCDPASS_USER",
 }
 
-export interface LoginConfig {
-  groupId: string;
-  groupUrl: string;
-  passportServerUrl: string;
-  passportAppUrl: string;
-  name: LoginConfigurationName;
-}
-
 export interface BallotConfig {
   voterGroupId: string;
   voterGroupUrl: string;
@@ -37,6 +29,14 @@ export interface BallotConfig {
   passportServerUrl: string;
   passportAppUrl: string;
   ballotType: BallotType;
+}
+
+export interface LoginConfig {
+  groupId: string;
+  groupUrl: string;
+  passportServerUrl: string;
+  passportAppUrl: string;
+  name: LoginConfigurationName;
 }
 
 export interface LoginState {

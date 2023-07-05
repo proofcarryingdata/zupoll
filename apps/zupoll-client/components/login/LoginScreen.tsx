@@ -5,7 +5,7 @@ import {
   ZUZALU_ORGANIZER_LOGIN_CONFIG,
   ZUZALU_PARTICIPANT_LOGIN_CONFIG,
 } from "../../src/loginConfig";
-import { LoginConfig, ZupollError } from "../../src/types";
+import { LoginState, ZupollError } from "../../src/types";
 import { Center } from "../core";
 import { LoggedOutHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
@@ -15,7 +15,7 @@ import { Login } from "./Login";
 export function LoginScreen({
   onLogin,
 }: {
-  onLogin: (token: string, configuration: LoginConfig) => void;
+  onLogin: (loginState: LoginState) => void;
 }) {
   const [serverLoading, setServerLoading] = useState<boolean>(false);
   const [error, setError] = useState<ZupollError>();
@@ -44,20 +44,20 @@ export function LoginScreen({
                 onError={setError}
                 setServerLoading={setServerLoading}
                 prompt="PCDPass login"
-                configuration={PCDPASS_USER_CONFIG}
+                config={PCDPASS_USER_CONFIG}
               />
               <Login
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
-                configuration={ZUZALU_PARTICIPANT_LOGIN_CONFIG}
+                config={ZUZALU_PARTICIPANT_LOGIN_CONFIG}
                 prompt="Resident login"
               />
               <Login
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
-                configuration={ZUZALU_ORGANIZER_LOGIN_CONFIG}
+                config={ZUZALU_ORGANIZER_LOGIN_CONFIG}
                 prompt="Organizer login"
                 deemphasized
               />

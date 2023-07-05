@@ -4,7 +4,7 @@ import {
 } from "@pcd/passport-interface";
 import { useEffect, useState } from "react";
 import { login } from "../../src/api";
-import { LoginConfig, ZupollError } from "../../src/types";
+import { LoginConfig, LoginState, ZupollError } from "../../src/types";
 import { Button } from "../core/Button";
 
 /**
@@ -20,14 +20,14 @@ export function Login({
   setServerLoading,
   prompt,
   deemphasized,
-  configuration,
+  config,
 }: {
-  onLogin: (token: string, configuration: LoginConfig) => void;
+  onLogin: (loginState: LoginState) => void;
   onError: (error: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
   prompt: string;
   deemphasized?: boolean;
-  configuration: LoginConfig;
+  config: LoginConfig;
 }) {
   const [loggingIn, setLoggingIn] = useState(false);
   const [pcdStr] = usePassportPopupMessages();
@@ -39,8 +39,11 @@ export function Login({
     (async () => {
       try {
         setServerLoading(true);
-        const token = await fetchLoginToken(configuration, pcdStr);
-        onLogin(token, configuration);
+        const token = await fetchLoginToken(config, pcdStr);
+        onLogin({
+          token,
+          config,
+        });
       } catch (err: any) {
         const loginError: ZupollError = {
           title: "Login failed",
@@ -51,7 +54,7 @@ export function Login({
       setLoggingIn(false);
       setServerLoading(false);
     })();
-  }, [pcdStr, loggingIn, onLogin, onError, setServerLoading, configuration]);
+  }, [pcdStr, loggingIn, onLogin, onError, setServerLoading, config]);
 
   return (
     <>
@@ -60,9 +63,9 @@ export function Login({
         onClick={() => {
           setLoggingIn(true);
           openZuzaluMembershipPopup(
-            configuration.passportAppUrl,
+            config.passportAppUrl,
             window.location.origin + "/popup",
-            configuration.groupUrl,
+            config.groupUrl,
             "zupoll"
           );
         }}

@@ -4,6 +4,7 @@ import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
+import { LoginState } from "../src/types";
 import { useSavedLoginState } from "../src/useLoginState";
 
 export default function Index() {
@@ -26,11 +27,8 @@ export default function Index() {
   if (!isLoading && !loginState) {
     content = (
       <LoginScreen
-        onLogin={(token, config) => {
-          replaceLoginState({
-            config,
-            token,
-          });
+        onLogin={(state: LoginState) => {
+          replaceLoginState(state);
         }}
       />
     );
