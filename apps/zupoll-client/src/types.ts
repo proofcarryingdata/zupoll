@@ -42,8 +42,6 @@ export interface BallotConfig {
 export interface LoginState {
   token: string | undefined;
   config: LoginConfig | undefined;
-  isLoaded: boolean;
-  logout: () => void;
 }
 
 export interface SavedLogin {

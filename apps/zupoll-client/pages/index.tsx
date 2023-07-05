@@ -1,43 +1,14 @@
 import Head from "next/head";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import styled from "styled-components";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
 import { LoginConfig } from "../src/types";
+import { useSavedLoginState } from "../src/useLoginState";
 
-export default function Page() {
-  const [token, setToken] = useState<string>();
-  const [config, setConfig] = useState<LoginConfig>();
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    const savedConfig = window.localStorage["configuration"];
-    let parsedConfig: LoginConfig | undefined;
-
-    if (!savedConfig) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      parsedConfig = JSON.parse(savedConfig);
-    } catch (e) {
-      console.log(e);
-    }
-
-    if (!parsedConfig) {
-      delete window.localStorage["access_token"];
-      delete window.localStorage["configuration"];
-      setToken(undefined);
-      setLoading(false);
-      return;
-    }
-
-    setToken(window.localStorage["access_token"]);
-    setConfig(parsedConfig);
-    setLoading(false);
-  }, [setToken]);
+export default function Index() {
+  const savedLoginState = useSavedLoginState();
 
   const saveLoginDetails = useCallback(
     (token: string | undefined, config: LoginConfig | undefined) => {

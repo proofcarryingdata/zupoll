@@ -30,7 +30,6 @@ export function Login({
   configuration: LoginConfig;
 }) {
   const [loggingIn, setLoggingIn] = useState(false);
-
   const [pcdStr] = usePassportPopupMessages();
 
   useEffect(() => {
