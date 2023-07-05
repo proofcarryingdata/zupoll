@@ -6,13 +6,13 @@ export enum DEPLOYMENT_TYPE {
 
 const zupassUrl: Record<DEPLOYMENT_TYPE, string> = {
   [DEPLOYMENT_TYPE.PROD]: "https://zupass.org/",
-  [DEPLOYMENT_TYPE.STAGING]: "https://zupass.org/",
+  [DEPLOYMENT_TYPE.STAGING]: "https://staging.zupass.org/",
   [DEPLOYMENT_TYPE.LOCAL]: "http://localhost:3000/",
 };
 
 const zuzaluPassportServerURL: Record<DEPLOYMENT_TYPE, string> = {
-  [DEPLOYMENT_TYPE.PROD]: "https://api.pcd-passport.com/",
-  [DEPLOYMENT_TYPE.STAGING]: "https://api.pcd-passport.com/",
+  [DEPLOYMENT_TYPE.PROD]: "https://api.zupass.org/",
+  [DEPLOYMENT_TYPE.STAGING]: "https://api-staging.zupass.org/",
   [DEPLOYMENT_TYPE.LOCAL]: "http://localhost:3002/",
 };
 

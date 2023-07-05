@@ -7,7 +7,6 @@ import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { useCallback, useEffect, useRef } from "react";
 import { voteBallot } from "./api";
-import { ZUPASS_URL } from "./env";
 import { UserType, Vote } from "./prismaTypes";
 import {
   MultiVoteRequest,
@@ -147,6 +146,10 @@ export function useBallotVoting({
   ]);
 
   const createBallotVotePCD = useCallback(async () => {
+    if (!loginState) {
+      return;
+    }
+
     pcdState.current = PCDState.AWAITING_PCDSTR;
 
     const multiVoteSignal: MultiVoteSignal = {
@@ -168,14 +171,14 @@ export function useBallotVoting({
     const externalNullifier = generateMessageHash(ballotId).toString();
 
     openZuzaluMembershipPopup(
-      ZUPASS_URL,
+      loginState.config.passportAppUrl,
       window.location.origin + "/popup",
       ballotVoterSemaphoreGroupUrl,
       "zupoll",
       sigHashEnc,
       externalNullifier
     );
-  }, [ballotId, ballotVoterSemaphoreGroupUrl, polls, pollToVote]);
+  }, [loginState, polls, ballotId, ballotVoterSemaphoreGroupUrl, pollToVote]);
 
   return createBallotVotePCD;
 }
