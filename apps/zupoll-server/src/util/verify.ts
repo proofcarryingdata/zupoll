@@ -82,7 +82,8 @@ export async function verifyGroupProof(
     if (!residentRootCache.has(pcd.claim.merkleRoot)) {
       const validResidentRoot = await verifyRootValidity(
         PARTICIPANTS_GROUP_ID,
-        pcd.claim.merkleRoot
+        pcd.claim.merkleRoot,
+        ZUZALU_HISTORIC_API_URL!
       );
       if (validResidentRoot) {
         residentRootCache.add(pcd.claim.merkleRoot);
@@ -94,7 +95,8 @@ export async function verifyGroupProof(
     if (!organizerRootCache.has(pcd.claim.merkleRoot)) {
       const validOrganizerRoot = await verifyRootValidity(
         ADMIN_GROUP_ID,
-        pcd.claim.merkleRoot
+        pcd.claim.merkleRoot,
+        ZUZALU_HISTORIC_API_URL!
       );
       if (validOrganizerRoot) {
         organizerRootCache.add(pcd.claim.merkleRoot);
@@ -107,7 +109,7 @@ export async function verifyGroupProof(
       const validPcdpassRoot = await verifyRootValidity(
         PCDPASS_GROUP_ID,
         pcd.claim.merkleRoot,
-        PCDPASS_HISTORIC_API_URL
+        PCDPASS_HISTORIC_API_URL!
       );
       if (validPcdpassRoot) {
         pcdpassUserRootCache.add(pcd.claim.merkleRoot);
@@ -166,9 +168,9 @@ export async function verifySignatureProof(
 async function verifyRootValidity(
   groupId: string,
   root: string,
-  historicAPI?: string
+  historicAPI: string
 ): Promise<boolean> {
-  const url = (historicAPI ?? ZUZALU_HISTORIC_API_URL) + groupId + "/" + root;
+  const url = historicAPI + groupId + "/" + root;
   const response = await fetch(url);
   const result = await response.json();
   return result.valid;
