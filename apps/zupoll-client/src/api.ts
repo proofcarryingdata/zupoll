@@ -1,4 +1,4 @@
-import { ZUPASS_SERVER_URL, ZUPOLL_SERVER_URL } from "./env";
+import { ZUPOLL_SERVER_URL } from "./env";
 import {
   BotPostRequest,
   CreateBallotRequest,
@@ -150,11 +150,11 @@ export async function listBallotPolls(
 
 export async function getLatestSemaphoreGroupHash(
   groupId: string,
-  serverUrl?: string
+  serverUrl: string
 ): Promise<string | null> {
-  const url = `${
-    serverUrl ?? ZUPASS_SERVER_URL
-  }semaphore/latest-root/${encodeURIComponent(groupId)}`;
+  const url = `${serverUrl}semaphore/latest-root/${encodeURIComponent(
+    groupId
+  )}`;
   const res = await fetch(url);
 
   if (!res.ok) {
