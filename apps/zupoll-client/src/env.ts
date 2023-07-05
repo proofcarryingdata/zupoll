@@ -24,13 +24,13 @@ const pcdpassUrl: Record<DEPLOYMENT_TYPE, string> = {
 
 const pcdpassServerUrl: Record<DEPLOYMENT_TYPE, string> = {
   [DEPLOYMENT_TYPE.PROD]: "https://api.pcdpass.xyz/",
-  [DEPLOYMENT_TYPE.STAGING]: "https://staging-api.pcdpass.xyz/",
+  [DEPLOYMENT_TYPE.STAGING]: "https://api-staging.pcdpass.xyz/",
   [DEPLOYMENT_TYPE.LOCAL]: "http://localhost:3002/",
 };
 
 const zupollServerURL: Record<DEPLOYMENT_TYPE, string> = {
-  [DEPLOYMENT_TYPE.PROD]: "https://zupoll-server.onrender.com/",
-  [DEPLOYMENT_TYPE.STAGING]: "https://zupoll-server-staging.onrender.com/",
+  [DEPLOYMENT_TYPE.PROD]: "https://api.zupoll.org/",
+  [DEPLOYMENT_TYPE.STAGING]: "https://api-staging.zupoll.org/",
   [DEPLOYMENT_TYPE.LOCAL]: "http://localhost:3005/",
 };
 
