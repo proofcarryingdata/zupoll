@@ -1,39 +1,44 @@
 import Head from "next/head";
-import { useCallback } from "react";
+import { useRouter } from "next/router";
+import { useCallback, useEffect } from "react";
 import styled from "styled-components";
-import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
-import { LoginConfig } from "../src/types";
 import { useSavedLoginState } from "../src/useLoginState";
 
 export default function Index() {
-  const savedLoginState = useSavedLoginState();
+  const router = useRouter();
+  const { loginState, replaceLoginState, isLoading } = useSavedLoginState();
 
-  const saveLoginDetails = useCallback(
-    (token: string | undefined, config: LoginConfig | undefined) => {
-      setToken(token);
-      setConfig(config);
+  console.log(loginState);
 
-      if (token) {
-        window.localStorage["access_token"] = token;
-      } else {
-        delete window.localStorage["access_token"];
-      }
+  const onLogout = useCallback(() => {
+    replaceLoginState(undefined);
+    router.push("/");
+  }, [replaceLoginState, router]);
 
-      if (config) {
-        window.localStorage["configuration"] = JSON.stringify(config);
-      } else {
-        delete window.localStorage["configuration"];
-      }
-    },
-    [setToken]
-  );
+  useEffect(() => {
+    if (!isLoading && !loginState) {
+      replaceLoginState(undefined);
+    }
+  }, [isLoading, loginState, onLogout, replaceLoginState]);
 
-  const logout = useCallback(
-    () => saveLoginDetails(undefined, undefined),
-    [saveLoginDetails]
-  );
+  let content = <></>;
+
+  if (!isLoading && !loginState) {
+    content = (
+      <LoginScreen
+        onLogin={(token, config) => {
+          replaceLoginState({
+            config,
+            token,
+          });
+        }}
+      />
+    );
+  } else if (!isLoading && loginState) {
+    content = <MainScreen loginState={loginState} onLogout={onLogout} />;
+  }
 
   return (
     <>
@@ -41,15 +46,7 @@ export default function Index() {
         <title>Zupoll</title>
         <link rel="Zupoll icon" href="/zupoll-icon.ico" />
       </Head>
-      <Wrapper>
-        {loading ? (
-          <RippleLoaderLightMargin />
-        ) : token && config ? (
-          <MainScreen config={config} token={token} onLogout={logout} />
-        ) : (
-          <LoginScreen onLogin={saveLoginDetails} />
-        )}
-      </Wrapper>
+      <Wrapper>{content}</Wrapper>
     </>
   );
 }

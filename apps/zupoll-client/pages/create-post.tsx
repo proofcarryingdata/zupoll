@@ -6,41 +6,23 @@ import { ReturnHeader } from "../components/core/Headers";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { CreatePost } from "../components/main/CreatePost";
 import { ErrorOverlay } from "../components/main/ErrorOverlay";
-import {
-  ZUZALU_ADMINS_GROUP_URL,
-  ZUZALU_PARTICIPANTS_GROUP_URL,
-} from "../src/env";
+import { ZUZALU_ADMINS_GROUP_URL } from "../src/env";
 import { ZupollError } from "../src/types";
 import { useSavedLoginState } from "../src/useLoginState";
 
 export default function CreateBotPostPage() {
   const [error, setError] = useState<ZupollError>();
   const router = useRouter();
-  const {
-    token,
-    group,
-    isLoaded: loadingToken,
-    logout,
-  } = useSavedLoginState(router);
-  const [loadingGroup, setLoadingGroup] = useState(true);
+  const { loginState } = useSavedLoginState();
 
   // Log them out if they're not in a valid group
   useEffect(() => {
-    if (group !== undefined) {
-      if (
-        group !== ZUZALU_ADMINS_GROUP_URL &&
-        group !== ZUZALU_PARTICIPANTS_GROUP_URL
-      ) {
-        logout();
-      }
-
-      if (group !== ZUZALU_ADMINS_GROUP_URL) {
+    if (loginState?.config?.groupUrl !== undefined) {
+      if (loginState.config.groupUrl !== ZUZALU_ADMINS_GROUP_URL) {
         router.push("/");
-      } else {
-        setLoadingGroup(false);
       }
     }
-  }, [group, logout, router]);
+  }, [loginState, router]);
 
   return (
     <>
@@ -48,14 +30,12 @@ export default function CreateBotPostPage() {
         <title>Post from bot</title>
         <link rel="Zupoll icon" href="/zupoll-icon.ico" />
       </Head>
-      {loadingGroup || loadingToken ? (
+      {!loginState ? (
         <RippleLoaderLightMargin />
       ) : (
         <Center>
           <ReturnHeader />
-
-          <CreatePost onError={setError} token={token} />
-
+          <CreatePost onError={setError} loginState={loginState} />
           {error && (
             <ErrorOverlay error={error} onClose={() => setError(undefined)} />
           )}

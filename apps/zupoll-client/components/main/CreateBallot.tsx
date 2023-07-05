@@ -1,16 +1,12 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { useCreateBallot } from "../../src/createBallot";
-import {
-  PCDPASS_USERS_GROUP_ID,
-  PCDPASS_USERS_GROUP_URL,
-  ZUZALU_ADMINS_GROUP_ID,
-  ZUZALU_ADMINS_GROUP_URL,
-  ZUZALU_PARTICIPANTS_GROUP_ID,
-  ZUZALU_PARTICIPANTS_GROUP_URL,
-} from "../../src/env";
 import { BallotType, Poll } from "../../src/prismaTypes";
-import { ZupollError } from "../../src/types";
+import {
+  LoginConfigurationName,
+  LoginState,
+  ZupollError,
+} from "../../src/types";
 import {
   FormButtonContainer,
   FormContainer,
@@ -24,30 +20,13 @@ import {
 } from "../core/Form";
 import { RippleLoaderLight } from "../core/RippleLoader";
 
-function urlToGroupId(groupUrl: string | undefined): string {
-  if (groupUrl === ZUZALU_ADMINS_GROUP_URL) {
-    return ZUZALU_ADMINS_GROUP_ID;
-  } else if (groupUrl === ZUZALU_PARTICIPANTS_GROUP_URL) {
-    return ZUZALU_PARTICIPANTS_GROUP_ID;
-  } else if (groupUrl === PCDPASS_USERS_GROUP_URL) {
-    return PCDPASS_USERS_GROUP_ID;
-  }
-
-  throw new Error(`unknown group id ${groupUrl}`);
-}
-
 export function CreateBallot({
-  groupUrl,
   onError,
-  token,
+  loginState,
 }: {
-  groupUrl: string | undefined;
   onError: (err: ZupollError) => void;
-  token: string;
+  loginState: LoginState;
 }) {
-  /**
-   * EDITING BALLOT INFO LOGIC
-   */
   const [polls, setPolls] = useState<Poll[]>([
     {
       id: "0",
@@ -64,7 +43,7 @@ export function CreateBallot({
     new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
   );
   const [ballotType, setBallotType] = useState<BallotType>(
-    urlToGroupId(groupUrl) === PCDPASS_USERS_GROUP_ID
+    loginState.config.name === LoginConfigurationName.PCDPASS_USER
       ? BallotType.PCDPASSUSER
       : BallotType.STRAWPOLL
   );
@@ -104,7 +83,7 @@ export function CreateBallot({
     polls,
     onError,
     setServerLoading,
-    token,
+    loginState,
   });
 
   return (
@@ -151,12 +130,14 @@ export function CreateBallot({
               value={ballotType}
               onChange={(e) => setBallotType(e.target.value)}
             >
-              {groupUrl === ZUZALU_PARTICIPANTS_GROUP_URL && (
+              {loginState.config.name ===
+                LoginConfigurationName.ZUZALU_PARTICIPANT && (
                 <>
                   <option value={BallotType.STRAWPOLL}>Straw Poll</option>
                 </>
               )}
-              {groupUrl === ZUZALU_ADMINS_GROUP_URL && (
+              {loginState.config.name ===
+                LoginConfigurationName.ZUZALU_ORGANIZER && (
                 <>
                   <option value={BallotType.STRAWPOLL}>Straw Poll</option>
                   <option value={BallotType.ADVISORYVOTE}>Advisory Vote</option>
@@ -165,7 +146,8 @@ export function CreateBallot({
                   </option>
                 </>
               )}
-              {groupUrl === PCDPASS_USERS_GROUP_URL && (
+              {loginState.config.name ===
+                LoginConfigurationName.PCDPASS_USER && (
                 <option value={BallotType.PCDPASSUSER}>PCDPass Poll</option>
               )}
             </StyledSelect>

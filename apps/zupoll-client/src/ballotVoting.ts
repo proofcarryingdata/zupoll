@@ -16,7 +16,7 @@ import {
   PollWithCounts,
   VoteSignal,
 } from "./requestTypes";
-import { PCDState, ZupollError } from "./types";
+import { LoginState, PCDState, ZupollError } from "./types";
 
 /**
  * Hook that handles requesting a PCD for voting on a set of polls on a ballot.
@@ -37,7 +37,7 @@ export function useBallotVoting({
   onError,
   setServerLoading,
   refresh,
-  token,
+  loginState,
 }: {
   ballotId: string;
   ballotURL: string;
@@ -47,7 +47,7 @@ export function useBallotVoting({
   onError: (err: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
   refresh: (id: string) => void;
-  token: string;
+  loginState: LoginState | undefined;
 }) {
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
@@ -92,8 +92,12 @@ export function useBallotVoting({
     });
 
     async function doRequest() {
+      if (!loginState) {
+        return;
+      }
+
       setServerLoading(true);
-      const res = await voteBallot(request, token);
+      const res = await voteBallot(request, loginState.token);
       setServerLoading(false);
 
       if (res === undefined) {
@@ -139,7 +143,7 @@ export function useBallotVoting({
     polls,
     setServerLoading,
     refresh,
-    token,
+    loginState,
   ]);
 
   const createBallotVotePCD = useCallback(async () => {

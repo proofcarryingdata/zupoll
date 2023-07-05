@@ -15,27 +15,22 @@ import { ZupollError } from "../src/types";
 import { useSavedLoginState } from "../src/useLoginState";
 
 export default function CreateBallotPage() {
-  const [error, setError] = useState<ZupollError>();
   const router = useRouter();
-  const {
-    token,
-    group,
-    isLoaded: loadingToken,
-    logout,
-  } = useSavedLoginState(router);
+  const [error, setError] = useState<ZupollError>();
+  const { loginState } = useSavedLoginState();
 
   // Log them out if they're not in a valid group
   useEffect(() => {
-    if (group !== undefined) {
+    if (loginState?.config?.groupUrl !== undefined) {
       if (
-        group !== ZUZALU_ADMINS_GROUP_URL &&
-        group !== ZUZALU_PARTICIPANTS_GROUP_URL &&
-        group !== PCDPASS_USERS_GROUP_URL
+        loginState.config.groupUrl !== ZUZALU_ADMINS_GROUP_URL &&
+        loginState.config.groupUrl !== ZUZALU_PARTICIPANTS_GROUP_URL &&
+        loginState.config.groupUrl !== PCDPASS_USERS_GROUP_URL
       ) {
-        logout();
+        router.push("/");
       }
     }
-  }, [group, logout]);
+  }, [loginState, router]);
 
   return (
     <>
@@ -43,14 +38,12 @@ export default function CreateBallotPage() {
         <title>Create Ballot</title>
         <link rel="Zupoll icon" href="/zupoll-icon.ico" />
       </Head>
-      {loadingToken ? (
+      {!loginState ? (
         <RippleLoaderLightMargin />
       ) : (
         <Center>
           <CancelPollHeader />
-
-          <CreateBallot groupUrl={group} onError={setError} token={token} />
-
+          <CreateBallot loginState={loginState} onError={setError} />
           {error && (
             <ErrorOverlay error={error} onClose={() => setError(undefined)} />
           )}

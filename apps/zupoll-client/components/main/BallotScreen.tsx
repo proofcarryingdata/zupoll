@@ -25,12 +25,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
   const router = useRouter();
   const [error, setError] = useState<ZupollError>();
   const [serverLoading, setServerLoading] = useState<boolean>(false);
-  const {
-    token,
-    group: _group,
-    isLoaded: loadingToken,
-    logout,
-  } = useSavedLoginState(router);
+  const { loginState } = useSavedLoginState();
 
   /**
    * BALLOT/POLL LOGIC
@@ -46,14 +41,19 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
 
   // Retrieve polls under this ballot, refresh after user votes
   useEffect(() => {
-    if (!token) {
+    if (!loginState) {
       setPolls([]);
       return;
     }
 
     async function getBallotPolls() {
+      if (!loginState) {
+        router.push("/");
+        return;
+      }
+
       setLoadingPolls(true);
-      const res = await listBallotPolls(token, ballotURL);
+      const res = await listBallotPolls(loginState.token, ballotURL);
       setLoadingPolls(false);
 
       if (res === undefined) {
@@ -66,7 +66,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
       }
 
       if (res.status === 403) {
-        logout();
+        router.push("/");
         return;
       }
 
@@ -133,7 +133,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
     }
 
     getBallotPolls();
-  }, [token, ballotURL, logout, refresh]);
+  }, [ballotURL, refresh, loginState, router]);
 
   /**
    * VOTING LOGIC
@@ -175,7 +175,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
       setPollToVote(new Map());
       setRefresh(id);
     },
-    token,
+    loginState,
   });
 
   return (
@@ -186,7 +186,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
       </Head>
       <Center>
         <ReturnHeader />
-        {loadingToken ||
+        {!loginState ||
         loadingPolls ||
         ballot === undefined ||
         polls === undefined ? (

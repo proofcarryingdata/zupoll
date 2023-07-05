@@ -36,15 +36,10 @@ export interface BallotConfig {
   creatorGroupUrl: string;
   passportServerUrl: string;
   passportAppUrl: string;
-  name: BallotType;
+  ballotType: BallotType;
 }
 
 export interface LoginState {
-  token: string | undefined;
-  config: LoginConfig | undefined;
-}
-
-export interface SavedLogin {
   token: string;
   config: LoginConfig;
 }

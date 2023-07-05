@@ -2,7 +2,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { botPost } from "../../src/api";
 import { BotPostRequest } from "../../src/requestTypes";
-import { ZupollError } from "../../src/types";
+import { LoginState, ZupollError } from "../../src/types";
 import { Button } from "../core/Button";
 
 /**
@@ -12,11 +12,11 @@ import { Button } from "../core/Button";
  * zupoll-server.
  */
 export function CreatePost({
-  token,
   onError,
+  loginState,
 }: {
-  token: string;
   onError: (err: ZupollError) => void;
+  loginState: LoginState;
 }) {
   const [text, setText] = useState("");
 
@@ -32,7 +32,7 @@ export function CreatePost({
     const request: BotPostRequest = {
       message: text,
     };
-    const res = await botPost(request, token);
+    const res = await botPost(request, loginState.token);
 
     if (res === undefined) {
       const serverDownError: ZupollError = {

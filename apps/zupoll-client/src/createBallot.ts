@@ -11,7 +11,7 @@ import { createBallot } from "./api";
 import { BALLOT_CONFIGS } from "./ballotConfig";
 import { BallotType, Poll, UserType } from "./prismaTypes";
 import { BallotSignal, CreateBallotRequest, PollSignal } from "./requestTypes";
-import { PCDState, ZupollError } from "./types";
+import { LoginState, PCDState, ZupollError } from "./types";
 import { useHistoricSemaphoreUrl } from "./useHistoricSemaphoreUrl";
 
 /**
@@ -33,7 +33,7 @@ export function useCreateBallot({
   polls,
   onError,
   setServerLoading,
-  token,
+  loginState,
 }: {
   ballotTitle: string;
   ballotDescription: string;
@@ -42,7 +42,7 @@ export function useCreateBallot({
   polls: Poll[];
   onError: (err: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
-  token: string;
+  loginState: LoginState;
 }) {
   const router = useRouter();
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
@@ -100,7 +100,7 @@ export function useCreateBallot({
 
     async function doRequest() {
       setServerLoading(true);
-      const res = await createBallot(finalRequest, token);
+      const res = await createBallot(finalRequest, loginState.token);
       setServerLoading(false);
 
       if (res === undefined) {
@@ -139,8 +139,8 @@ export function useCreateBallot({
     setServerLoading,
     voterGroupRootHash,
     voterGroupUrl,
-    token,
     ballotConfig.creatorGroupUrl,
+    loginState,
   ]);
 
   // ran after ballot is submitted by user

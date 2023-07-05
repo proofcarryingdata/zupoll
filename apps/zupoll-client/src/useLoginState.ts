@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
-import { LoginConfig, SavedLogin } from "./types";
+import { LoginConfig, LoginState } from "./types";
 
 const ACCESS_TOKEN_KEY = "access_token";
 const CONFIGURATION_KEY = "configuration";
 
-export function loadLoginStateFromLocalStorage(): SavedLogin | undefined {
-  const savedToken = localStorage[ACCESS_TOKEN_KEY];
-  const savedLoginConfig = localStorage[CONFIGURATION_KEY];
+export function loadLoginStateFromLocalStorage(): LoginState | undefined {
+  const savedToken: string | undefined = localStorage[ACCESS_TOKEN_KEY];
+  const savedLoginConfig: string | undefined = localStorage[CONFIGURATION_KEY];
 
   let parsedLoginConfig: LoginConfig | undefined;
   try {
-    parsedLoginConfig = JSON.parse(savedLoginConfig);
+    parsedLoginConfig = JSON.parse(savedLoginConfig as any);
   } catch (e) {
     //
   }
@@ -21,7 +21,7 @@ export function loadLoginStateFromLocalStorage(): SavedLogin | undefined {
 
   return {
     token: savedToken,
-    config: savedLoginConfig,
+    config: parsedLoginConfig,
   };
 }
 
@@ -31,7 +31,7 @@ export function clearLoginStateFromLocalStorage(): void {
 }
 
 export function saveLoginStateToLocalStorage(
-  state: SavedLogin | undefined
+  state: LoginState | undefined
 ): void {
   if (!state) {
     clearLoginStateFromLocalStorage();
@@ -42,10 +42,12 @@ export function saveLoginStateToLocalStorage(
 }
 
 export function useSavedLoginState(): {
-  state: SavedLogin | undefined;
-  replaceState: (state: SavedLogin | undefined) => void;
+  loginState: LoginState | undefined;
+  replaceLoginState: (state: LoginState | undefined) => void;
+  isLoading: boolean;
 } {
-  const [loginInfo, setLoginInfo] = useState<SavedLogin | undefined>();
+  const [loginState, setLoginInfo] = useState<LoginState | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const savedLoginState = loadLoginStateFromLocalStorage();
@@ -55,12 +57,14 @@ export function useSavedLoginState(): {
     } else {
       setLoginInfo(savedLoginState);
     }
+
+    setIsLoading(false);
   }, []);
 
-  const replaceState = useCallback((state: SavedLogin | undefined) => {
+  const replaceLoginState = useCallback((state: LoginState | undefined) => {
     setLoginInfo(state);
     saveLoginStateToLocalStorage(state);
   }, []);
 
-  return { state: loginInfo, replaceState };
+  return { loginState, replaceLoginState, isLoading };
 }

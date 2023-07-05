@@ -20,7 +20,7 @@ export const STRAWPOLL_BALLOT_CONFIG: BallotConfig = {
   creatorGroupUrl: ZUZALU_PARTICIPANTS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
-  name: BallotType.STRAWPOLL,
+  ballotType: BallotType.STRAWPOLL,
 };
 
 export const ADVISORY_VOTE_BALLOT_CONFIG: BallotConfig = {
@@ -30,7 +30,7 @@ export const ADVISORY_VOTE_BALLOT_CONFIG: BallotConfig = {
   creatorGroupUrl: ZUZALU_ADMINS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
-  name: BallotType.ADVISORYVOTE,
+  ballotType: BallotType.ADVISORYVOTE,
 };
 
 export const ORGANIZER_ONLY_BALLOT_CONFIG: BallotConfig = {
@@ -40,7 +40,7 @@ export const ORGANIZER_ONLY_BALLOT_CONFIG: BallotConfig = {
   creatorGroupUrl: ZUZALU_ADMINS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
-  name: BallotType.ORGANIZERONLY,
+  ballotType: BallotType.ORGANIZERONLY,
 };
 
 export const PCDPASS_BALLOT_CONFIG: BallotConfig = {
@@ -50,7 +50,7 @@ export const PCDPASS_BALLOT_CONFIG: BallotConfig = {
   creatorGroupUrl: PCDPASS_USERS_GROUP_URL,
   passportServerUrl: PCDPASS_SERVER_URL,
   passportAppUrl: PCDPASS_URL,
-  name: BallotType.PCDPASSUSER,
+  ballotType: BallotType.PCDPASSUSER,
 };
 
 export const BALLOT_CONFIGS = {

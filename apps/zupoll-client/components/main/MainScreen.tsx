@@ -5,8 +5,8 @@ import { listBallots } from "../../src/api";
 import { Ballot, BallotType } from "../../src/prismaTypes";
 import { BallotResponse } from "../../src/requestTypes";
 import {
-  LoginConfig,
   LoginConfigurationName,
+  LoginState,
   ZupollError,
 } from "../../src/types";
 import { Center } from "../core";
@@ -15,12 +15,10 @@ import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "./ErrorOverlay";
 
 export function MainScreen({
-  token,
-  config,
+  loginState,
   onLogout,
 }: {
-  token: string;
-  config: LoginConfig;
+  loginState: LoginState;
   onLogout: () => void;
 }) {
   const router = useRouter();
@@ -48,12 +46,12 @@ export function MainScreen({
   }
 
   useEffect(() => {
-    if (!token) {
+    if (!loginState.token) {
       setBallots([]);
     }
 
     async function getBallots() {
-      const res = await listBallots(token);
+      const res = await listBallots(loginState.token);
 
       if (res === undefined) {
         const serverDownError: ZupollError = {
@@ -82,12 +80,12 @@ export function MainScreen({
 
       const ballotResponse: BallotResponse = await res.json();
       setBallots(ballotResponse.ballots);
-      console.log(ballotResponse.ballots);
+      console.log("loaded ballots:", ballotResponse.ballots);
       setLoadingBallots(false);
     }
 
     getBallots();
-  }, [token, onLogout]);
+  }, [loginState.token, onLogout]);
 
   return (
     <Center>
@@ -101,7 +99,7 @@ export function MainScreen({
         <Guarentee>🚫🔗 Unlinkable votes across ballots/devices. </Guarentee>
       </GuarenteeContainer>
 
-      {config.name === LoginConfigurationName.ZUZALU_ORGANIZER && (
+      {loginState.config.name === LoginConfigurationName.ZUZALU_ORGANIZER && (
         <BallotListContainer>
           <TitleContainer>
             <H1>Organizer-only ballots</H1>
@@ -132,8 +130,9 @@ export function MainScreen({
         </BallotListContainer>
       )}
 
-      {(config.name === LoginConfigurationName.ZUZALU_ORGANIZER ||
-        config.name === LoginConfigurationName.ZUZALU_PARTICIPANT) && (
+      {(loginState.config.name === LoginConfigurationName.ZUZALU_ORGANIZER ||
+        loginState.config.name ===
+          LoginConfigurationName.ZUZALU_PARTICIPANT) && (
         <BallotListContainer>
           <TitleContainer>
             <H1>Advisory Votes</H1>
@@ -161,8 +160,9 @@ export function MainScreen({
           )}
         </BallotListContainer>
       )}
-      {(config.name === LoginConfigurationName.ZUZALU_ORGANIZER ||
-        config.name === LoginConfigurationName.ZUZALU_PARTICIPANT) && (
+      {(loginState.config.name === LoginConfigurationName.ZUZALU_ORGANIZER ||
+        loginState.config.name ===
+          LoginConfigurationName.ZUZALU_PARTICIPANT) && (
         <BallotListContainer>
           <TitleContainer>
             <H1>Straw Polls</H1>
@@ -191,7 +191,7 @@ export function MainScreen({
         </BallotListContainer>
       )}
 
-      {config.name === LoginConfigurationName.PCDPASS_USER && (
+      {loginState.config.name === LoginConfigurationName.PCDPASS_USER && (
         <BallotListContainer>
           <TitleContainer>
             <H1>PCDPass Polls</H1>
