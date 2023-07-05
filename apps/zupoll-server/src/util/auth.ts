@@ -53,7 +53,6 @@ export const authenticateJWT = (
       }
 
       const payload = group as GroupJwtPayload;
-      console.log(`authenticating ${JSON.stringify(payload)}`);
 
       if (
         ZUZALU_PARTICIPANTS_GROUP_URL &&
