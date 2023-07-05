@@ -10,8 +10,6 @@ export default function Index() {
   const router = useRouter();
   const { loginState, replaceLoginState, isLoading } = useSavedLoginState();
 
-  console.log(loginState);
-
   const onLogout = useCallback(() => {
     replaceLoginState(undefined);
     router.push("/");
