@@ -11,16 +11,17 @@ import { ZupollError } from "../src/types";
 import { useSavedLoginState } from "../src/useLoginState";
 
 export default function CreateBotPostPage() {
-  const [error, setError] = useState<ZupollError>();
   const router = useRouter();
+  const [error, setError] = useState<ZupollError>();
   const { loginState } = useSavedLoginState(router);
 
   // Log them out if they're not in a valid group
   useEffect(() => {
-    if (loginState?.config?.groupUrl !== undefined) {
-      if (loginState.config.groupUrl !== ZUZALU_ADMINS_GROUP_URL) {
-        router.push("/");
-      }
+    if (
+      loginState?.config?.groupUrl !== undefined &&
+      loginState.config.groupUrl !== ZUZALU_ADMINS_GROUP_URL
+    ) {
+      router.push("/");
     }
   }, [loginState, router]);
 

@@ -63,6 +63,7 @@ export function BallotScreen({
 
       if (res.status === 403) {
         logout();
+        return;
       }
 
       if (!res.ok) {

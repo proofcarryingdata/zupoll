@@ -6,31 +6,20 @@ import { CancelPollHeader } from "../components/core/Headers";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { CreateBallot } from "../components/main/CreateBallot";
 import { ErrorOverlay } from "../components/main/ErrorOverlay";
-import {
-  PCDPASS_USERS_GROUP_URL,
-  ZUZALU_ADMINS_GROUP_URL,
-  ZUZALU_PARTICIPANTS_GROUP_URL,
-} from "../src/env";
 import { ZupollError } from "../src/types";
 import { useSavedLoginState } from "../src/useLoginState";
 
 export default function CreateBallotPage() {
   const router = useRouter();
   const [error, setError] = useState<ZupollError>();
-  const { loginState } = useSavedLoginState(router);
+  const { loginState, definitelyNotLoggedIn, logout } =
+    useSavedLoginState(router);
 
-  // Log them out if they're not in a valid group
   useEffect(() => {
-    if (loginState?.config?.groupUrl !== undefined) {
-      if (
-        loginState.config.groupUrl !== ZUZALU_ADMINS_GROUP_URL &&
-        loginState.config.groupUrl !== ZUZALU_PARTICIPANTS_GROUP_URL &&
-        loginState.config.groupUrl !== PCDPASS_USERS_GROUP_URL
-      ) {
-        router.push("/");
-      }
+    if (definitelyNotLoggedIn) {
+      logout();
     }
-  }, [loginState, router]);
+  }, [definitelyNotLoggedIn, logout]);
 
   return (
     <>
