@@ -145,7 +145,10 @@ export function initPCDRoutes(
             })
           );
 
-          if (req.authUserType !== AuthType.PCDPASS) {
+          if (
+            newBallot.ballotType !== BallotType.PCDPASSUSER &&
+            newBallot.ballotType !== BallotType.ORGANIZERONLY
+          ) {
             // send message on TG channel, if bot is setup
             let ballotPost =
               newBallot.ballotType === BallotType.STRAWPOLL
