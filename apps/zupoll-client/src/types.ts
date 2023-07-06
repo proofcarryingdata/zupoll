@@ -1,3 +1,5 @@
+import { BallotType } from "./prismaTypes";
+
 export type ZupollError = {
   /** Big title, should be under 40 chars */
   title: string;
@@ -11,4 +13,33 @@ export enum PCDState {
   DEFAULT,
   AWAITING_PCDSTR,
   RECEIVED_PCDSTR,
+}
+
+export enum LoginConfigurationName {
+  ZUZALU_PARTICIPANT = "ZUZALU_PARTICIPANT",
+  ZUZALU_ORGANIZER = "ZUZALU_ORGANIZER",
+  PCDPASS_USER = "PCDPASS_USER",
+}
+
+export interface BallotConfig {
+  voterGroupId: string;
+  voterGroupUrl: string;
+  creatorGroupId: string;
+  creatorGroupUrl: string;
+  passportServerUrl: string;
+  passportAppUrl: string;
+  ballotType: BallotType;
+}
+
+export interface LoginConfig {
+  groupId: string;
+  groupUrl: string;
+  passportServerUrl: string;
+  passportAppUrl: string;
+  name: LoginConfigurationName;
+}
+
+export interface LoginState {
+  token: string;
+  config: LoginConfig;
 }

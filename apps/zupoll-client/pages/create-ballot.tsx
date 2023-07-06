@@ -6,26 +6,20 @@ import { CancelPollHeader } from "../components/core/Headers";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { CreateBallot } from "../components/main/CreateBallot";
 import { ErrorOverlay } from "../components/main/ErrorOverlay";
-import { useLogin } from "../src/login";
 import { ZupollError } from "../src/types";
-import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../src/util";
+import { useSavedLoginState } from "../src/useLoginState";
 
-export default function Page() {
-  const [error, setError] = useState<ZupollError>();
+export default function CreateBallotPage() {
   const router = useRouter();
-  const { token: _token, group, loadingToken, logout } = useLogin(router);
+  const [error, setError] = useState<ZupollError>();
+  const { loginState, definitelyNotLoggedIn, logout } =
+    useSavedLoginState(router);
 
-  // Log them out if they're not in a valid group
   useEffect(() => {
-    if (group !== undefined) {
-      if (
-        group !== SEMAPHORE_ADMIN_GROUP_URL &&
-        group !== SEMAPHORE_GROUP_URL
-      ) {
-        logout();
-      }
+    if (definitelyNotLoggedIn) {
+      logout();
     }
-  }, [group, logout]);
+  }, [definitelyNotLoggedIn, logout]);
 
   return (
     <>
@@ -33,14 +27,12 @@ export default function Page() {
         <title>Create Ballot</title>
         <link rel="Zupoll icon" href="/zupoll-icon.ico" />
       </Head>
-      {loadingToken ? (
+      {!loginState ? (
         <RippleLoaderLightMargin />
       ) : (
         <Center>
           <CancelPollHeader />
-
-          <CreateBallot group={group} onError={setError} />
-
+          <CreateBallot loginState={loginState} onError={setError} />
           {error && (
             <ErrorOverlay error={error} onClose={() => setError(undefined)} />
           )}

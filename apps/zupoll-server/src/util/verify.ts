@@ -9,13 +9,17 @@ import {
 import {
   ADMIN_GROUP_ID,
   PARTICIPANTS_GROUP_ID,
-  SEMAPHORE_ADMIN_GROUP_URL,
-  SEMAPHORE_GROUP_URL,
-  SEMAPHORE_HISTORIC_URL,
+  PCDPASS_GROUP_ID,
+  PCDPASS_HISTORIC_API_URL,
+  PCDPASS_USERS_GROUP_URL,
+  ZUZALU_HISTORIC_API_URL,
+  ZUZALU_ORGANIZERS_GROUP_URL,
+  ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "./auth";
 
 const residentRootCache = new Set<string>();
 const organizerRootCache = new Set<string>();
+const pcdpassUserRootCache = new Set<string>();
 
 // Returns nullfier or throws error.
 export async function verifyGroupProof(
@@ -74,11 +78,12 @@ export async function verifyGroupProof(
 
       throw new Error("Current root doesn't match any of the allowed roots");
     }
-  } else if (semaphoreGroupUrl === SEMAPHORE_GROUP_URL) {
+  } else if (semaphoreGroupUrl === ZUZALU_PARTICIPANTS_GROUP_URL) {
     if (!residentRootCache.has(pcd.claim.merkleRoot)) {
       const validResidentRoot = await verifyRootValidity(
         PARTICIPANTS_GROUP_ID,
-        pcd.claim.merkleRoot
+        pcd.claim.merkleRoot,
+        ZUZALU_HISTORIC_API_URL!
       );
       if (validResidentRoot) {
         residentRootCache.add(pcd.claim.merkleRoot);
@@ -86,16 +91,30 @@ export async function verifyGroupProof(
         throw new Error("Claim root isn't a valid resident root.");
       }
     }
-  } else if (semaphoreGroupUrl === SEMAPHORE_ADMIN_GROUP_URL) {
+  } else if (semaphoreGroupUrl === ZUZALU_ORGANIZERS_GROUP_URL) {
     if (!organizerRootCache.has(pcd.claim.merkleRoot)) {
       const validOrganizerRoot = await verifyRootValidity(
         ADMIN_GROUP_ID,
-        pcd.claim.merkleRoot
+        pcd.claim.merkleRoot,
+        ZUZALU_HISTORIC_API_URL!
       );
       if (validOrganizerRoot) {
         organizerRootCache.add(pcd.claim.merkleRoot);
       } else {
         throw new Error("Claim root isn't a valid organizer root.");
+      }
+    }
+  } else if (semaphoreGroupUrl === PCDPASS_USERS_GROUP_URL) {
+    if (!pcdpassUserRootCache.has(pcd.claim.merkleRoot)) {
+      const validPcdpassRoot = await verifyRootValidity(
+        PCDPASS_GROUP_ID,
+        pcd.claim.merkleRoot,
+        PCDPASS_HISTORIC_API_URL!
+      );
+      if (validPcdpassRoot) {
+        pcdpassUserRootCache.add(pcd.claim.merkleRoot);
+      } else {
+        throw new Error("Claim root isn't a valid pcdpass root.");
       }
     }
   } else {
@@ -148,9 +167,11 @@ export async function verifySignatureProof(
 
 async function verifyRootValidity(
   groupId: string,
-  root: string
+  root: string,
+  historicAPI: string
 ): Promise<boolean> {
-  const response = await fetch(SEMAPHORE_HISTORIC_URL + groupId + "/" + root);
+  const url = historicAPI + groupId + "/" + root;
+  const response = await fetch(url);
   const result = await response.json();
   return result.valid;
 }

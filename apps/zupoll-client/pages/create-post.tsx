@@ -6,33 +6,24 @@ import { ReturnHeader } from "../components/core/Headers";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { CreatePost } from "../components/main/CreatePost";
 import { ErrorOverlay } from "../components/main/ErrorOverlay";
-import { useLogin } from "../src/login";
+import { ZUZALU_ADMINS_GROUP_URL } from "../src/env";
 import { ZupollError } from "../src/types";
-import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../src/util";
+import { useSavedLoginState } from "../src/useLoginState";
 
-export default function Page() {
-  const [error, setError] = useState<ZupollError>();
+export default function CreateBotPostPage() {
   const router = useRouter();
-  const { token, group, loadingToken, logout } = useLogin(router);
-  const [loadingGroup, setLoadingGroup] = useState(true);
+  const [error, setError] = useState<ZupollError>();
+  const { loginState } = useSavedLoginState(router);
 
   // Log them out if they're not in a valid group
   useEffect(() => {
-    if (group !== undefined) {
-      if (
-        group !== SEMAPHORE_ADMIN_GROUP_URL &&
-        group !== SEMAPHORE_GROUP_URL
-      ) {
-        logout();
-      }
-
-      if (group !== SEMAPHORE_ADMIN_GROUP_URL) {
-        router.push("/");
-      } else {
-        setLoadingGroup(false);
-      }
+    if (
+      loginState?.config?.groupUrl !== undefined &&
+      loginState.config.groupUrl !== ZUZALU_ADMINS_GROUP_URL
+    ) {
+      router.push("/");
     }
-  }, [group, logout, router]);
+  }, [loginState, router]);
 
   return (
     <>
@@ -40,14 +31,12 @@ export default function Page() {
         <title>Post from bot</title>
         <link rel="Zupoll icon" href="/zupoll-icon.ico" />
       </Head>
-      {loadingGroup || loadingToken ? (
+      {!loginState ? (
         <RippleLoaderLightMargin />
       ) : (
         <Center>
           <ReturnHeader />
-
-          <CreatePost onError={setError} token={token} />
-
+          <CreatePost onError={setError} loginState={loginState} />
           {error && (
             <ErrorOverlay error={error} onClose={() => setError(undefined)} />
           )}

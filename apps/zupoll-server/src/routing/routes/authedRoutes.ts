@@ -4,11 +4,12 @@ import { ApplicationContext } from "../../types";
 import {
   ACCESS_TOKEN_SECRET,
   authenticateJWT,
-  authenticateOrganizerJWT,
+  getVisibleBallotTypesForUser,
 } from "../../util/auth";
-import { prisma } from "../../util/prisma";
-import { verifyGroupProof } from "../../util/verify";
 import { sendMessage } from "../../util/bot";
+import { prisma } from "../../util/prisma";
+import { AuthType } from "../../util/types";
+import { verifyGroupProof } from "../../util/verify";
 
 export function initAuthedRoutes(
   app: express.Application,
@@ -21,7 +22,7 @@ export function initAuthedRoutes(
 
       try {
         // request.semaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
-        // SEMAPHORE_ADMIN_GROUP_URL
+        // SEMAPHORE_ADMIN_GROUP_URL or PCDPASS_USERS_GROUP_URL
         await verifyGroupProof(request.semaphoreGroupUrl, request.proof, {});
 
         const accessToken = sign(
@@ -39,12 +40,17 @@ export function initAuthedRoutes(
 
   app.post(
     "/bot-post",
-    authenticateOrganizerJWT,
+    authenticateJWT,
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as BotPostRequest;
 
+      if (![AuthType.ZUZALU_ORGANIZER].includes(req.authUserType as any)) {
+        res.sendStatus(403);
+        return;
+      }
+
       try {
-        sendMessage(request.message, context.bot)
+        sendMessage(request.message, context.bot);
       } catch (e) {
         console.error(e);
         next(e);
@@ -55,6 +61,17 @@ export function initAuthedRoutes(
   );
 
   app.get("/ballots", authenticateJWT, async (req: Request, res: Response) => {
+    if (
+      ![
+        AuthType.ZUZALU_ORGANIZER,
+        AuthType.ZUZALU_PARTICIPANT,
+        AuthType.PCDPASS,
+      ].includes(req.authUserType as any)
+    ) {
+      res.sendStatus(403);
+      return;
+    }
+
     const ballots = await prisma.ballot.findMany({
       select: {
         ballotTitle: true,
@@ -63,6 +80,11 @@ export function initAuthedRoutes(
         ballotType: true,
       },
       orderBy: { expiry: "desc" },
+      where: {
+        ballotType: {
+          in: getVisibleBallotTypesForUser(req.authUserType),
+        },
+      },
     });
 
     res.status(200).json({ ballots });
@@ -72,6 +94,17 @@ export function initAuthedRoutes(
     "/ballot-polls/:ballotURL",
     authenticateJWT,
     async (req: Request, res: Response, next: NextFunction) => {
+      if (
+        ![
+          AuthType.ZUZALU_ORGANIZER,
+          AuthType.ZUZALU_PARTICIPANT,
+          AuthType.PCDPASS,
+        ].includes(req.authUserType as any)
+      ) {
+        res.sendStatus(403);
+        return;
+      }
+
       try {
         const ballotURL = parseInt(req.params.ballotURL);
 
@@ -79,9 +112,12 @@ export function initAuthedRoutes(
           throw new Error("Invalid ballot URL.");
         }
 
-        const ballot = await prisma.ballot.findUnique({
+        const ballot = await prisma.ballot.findFirst({
           where: {
             ballotURL: ballotURL,
+            ballotType: {
+              in: getVisibleBallotTypesForUser(req.authUserType),
+            },
           },
         });
         if (ballot === null) {

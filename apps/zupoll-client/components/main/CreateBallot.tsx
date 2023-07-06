@@ -2,8 +2,11 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useCreateBallot } from "../../src/createBallot";
 import { BallotType, Poll } from "../../src/prismaTypes";
-import { ZupollError } from "../../src/types";
-import { SEMAPHORE_ADMIN_GROUP_URL } from "../../src/util";
+import {
+  LoginConfigurationName,
+  LoginState,
+  ZupollError,
+} from "../../src/types";
 import {
   FormButtonContainer,
   FormContainer,
@@ -18,15 +21,12 @@ import {
 import { RippleLoaderLight } from "../core/RippleLoader";
 
 export function CreateBallot({
-  group,
   onError,
+  loginState,
 }: {
-  group: string | undefined;
   onError: (err: ZupollError) => void;
+  loginState: LoginState;
 }) {
-  /**
-   * EDITING BALLOT INFO LOGIC
-   */
   const [polls, setPolls] = useState<Poll[]>([
     {
       id: "0",
@@ -43,7 +43,9 @@ export function CreateBallot({
     new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
   );
   const [ballotType, setBallotType] = useState<BallotType>(
-    BallotType.STRAWPOLL
+    loginState.config.name === LoginConfigurationName.PCDPASS_USER
+      ? BallotType.PCDPASSUSER
+      : BallotType.STRAWPOLL
   );
 
   const getDateString = (date: Date) => {
@@ -81,6 +83,7 @@ export function CreateBallot({
     polls,
     onError,
     setServerLoading,
+    loginState,
   });
 
   return (
@@ -99,7 +102,7 @@ export function CreateBallot({
               placeholder="Advisory Vote 04/25"
             />
           </StyledLabel>
-          <StyledLabel >
+          <StyledLabel>
             Ballot description &nbsp;
             <StyledInput
               type="text"
@@ -110,7 +113,7 @@ export function CreateBallot({
               placeholder="Advisory vote for 04/25 town hall"
             />
           </StyledLabel>
-          <StyledLabel >
+          <StyledLabel>
             Expiry&nbsp;
             <StyledInput
               type="datetime-local"
@@ -120,18 +123,32 @@ export function CreateBallot({
               onChange={(e) => setBallotExpiry(new Date(e.target.value))}
             />
           </StyledLabel>
-          <StyledLabel >
+          <StyledLabel>
             Type of ballot
             <StyledSelect
               id="ballotType"
               value={ballotType}
               onChange={(e) => setBallotType(e.target.value)}
             >
-              <option value={BallotType.STRAWPOLL}>Straw Poll</option>
-              {group === SEMAPHORE_ADMIN_GROUP_URL ? (
-                <option value={BallotType.ADVISORYVOTE}>Advisory Vote</option>
-              ) : (
-                <></>
+              {loginState.config.name ===
+                LoginConfigurationName.ZUZALU_PARTICIPANT && (
+                <>
+                  <option value={BallotType.STRAWPOLL}>Straw Poll</option>
+                </>
+              )}
+              {loginState.config.name ===
+                LoginConfigurationName.ZUZALU_ORGANIZER && (
+                <>
+                  <option value={BallotType.STRAWPOLL}>Straw Poll</option>
+                  <option value={BallotType.ADVISORYVOTE}>Advisory Vote</option>
+                  <option value={BallotType.ORGANIZERONLY}>
+                    Organizer Only
+                  </option>
+                </>
+              )}
+              {loginState.config.name ===
+                LoginConfigurationName.PCDPASS_USER && (
+                <option value={BallotType.PCDPASSUSER}>PCDPass Poll</option>
               )}
             </StyledSelect>
           </StyledLabel>
@@ -143,7 +160,7 @@ export function CreateBallot({
           <FormContainer key={i}>
             <StyledForm>
               <h2>Question {i + 1}</h2>
-              <StyledLabel >
+              <StyledLabel>
                 Question&nbsp;
                 <StyledInput
                   type="text"

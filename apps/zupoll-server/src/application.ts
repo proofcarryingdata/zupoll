@@ -1,11 +1,12 @@
+import { BallotType } from "@prisma/client";
+import { CronJob } from "cron";
+import { Bot } from "grammy";
 import { startServer } from "./routing/server";
 import { ServiceInitializer } from "./services/types";
 import { ApplicationContext } from "./types";
-import { Bot } from "grammy";
-import { CronJob } from "cron";
-import { prisma } from "./util/prisma";
 import { SITE_URL } from "./util/auth";
 import { cleanString, sendMessage } from "./util/bot";
+import { prisma } from "./util/prisma";
 
 const services: ServiceInitializer[] = [startServer];
 
@@ -33,6 +34,13 @@ export async function startApplication() {
           expiryNotif: true,
         },
         orderBy: { expiry: "desc" },
+        where: {
+          NOT: {
+            ballotType: {
+              in: [BallotType.PCDPASSUSER],
+            },
+          },
+        },
       });
 
       for (const ballot of ballots) {
@@ -58,7 +66,6 @@ export async function startApplication() {
             ballot.ballotTitle
           )}</b> will expire in less than 1 week. Vote at ${pollUrl}`;
           await sendMessage(expiryMessage, context.bot);
-
         } else if (
           hours === 24 &&
           (ballot.expiryNotif === "WEEK" || ballot.expiryNotif === "NONE")
@@ -76,7 +83,6 @@ export async function startApplication() {
             ballot.ballotTitle
           )}</b> will expire in less than 24 hours. Vote at ${pollUrl}`;
           await sendMessage(expiryMessage, context.bot);
-
         } else if (
           hours === 1 &&
           (ballot.expiryNotif === "DAY" || ballot.expiryNotif === "NONE")
@@ -96,9 +102,9 @@ export async function startApplication() {
           await sendMessage(expiryMessage, context.bot);
         }
       }
-    },
+    }
   );
-  
+
   cronJob.start();
 
   for (const service of services) {

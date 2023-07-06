@@ -2,10 +2,19 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { BallotScreen } from "../components/main/BallotScreen";
+import { useSavedLoginState } from "../src/useLoginState";
 
-export default function Page() {
+export default function BallotPage() {
   const router = useRouter();
   const [ballotURL, setBallotURL] = useState<string | null>(null);
+  const { loginState, logout, definitelyNotLoggedIn } =
+    useSavedLoginState(router);
+
+  useEffect(() => {
+    if (definitelyNotLoggedIn) {
+      logout();
+    }
+  }, [definitelyNotLoggedIn, logout]);
 
   useEffect(() => {
     if (router.isReady) {
@@ -20,10 +29,14 @@ export default function Page() {
 
   return (
     <>
-      {ballotURL === null ? (
+      {ballotURL === null || !loginState ? (
         <RippleLoaderLightMargin />
       ) : (
-        <BallotScreen ballotURL={ballotURL.toString()} />
+        <BallotScreen
+          logout={logout}
+          loginState={loginState}
+          ballotURL={ballotURL.toString()}
+        />
       )}
     </>
   );

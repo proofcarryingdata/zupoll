@@ -62,6 +62,8 @@ enum UserType {
 enum BallotType {
   ADVISORYVOTE
   STRAWPOLL
+  PCDPASSUSER
+  ORGANIZERONLY
 }
 
 enum ExpiryNotifStatus {

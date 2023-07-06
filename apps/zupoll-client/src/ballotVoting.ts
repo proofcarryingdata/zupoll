@@ -15,8 +15,7 @@ import {
   PollWithCounts,
   VoteSignal,
 } from "./requestTypes";
-import { PCDState, ZupollError } from "./types";
-import { PASSPORT_URL } from "./util";
+import { LoginState, PCDState, ZupollError } from "./types";
 
 /**
  * Hook that handles requesting a PCD for voting on a set of polls on a ballot.
@@ -37,6 +36,7 @@ export function useBallotVoting({
   onError,
   setServerLoading,
   refresh,
+  loginState,
 }: {
   ballotId: string;
   ballotURL: string;
@@ -46,6 +46,7 @@ export function useBallotVoting({
   onError: (err: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
   refresh: (id: string) => void;
+  loginState: LoginState;
 }) {
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
@@ -91,7 +92,7 @@ export function useBallotVoting({
 
     async function doRequest() {
       setServerLoading(true);
-      const res = await voteBallot(request);
+      const res = await voteBallot(request, loginState.token);
       setServerLoading(false);
 
       if (res === undefined) {
@@ -110,7 +111,7 @@ export function useBallotVoting({
           message: `Server Error: ${resErr}`,
         };
         if (resErr === "User has already voted on this ballot.") {
-          err.message = "You have already voted on this ballot!"
+          err.message = "You have already voted on this ballot!";
           setVoted(ballotId);
           refresh(ballotId);
         }
@@ -119,10 +120,10 @@ export function useBallotVoting({
         return;
       }
 
-      const multiVotesResponse : MultiVoteResponse = await res.json();
+      const multiVotesResponse: MultiVoteResponse = await res.json();
 
       setVoted(ballotId);
-      setBallotVotes(ballotId, multiVotesResponse.userVotes)
+      setBallotVotes(ballotId, multiVotesResponse.userVotes);
       refresh(ballotId);
     }
 
@@ -137,6 +138,7 @@ export function useBallotVoting({
     polls,
     setServerLoading,
     refresh,
+    loginState,
   ]);
 
   const createBallotVotePCD = useCallback(async () => {
@@ -161,14 +163,14 @@ export function useBallotVoting({
     const externalNullifier = generateMessageHash(ballotId).toString();
 
     openZuzaluMembershipPopup(
-      PASSPORT_URL,
+      loginState.config.passportAppUrl,
       window.location.origin + "/popup",
       ballotVoterSemaphoreGroupUrl,
       "zupoll",
       sigHashEnc,
       externalNullifier
     );
-  }, [ballotId, ballotVoterSemaphoreGroupUrl, polls, pollToVote]);
+  }, [loginState, polls, ballotId, ballotVoterSemaphoreGroupUrl, pollToVote]);
 
   return createBallotVotePCD;
 }
@@ -191,16 +193,12 @@ function setVoted(ballotId: string) {
 }
 
 export function getBallotVotes(ballotId: string) {
-  const allVotes = JSON.parse(
-    window.localStorage.getItem("allVotes") || "{}"
-  );
+  const allVotes = JSON.parse(window.localStorage.getItem("allVotes") || "{}");
   return allVotes[ballotId] || {};
 }
 
 function setBallotVotes(ballotId: string, userVotes: VoteSignal[]) {
-  const allVotes = JSON.parse(
-    window.localStorage.getItem("allVotes") || "{}"
-  );
+  const allVotes = JSON.parse(window.localStorage.getItem("allVotes") || "{}");
   allVotes[ballotId] = {};
   for (const vote of userVotes) {
     allVotes[ballotId][vote.pollId] = vote.voteIdx;

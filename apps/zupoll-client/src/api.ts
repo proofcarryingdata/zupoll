@@ -1,9 +1,17 @@
-import { PASSPORT_SERVER_URL, ZUPOLL_SERVER_URL } from "../src/util";
-import { CreateBallotRequest, MultiVoteRequest, BotPostRequest } from "./requestTypes";
+import { ZUPOLL_SERVER_URL } from "./env";
+import {
+  BotPostRequest,
+  CreateBallotRequest,
+  MultiVoteRequest,
+} from "./requestTypes";
+import { LoginConfig } from "./types";
 
 export async function createBallot(
-  request: CreateBallotRequest
+  request: CreateBallotRequest,
+  accessToken: string
 ): Promise<Response | undefined> {
+  if (!accessToken) return undefined;
+
   const url = `${ZUPOLL_SERVER_URL}create-ballot`;
 
   try {
@@ -13,6 +21,7 @@ export async function createBallot(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return await res;
@@ -23,8 +32,11 @@ export async function createBallot(
 }
 
 export async function voteBallot(
-  request: MultiVoteRequest
+  request: MultiVoteRequest,
+  accessToken: string
 ): Promise<Response | undefined> {
+  if (!accessToken) return undefined;
+
   const url = `${ZUPOLL_SERVER_URL}vote-ballot`;
 
   try {
@@ -34,6 +46,7 @@ export async function voteBallot(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return await res;
@@ -44,13 +57,13 @@ export async function voteBallot(
 }
 
 export async function login(
-  semaphoreGroupUrl: string,
+  config: LoginConfig,
   pcdStr: string
 ): Promise<Response | undefined> {
   const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
 
   const request = {
-    semaphoreGroupUrl,
+    semaphoreGroupUrl: config.groupUrl,
     proof: parsedPcd.pcd,
   };
   const url = `${ZUPOLL_SERVER_URL}login`;
@@ -86,7 +99,7 @@ export async function botPost(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return await res;
@@ -136,9 +149,10 @@ export async function listBallotPolls(
 }
 
 export async function getLatestSemaphoreGroupHash(
-  groupId: string
+  groupId: string,
+  serverUrl: string
 ): Promise<string | null> {
-  const url = `${PASSPORT_SERVER_URL}semaphore/latest-root/${encodeURIComponent(
+  const url = `${serverUrl}semaphore/latest-root/${encodeURIComponent(
     groupId
   )}`;
   const res = await fetch(url);
@@ -151,6 +165,10 @@ export async function getLatestSemaphoreGroupHash(
   return rootHash;
 }
 
-export function getHistoricGroupUrl(groupId: string, rootHash: string): string {
-  return `${PASSPORT_SERVER_URL}semaphore/historic/${groupId}/${rootHash}`;
+export function getHistoricGroupUrl(
+  groupId: string,
+  rootHash: string,
+  serverUrl: string
+): string {
+  return `${serverUrl}semaphore/historic/${groupId}/${rootHash}`;
 }

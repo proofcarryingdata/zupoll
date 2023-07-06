@@ -1,29 +1,41 @@
 import Head from "next/head";
-import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import styled from "styled-components";
-import { RippleLoaderLightMargin } from "../components/core/RippleLoader";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
+import { LoginState } from "../src/types";
+import { useSavedLoginState } from "../src/useLoginState";
 
-export default function Page() {
-  const [token, setToken] = useState<string>();
-  const [loading, setLoading] = useState<boolean>(true);
+export default function Index() {
+  const router = useRouter();
+  const {
+    loginState,
+    replaceLoginState,
+    isLoading,
+    logout,
+    definitelyNotLoggedIn,
+  } = useSavedLoginState(router);
 
   useEffect(() => {
-    setToken(window.localStorage["access_token"]);
-    setLoading(false);
-  }, [setToken]);
+    if (definitelyNotLoggedIn) {
+      replaceLoginState(undefined);
+    }
+  }, [definitelyNotLoggedIn, logout, replaceLoginState]);
 
-  const saveToken = useCallback(
-    (token: string | undefined) => {
-      setToken(token);
-      if (token) window.localStorage["access_token"] = token;
-      else delete window.localStorage["access_token"];
-    },
-    [setToken]
-  );
+  let content = <></>;
 
-  const logout = useCallback(() => saveToken(undefined), [saveToken]);
+  if (!isLoading && !loginState) {
+    content = (
+      <LoginScreen
+        onLogin={(state: LoginState) => {
+          replaceLoginState(state);
+        }}
+      />
+    );
+  } else if (loginState) {
+    content = <MainScreen loginState={loginState} logout={logout} />;
+  }
 
   return (
     <>
@@ -31,15 +43,7 @@ export default function Page() {
         <title>Zupoll</title>
         <link rel="Zupoll icon" href="/zupoll-icon.ico" />
       </Head>
-      <Wrapper>
-        {loading ? (
-          <RippleLoaderLightMargin />
-        ) : token ? (
-          <MainScreen token={token} onLogout={logout} />
-        ) : (
-          <LoginScreen onLogin={saveToken} />
-        )}
-      </Wrapper>
+      <Wrapper>{content}</Wrapper>
     </>
   );
 }

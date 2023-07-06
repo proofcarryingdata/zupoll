@@ -8,10 +8,9 @@ import {
   useBallotVoting,
   votedOn,
 } from "../../src/ballotVoting";
-import { useLogin } from "../../src/login";
 import { Ballot } from "../../src/prismaTypes";
 import { BallotPollResponse, PollWithCounts } from "../../src/requestTypes";
-import { ZupollError } from "../../src/types";
+import { LoginState, ZupollError } from "../../src/types";
 import { Center } from "../core";
 import { ReturnHeader } from "../core/Headers";
 import {
@@ -21,11 +20,18 @@ import {
 import { BallotPoll } from "./BallotPoll";
 import { ErrorOverlay } from "./ErrorOverlay";
 
-export function BallotScreen({ ballotURL }: { ballotURL: string }) {
+export function BallotScreen({
+  ballotURL,
+  loginState,
+  logout,
+}: {
+  ballotURL: string;
+  loginState: LoginState;
+  logout: () => void;
+}) {
   const router = useRouter();
   const [error, setError] = useState<ZupollError>();
   const [serverLoading, setServerLoading] = useState<boolean>(false);
-  const { token, group: _group, loadingToken, logout } = useLogin(router);
 
   /**
    * BALLOT/POLL LOGIC
@@ -41,14 +47,9 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
 
   // Retrieve polls under this ballot, refresh after user votes
   useEffect(() => {
-    if (!token) {
-      setPolls([]);
-      return;
-    }
-
     async function getBallotPolls() {
       setLoadingPolls(true);
-      const res = await listBallotPolls(token, ballotURL);
+      const res = await listBallotPolls(loginState.token, ballotURL);
       setLoadingPolls(false);
 
       if (res === undefined) {
@@ -128,7 +129,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
     }
 
     getBallotPolls();
-  }, [token, ballotURL, logout, refresh]);
+  }, [ballotURL, refresh, loginState, router, logout]);
 
   /**
    * VOTING LOGIC
@@ -170,6 +171,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
       setPollToVote(new Map());
       setRefresh(id);
     },
+    loginState,
   });
 
   return (
@@ -180,10 +182,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
       </Head>
       <Center>
         <ReturnHeader />
-        {loadingToken ||
-        loadingPolls ||
-        ballot === undefined ||
-        polls === undefined ? (
+        {loadingPolls || ballot === undefined || polls === undefined ? (
           <RippleLoaderLight />
         ) : (
           <>
@@ -191,9 +190,9 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
               <TextContainer>
                 <div>🚨</div>
                 <div>
-                  If you created or reset your passport after this poll was created 
-                  you will not be able to vote 😢. This is to prevent people from
-                  double-voting.
+                  If you created or reset your passport after this poll was
+                  created you will not be able to vote 😢. This is to prevent
+                  people from double-voting.
                 </div>
               </TextContainer>
             ) : (

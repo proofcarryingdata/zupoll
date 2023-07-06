@@ -3,6 +3,7 @@ import { getHistoricGroupUrl, getLatestSemaphoreGroupHash } from "./api";
 import { ZupollError } from "./types";
 
 export function useHistoricSemaphoreUrl(
+  semaphoreGroupServer: string,
   semaphoreGroupId: string,
   onError: (error: ZupollError) => void
 ) {
@@ -10,7 +11,7 @@ export function useHistoricSemaphoreUrl(
   const [rootHash, setRootHash] = useState<string | null>(null);
 
   useEffect(() => {
-    getLatestSemaphoreGroupHash(semaphoreGroupId)
+    getLatestSemaphoreGroupHash(semaphoreGroupId, semaphoreGroupServer)
       .then((hash) => setRootHash(hash))
       .catch((e: Error) => {
         console.log(e);
@@ -22,11 +23,13 @@ export function useHistoricSemaphoreUrl(
       .finally(() => {
         setLoading(false);
       });
-  }, [onError, semaphoreGroupId]);
+  }, [onError, semaphoreGroupId, semaphoreGroupServer]);
 
   return {
     loading,
     rootHash,
-    groupUrl: rootHash && getHistoricGroupUrl(semaphoreGroupId, rootHash),
+    groupUrl:
+      rootHash &&
+      getHistoricGroupUrl(semaphoreGroupId, rootHash, semaphoreGroupServer),
   };
 }

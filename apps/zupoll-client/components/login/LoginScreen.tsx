@@ -1,14 +1,22 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { ZupollError } from "../../src/types";
-import { SEMAPHORE_ADMIN_GROUP_URL, SEMAPHORE_GROUP_URL } from "../../src/util";
+import {
+  PCDPASS_USER_CONFIG,
+  ZUZALU_ORGANIZER_LOGIN_CONFIG,
+  ZUZALU_PARTICIPANT_LOGIN_CONFIG,
+} from "../../src/loginConfig";
+import { LoginState, ZupollError } from "../../src/types";
 import { Center } from "../core";
 import { LoggedOutHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "../main/ErrorOverlay";
 import { Login } from "./Login";
 
-export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
+export function LoginScreen({
+  onLogin,
+}: {
+  onLogin: (loginState: LoginState) => void;
+}) {
   const [serverLoading, setServerLoading] = useState<boolean>(false);
   const [error, setError] = useState<ZupollError>();
 
@@ -35,20 +43,32 @@ export function LoginScreen({ onLogin }: { onLogin: (token: string) => void }) {
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
-                requestedGroup={SEMAPHORE_GROUP_URL}
+                prompt="PCDPass login"
+                config={PCDPASS_USER_CONFIG}
+              />
+              <Login
+                onLogin={onLogin}
+                onError={setError}
+                setServerLoading={setServerLoading}
+                config={ZUZALU_PARTICIPANT_LOGIN_CONFIG}
                 prompt="Resident login"
               />
               <Login
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
-                requestedGroup={SEMAPHORE_ADMIN_GROUP_URL}
+                config={ZUZALU_ORGANIZER_LOGIN_CONFIG}
                 prompt="Organizer login"
                 deemphasized
               />
             </>
           )}
         </LoginRow>
+        <br />
+        <Description>
+          PCDPass users don't see any of the Zuzalu ballots. They have their own
+          private ballot section.
+        </Description>
       </Body>
 
       {error && (

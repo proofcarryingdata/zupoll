@@ -4,13 +4,17 @@ import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { ApplicationContext } from "../../types";
 import {
-  SEMAPHORE_ADMIN_GROUP_URL,
-  SEMAPHORE_GROUP_URL,
+  authenticateJWT,
+  getVisibleBallotTypesForUser,
+  PCDPASS_USERS_GROUP_URL,
   SITE_URL,
+  ZUZALU_ORGANIZERS_GROUP_URL,
+  ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../../util/auth";
-import { prisma } from "../../util/prisma";
-import { verifyGroupProof } from "../../util/verify";
 import { cleanString, sendMessage } from "../../util/bot";
+import { prisma } from "../../util/prisma";
+import { AuthType } from "../../util/types";
+import { verifyGroupProof } from "../../util/verify";
 
 /**
  * The endpoints in this function accepts proof (PCD) in the request. It verifies
@@ -23,6 +27,7 @@ export function initPCDRoutes(
 ): void {
   app.post(
     "/create-ballot",
+    authenticateJWT,
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as CreateBallotRequest;
 
@@ -31,8 +36,33 @@ export function initPCDRoutes(
           ballotURL: request.ballot.ballotURL,
         },
       });
+
       if (prevBallot !== null) {
         throw new Error("Ballot already exists with this URL.");
+      }
+
+      if (req.authUserType === AuthType.PCDPASS) {
+        if (request.ballot.ballotType !== BallotType.PCDPASSUSER) {
+          throw new Error(
+            `${req.authUserType} user can't create this ballot type`
+          );
+        }
+      } else if (req.authUserType === AuthType.ZUZALU_PARTICIPANT) {
+        if (
+          request.ballot.ballotType === BallotType.PCDPASSUSER ||
+          request.ballot.ballotType === BallotType.ADVISORYVOTE ||
+          request.ballot.ballotType === BallotType.ORGANIZERONLY
+        ) {
+          throw new Error(
+            `${req.authUserType} user can't create this ballot type`
+          );
+        }
+      } else if (req.authUserType === AuthType.ZUZALU_ORGANIZER) {
+        if (request.ballot.ballotType === BallotType.PCDPASSUSER) {
+          throw new Error(
+            `${req.authUserType} user can't create this ballot type`
+          );
+        }
       }
 
       const ballotSignal: BallotSignal = {
@@ -44,6 +74,7 @@ export function initPCDRoutes(
         voterSemaphoreGroupUrls: request.ballot.voterSemaphoreGroupUrls,
         voterSemaphoreGroupRoots: request.ballot.voterSemaphoreGroupRoots,
       };
+
       request.polls.forEach((poll: Poll) => {
         const pollSignal: PollSignal = {
           body: poll.body,
@@ -51,23 +82,30 @@ export function initPCDRoutes(
         };
         ballotSignal.pollSignals.push(pollSignal);
       });
+
       const signalHash = sha256(stableStringify(ballotSignal));
 
       try {
         if (request.ballot.pollsterType == UserType.ANON) {
-          const groupUrl =
-            request.ballot.ballotType === BallotType.STRAWPOLL
-              ? SEMAPHORE_GROUP_URL!
-              : SEMAPHORE_ADMIN_GROUP_URL!;
+          let groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
+          if (request.ballot.ballotType === BallotType.ADVISORYVOTE) {
+            groupUrl = ZUZALU_ORGANIZERS_GROUP_URL;
+          } else if (request.ballot.ballotType === BallotType.ORGANIZERONLY) {
+            groupUrl = ZUZALU_ORGANIZERS_GROUP_URL;
+          } else if (request.ballot.ballotType === BallotType.STRAWPOLL) {
+            groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
+          } else if (request.ballot.ballotType === BallotType.PCDPASSUSER) {
+            groupUrl = PCDPASS_USERS_GROUP_URL;
+          }
 
           // pollsterSemaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
-          // SEMAPHORE_ADMIN_GROUP_URL
+          // SEMAPHORE_ADMIN_GROUP_URL or PCDPASS_USERS_GROUP_URL
           const nullifier = await verifyGroupProof(
             request.ballot.pollsterSemaphoreGroupUrl!,
             request.proof,
             {
               signal: signalHash,
-              allowedGroups: [groupUrl],
+              allowedGroups: [groupUrl!],
               claimedExtNullifier: signalHash,
             }
           );
@@ -107,21 +145,23 @@ export function initPCDRoutes(
             })
           );
 
-          // send message on TG channel, if bot is setup
-          let ballotPost =
-            newBallot.ballotType === BallotType.STRAWPOLL
-              ? "New straw poll posted!"
-              : "New advisory vote posted!";
-          ballotPost =
-            ballotPost +
-            `\n\nTitle: <b>${cleanString(newBallot.ballotTitle)}</b>` +
-            `\nDescription: ${cleanString(newBallot.ballotDescription)}` +
-            `\nExpiry: ${new Date(newBallot.expiry).toLocaleString("en-US", {
-              timeZone: "Europe/Podgorica",
-            })}` +
-            `\n\nLink: ${SITE_URL}ballot?id=${newBallot.ballotURL}`;
-          console.log(ballotPost);
-          await sendMessage(ballotPost, context.bot);
+          if (req.authUserType !== AuthType.PCDPASS) {
+            // send message on TG channel, if bot is setup
+            let ballotPost =
+              newBallot.ballotType === BallotType.STRAWPOLL
+                ? "New straw poll posted!"
+                : "New advisory vote posted!";
+            ballotPost =
+              ballotPost +
+              `\n\nTitle: <b>${cleanString(newBallot.ballotTitle)}</b>` +
+              `\nDescription: ${cleanString(newBallot.ballotDescription)}` +
+              `\nExpiry: ${new Date(newBallot.expiry).toLocaleString("en-US", {
+                timeZone: "Europe/Podgorica",
+              })}` +
+              `\n\nLink: ${SITE_URL}ballot?id=${newBallot.ballotURL}`;
+            console.log(ballotPost);
+            await sendMessage(ballotPost, context.bot);
+          }
 
           res.json({
             url: newBallot.ballotURL,
@@ -138,6 +178,7 @@ export function initPCDRoutes(
 
   app.post(
     "/vote-ballot",
+    authenticateJWT,
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as MultiVoteRequest;
 
@@ -189,13 +230,17 @@ export function initPCDRoutes(
         if (isNaN(ballotURL)) {
           throw new Error("Invalid ballot URL.");
         }
-        const ballot = await prisma.ballot.findUnique({
+        const ballot = await prisma.ballot.findFirst({
           where: {
             ballotURL: ballotURL,
+            ballotType: {
+              in: getVisibleBallotTypesForUser(req.authUserType),
+            },
           },
         });
+
         if (ballot === null) {
-          throw new Error("Invalid ballot id.");
+          throw new Error("Can't find the given ballot.");
         }
 
         // Only use of voterSemaphoreGroupUrl is to check if it's in the list of
