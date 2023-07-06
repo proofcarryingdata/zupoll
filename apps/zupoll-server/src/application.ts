@@ -37,7 +37,7 @@ export async function startApplication() {
         where: {
           NOT: {
             ballotType: {
-              in: [BallotType.PCDPASSUSER],
+              in: [BallotType.PCDPASSUSER, BallotType.ORGANIZERONLY],
             },
           },
         },
