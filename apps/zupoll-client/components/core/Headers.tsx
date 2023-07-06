@@ -5,17 +5,17 @@ import { Logo } from ".";
 import { Button } from "./Button";
 
 export function MainScreenHeader({
-  onLogout,
+  logout,
   createBallot,
 }: {
-  onLogout: () => void;
+  logout: () => void;
   createBallot: () => Promise<boolean>;
 }) {
   const confirmLogout = useCallback(() => {
     if (window.confirm("Are you sure you want to log out?")) {
-      onLogout();
+      logout();
     }
-  }, [onLogout]);
+  }, [logout]);
 
   return (
     <StickyHeader>

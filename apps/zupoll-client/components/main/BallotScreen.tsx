@@ -10,8 +10,7 @@ import {
 } from "../../src/ballotVoting";
 import { Ballot } from "../../src/prismaTypes";
 import { BallotPollResponse, PollWithCounts } from "../../src/requestTypes";
-import { ZupollError } from "../../src/types";
-import { useSavedLoginState } from "../../src/useLoginState";
+import { LoginState, ZupollError } from "../../src/types";
 import { Center } from "../core";
 import { ReturnHeader } from "../core/Headers";
 import {
@@ -21,11 +20,18 @@ import {
 import { BallotPoll } from "./BallotPoll";
 import { ErrorOverlay } from "./ErrorOverlay";
 
-export function BallotScreen({ ballotURL }: { ballotURL: string }) {
+export function BallotScreen({
+  ballotURL,
+  loginState,
+  logout,
+}: {
+  ballotURL: string;
+  loginState: LoginState;
+  logout: () => void;
+}) {
   const router = useRouter();
   const [error, setError] = useState<ZupollError>();
   const [serverLoading, setServerLoading] = useState<boolean>(false);
-  const { loginState } = useSavedLoginState();
 
   /**
    * BALLOT/POLL LOGIC
@@ -41,17 +47,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
 
   // Retrieve polls under this ballot, refresh after user votes
   useEffect(() => {
-    if (!loginState) {
-      setPolls([]);
-      return;
-    }
-
     async function getBallotPolls() {
-      if (!loginState) {
-        router.push("/");
-        return;
-      }
-
       setLoadingPolls(true);
       const res = await listBallotPolls(loginState.token, ballotURL);
       setLoadingPolls(false);
@@ -66,8 +62,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
       }
 
       if (res.status === 403) {
-        router.push("/");
-        return;
+        logout();
       }
 
       if (!res.ok) {
@@ -133,7 +128,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
     }
 
     getBallotPolls();
-  }, [ballotURL, refresh, loginState, router]);
+  }, [ballotURL, refresh, loginState, router, logout]);
 
   /**
    * VOTING LOGIC
@@ -186,10 +181,7 @@ export function BallotScreen({ ballotURL }: { ballotURL: string }) {
       </Head>
       <Center>
         <ReturnHeader />
-        {!loginState ||
-        loadingPolls ||
-        ballot === undefined ||
-        polls === undefined ? (
+        {loadingPolls || ballot === undefined || polls === undefined ? (
           <RippleLoaderLight />
         ) : (
           <>

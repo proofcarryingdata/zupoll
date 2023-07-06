@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
@@ -9,18 +9,19 @@ import { useSavedLoginState } from "../src/useLoginState";
 
 export default function Index() {
   const router = useRouter();
-  const { loginState, replaceLoginState, isLoading } = useSavedLoginState();
-
-  const onLogout = useCallback(() => {
-    replaceLoginState(undefined);
-    router.push("/");
-  }, [replaceLoginState, router]);
+  const {
+    loginState,
+    replaceLoginState,
+    isLoading,
+    logout,
+    definitelyNotLoggedIn,
+  } = useSavedLoginState(router);
 
   useEffect(() => {
-    if (!isLoading && !loginState) {
+    if (definitelyNotLoggedIn) {
       replaceLoginState(undefined);
     }
-  }, [isLoading, loginState, onLogout, replaceLoginState]);
+  }, [definitelyNotLoggedIn, logout, replaceLoginState]);
 
   let content = <></>;
 
@@ -32,8 +33,8 @@ export default function Index() {
         }}
       />
     );
-  } else if (!isLoading && loginState) {
-    content = <MainScreen loginState={loginState} onLogout={onLogout} />;
+  } else if (loginState) {
+    content = <MainScreen loginState={loginState} logout={logout} />;
   }
 
   return (

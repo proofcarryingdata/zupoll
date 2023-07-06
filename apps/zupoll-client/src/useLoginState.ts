@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { NextRouter } from "next/router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { LoginConfig, LoginState } from "./types";
 
 const ACCESS_TOKEN_KEY = "access_token";
@@ -41,11 +42,7 @@ export function saveLoginStateToLocalStorage(
   }
 }
 
-export function useSavedLoginState(): {
-  loginState: LoginState | undefined;
-  replaceLoginState: (state: LoginState | undefined) => void;
-  isLoading: boolean;
-} {
+export function useSavedLoginState(router: NextRouter): SavedLoginState {
   const [loginState, setLoginInfo] = useState<LoginState | undefined>();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -66,5 +63,28 @@ export function useSavedLoginState(): {
     saveLoginStateToLocalStorage(state);
   }, []);
 
-  return { loginState, replaceLoginState, isLoading };
+  const logout = useCallback(() => {
+    replaceLoginState(undefined);
+    router.push("/");
+  }, [replaceLoginState, router]);
+
+  const definitelyNotLoggedIn = useMemo(() => {
+    return !loginState && !isLoading;
+  }, [isLoading, loginState]);
+
+  return {
+    loginState,
+    replaceLoginState,
+    isLoading,
+    logout,
+    definitelyNotLoggedIn,
+  };
+}
+
+export interface SavedLoginState {
+  loginState: LoginState | undefined;
+  isLoading: boolean;
+  definitelyNotLoggedIn: boolean;
+  replaceLoginState: (state: LoginState | undefined) => void;
+  logout: () => void;
 }

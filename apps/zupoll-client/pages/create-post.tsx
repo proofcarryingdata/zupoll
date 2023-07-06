@@ -13,7 +13,7 @@ import { useSavedLoginState } from "../src/useLoginState";
 export default function CreateBotPostPage() {
   const [error, setError] = useState<ZupollError>();
   const router = useRouter();
-  const { loginState } = useSavedLoginState();
+  const { loginState } = useSavedLoginState(router);
 
   // Log them out if they're not in a valid group
   useEffect(() => {

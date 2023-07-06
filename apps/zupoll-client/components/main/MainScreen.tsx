@@ -16,10 +16,10 @@ import { ErrorOverlay } from "./ErrorOverlay";
 
 export function MainScreen({
   loginState,
-  onLogout,
+  logout,
 }: {
   loginState: LoginState;
-  onLogout: () => void;
+  logout: () => void;
 }) {
   const router = useRouter();
 
@@ -46,10 +46,6 @@ export function MainScreen({
   }
 
   useEffect(() => {
-    if (!loginState.token) {
-      setBallots([]);
-    }
-
     async function getBallots() {
       const res = await listBallots(loginState.token);
 
@@ -63,7 +59,7 @@ export function MainScreen({
       }
 
       if (res.status === 403) {
-        onLogout();
+        logout();
         return;
       }
 
@@ -85,12 +81,12 @@ export function MainScreen({
     }
 
     getBallots();
-  }, [loginState.token, onLogout]);
+  }, [loginState.token, logout]);
 
   return (
     <Center>
       <MainScreenHeader
-        onLogout={onLogout}
+        logout={logout}
         createBallot={() => router.push("/create-ballot")}
       />
       <GuarenteeContainer>

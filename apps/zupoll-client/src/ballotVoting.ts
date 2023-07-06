@@ -46,7 +46,7 @@ export function useBallotVoting({
   onError: (err: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
   refresh: (id: string) => void;
-  loginState: LoginState | undefined;
+  loginState: LoginState;
 }) {
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
@@ -91,10 +91,6 @@ export function useBallotVoting({
     });
 
     async function doRequest() {
-      if (!loginState) {
-        return;
-      }
-
       setServerLoading(true);
       const res = await voteBallot(request, loginState.token);
       setServerLoading(false);
@@ -146,10 +142,6 @@ export function useBallotVoting({
   ]);
 
   const createBallotVotePCD = useCallback(async () => {
-    if (!loginState) {
-      return;
-    }
-
     pcdState.current = PCDState.AWAITING_PCDSTR;
 
     const multiVoteSignal: MultiVoteSignal = {

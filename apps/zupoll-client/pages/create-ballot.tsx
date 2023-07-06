@@ -17,7 +17,7 @@ import { useSavedLoginState } from "../src/useLoginState";
 export default function CreateBallotPage() {
   const router = useRouter();
   const [error, setError] = useState<ZupollError>();
-  const { loginState } = useSavedLoginState();
+  const { loginState } = useSavedLoginState(router);
 
   // Log them out if they're not in a valid group
   useEffect(() => {
