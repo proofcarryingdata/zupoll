@@ -1,7 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
 import {
-  PCDPASS_USER_CONFIG,
   ZUZALU_ORGANIZER_LOGIN_CONFIG,
   ZUZALU_PARTICIPANT_LOGIN_CONFIG,
 } from "../../src/loginConfig";
@@ -39,13 +38,6 @@ export function LoginScreen({
             <RippleLoader />
           ) : (
             <>
-              <Login
-                onLogin={onLogin}
-                onError={setError}
-                setServerLoading={setServerLoading}
-                prompt="PCDPass login"
-                config={PCDPASS_USER_CONFIG}
-              />
               <Login
                 onLogin={onLogin}
                 onError={setError}
