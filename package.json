@@ -25,5 +25,10 @@
     "@changesets/cli": "^2.26.0",
     "turbo": "^1.8.5"
   },
+  "resolutions": {
+    "@semaphore-protocol/group": "^3.14.0",
+    "@semaphore-protocol/identity": "^3.14.0",
+    "@semaphore-protocol/proof": "^3.14.0"
+  },
   "packageManager": "yarn@1.22.19"
 }
