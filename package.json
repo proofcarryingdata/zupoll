@@ -18,6 +18,11 @@
     "prettier": "latest",
     "prettier-plugin-organize-imports": "^3.2.2"
   },
+  "resolutions": {
+    "@semaphore-protocol/group": "3.11.0",
+    "@semaphore-protocol/identity": "3.11.0",
+    "@semaphore-protocol/proof": "3.11.0"
+  },
   "engines": {
     "node": "^18.0.0"
   },

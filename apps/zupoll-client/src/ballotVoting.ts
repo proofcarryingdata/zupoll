@@ -1,8 +1,7 @@
 import {
-  openZuzaluMembershipPopup,
-  usePassportPopupMessages,
+  openGroupMembershipPopup,
+  useZupassPopupMessages,
 } from "@pcd/passport-interface";
-import { generateMessageHash } from "@pcd/semaphore-group-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { useCallback, useEffect, useRef } from "react";
@@ -16,6 +15,7 @@ import {
   VoteSignal,
 } from "./requestTypes";
 import { LoginState, PCDState, ZupollError } from "./types";
+import { generateSnarkMessageHash } from "@pcd/util";
 
 /**
  * Hook that handles requesting a PCD for voting on a set of polls on a ballot.
@@ -49,7 +49,7 @@ export function useBallotVoting({
   loginState: LoginState;
 }) {
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
-  const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
+  const [pcdStr, _passportPendingPCDStr] = useZupassPopupMessages();
 
   // only accept pcdStr if we were expecting one
   useEffect(() => {
@@ -159,16 +159,16 @@ export function useBallotVoting({
       }
     });
     const signalHash = sha256(stableStringify(multiVoteSignal));
-    const sigHashEnc = generateMessageHash(signalHash).toString();
-    const externalNullifier = generateMessageHash(ballotId).toString();
+    const sigHashEnc = generateSnarkMessageHash(signalHash).toString();
+    const externalNullifier = generateSnarkMessageHash(ballotId).toString();
 
-    openZuzaluMembershipPopup(
+    openGroupMembershipPopup(
       loginState.config.passportAppUrl,
       window.location.origin + "/popup",
       ballotVoterSemaphoreGroupUrl,
       "zupoll",
       sigHashEnc,
-      externalNullifier
+      externalNullifier,
     );
   }, [loginState, polls, ballotId, ballotVoterSemaphoreGroupUrl, pollToVote]);
 
@@ -181,7 +181,7 @@ export function votedOn(ballotId: string): boolean {
 
 function getVoted(): Array<string> {
   const voted: Array<string> = JSON.parse(
-    window.localStorage.getItem("voted") || "[]"
+    window.localStorage.getItem("voted") || "[]",
   );
   return voted;
 }

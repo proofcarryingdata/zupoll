@@ -14,7 +14,7 @@
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "isolatedModules": false,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "typeRoots": [
       "src/util/declarations/",
       "./node_modules/@types/",

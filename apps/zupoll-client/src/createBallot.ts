@@ -1,8 +1,7 @@
 import {
-  openZuzaluMembershipPopup,
-  usePassportPopupMessages,
+  openGroupMembershipPopup,
+  useZupassPopupMessages,
 } from "@pcd/passport-interface";
-import { generateMessageHash } from "@pcd/semaphore-group-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { useRouter } from "next/router";
@@ -13,6 +12,7 @@ import { BallotType, Poll, UserType } from "./prismaTypes";
 import { BallotSignal, CreateBallotRequest, PollSignal } from "./requestTypes";
 import { LoginState, PCDState, ZupollError } from "./types";
 import { useHistoricSemaphoreUrl } from "./useHistoricSemaphoreUrl";
+import { generateSnarkMessageHash } from "@pcd/util";
 
 /**
  * Hook that handles requesting a PCD for creating a ballot.
@@ -46,7 +46,7 @@ export function useCreateBallot({
 }) {
   const router = useRouter();
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
-  const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
+  const [pcdStr, _passportPendingPCDStr] = useZupassPopupMessages();
   const ballotConfig = BALLOT_CONFIGS[ballotType];
 
   const {
@@ -173,9 +173,9 @@ export function useCreateBallot({
     const signalHash = sha256(stableStringify(ballotSignal));
     console.log(stableStringify(ballotSignal));
     console.log(signalHash);
-    const sigHashEnc = generateMessageHash(signalHash).toString();
+    const sigHashEnc = generateSnarkMessageHash(signalHash).toString();
 
-    openZuzaluMembershipPopup(
+    openGroupMembershipPopup(
       ballotConfig.passportAppUrl,
       window.location.origin + "/popup",
       ballotConfig.creatorGroupUrl,
