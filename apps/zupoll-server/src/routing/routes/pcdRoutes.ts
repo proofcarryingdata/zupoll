@@ -7,11 +7,10 @@ import {
   authenticateJWT,
   getVisibleBallotTypesForUser,
   PCDPASS_USERS_GROUP_URL,
-  SITE_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../../util/auth";
-import { cleanString, sendMessage } from "../../util/bot";
+import { formatPollCreated, sendMessage, voteStr } from "../../util/bot";
 import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
@@ -150,18 +149,7 @@ export function initPCDRoutes(
             newBallot.ballotType !== BallotType.ORGANIZERONLY
           ) {
             // send message on TG channel, if bot is setup
-            let ballotPost =
-              newBallot.ballotType === BallotType.STRAWPOLL
-                ? "New straw poll posted!"
-                : "New advisory vote posted!";
-            ballotPost =
-              ballotPost +
-              `\n\nTitle: <b>${cleanString(newBallot.ballotTitle)}</b>` +
-              `\nDescription: ${cleanString(newBallot.ballotDescription)}` +
-              `\nExpiry: ${new Date(newBallot.expiry).toLocaleString("en-US", {
-                timeZone: "Europe/Podgorica",
-              })}` +
-              `\n\nLink: ${SITE_URL}ballot?id=${newBallot.ballotURL}`;
+            const ballotPost = formatPollCreated(newBallot, request.polls);
             console.log(ballotPost);
             await sendMessage(ballotPost, context.bot);
           }
@@ -288,6 +276,11 @@ export function initPCDRoutes(
         const multiVoteResponse: MultiVoteResponse = {
           userVotes: multiVoteSignal.voteSignals,
         };
+        // await sendMessage(
+        //   `${nullifier.slice(0, 5)} just voted on ${ballot.ballotTitle}!`,
+        //   context.bot
+        // );
+        await sendMessage(voteStr, context.bot);
         res.json(multiVoteResponse);
       } catch (e) {
         console.error(e);
