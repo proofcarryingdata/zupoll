@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { createBallot } from "../../src/api";
 import { useCreateBallot } from "../../src/createBallot";
-import { BallotType, Poll } from "../../src/prismaTypes";
+import { BallotType, Poll, UserType } from "../../src/prismaTypes";
+import { BallotSignal, CreateBallotRequest } from "../../src/requestTypes";
 import {
+  BallotConfig,
   LoginConfigurationName,
   LoginState,
   ZupollError,
 } from "../../src/types";
+import { useHistoricSemaphoreUrl } from "../../src/useHistoricSemaphoreUrl";
 import {
   FormButtonContainer,
   FormContainer,
@@ -19,6 +24,16 @@ import {
   StyledSelect,
 } from "../core/Form";
 import { RippleLoaderLight } from "../core/RippleLoader";
+
+interface BallotFromUrl {
+  ballotConfig: BallotConfig;
+  ballotDescription: string;
+  ballotTitle: string;
+  ballotType: BallotType;
+  expiry: string;
+  ballotSignal: BallotSignal;
+  polls: Poll[];
+}
 
 export function CreateBallot({
   onError,
@@ -37,11 +52,17 @@ export function CreateBallot({
       expiry: new Date(),
     },
   ]);
+  const router = useRouter();
   const [ballotTitle, setBallotTitle] = useState("");
   const [ballotDescription, setBallotDescription] = useState("");
   const [ballotExpiry, setBallotExpiry] = useState<Date>(
     new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
   );
+  const [ballotFromUrl, setBallotFromUrl] = useState<BallotFromUrl>();
+  const [ballotConfig, setBallotConfig] = useState<BallotConfig>();
+
+  const [myPcdStr, setMyPcdStr] = useState("");
+
   const [ballotType, setBallotType] = useState<BallotType>(
     loginState.config.name === LoginConfigurationName.PCDPASS_USER
       ? BallotType.PCDPASSUSER
@@ -73,6 +94,7 @@ export function CreateBallot({
   /**
    * CREATING BALLOT LOGIC
    */
+
   const [serverLoading, setServerLoading] = useState(false);
 
   const { loadingVoterGroupUrl, createBallotPCD } = useCreateBallot({
@@ -84,7 +106,88 @@ export function CreateBallot({
     onError,
     setServerLoading,
     loginState,
+    url: window.location.href, // If exists, will use redirect instead of pop up
   });
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    console.log({ url });
+    // Use URLSearchParams to get the proof query parameter
+    const proofString = url.searchParams.get("proof");
+    const ballotString = url.searchParams.get("ballot");
+    if (proofString && ballotString) {
+      // Decode the URL-encoded string
+      const decodedProofString = decodeURIComponent(proofString);
+      // Parse the decoded string into an object
+      const proofObject = JSON.parse(decodedProofString);
+      console.log(`proof object`, proofObject);
+      const pcdStr = JSON.stringify(proofObject);
+
+      const ballot = JSON.parse(ballotString) as BallotFromUrl;
+      setMyPcdStr(pcdStr);
+      setBallotFromUrl(ballot);
+      setBallotConfig(ballot.ballotConfig);
+    }
+    // uwu
+  }, []);
+
+  const { rootHash: voterGroupRootHash, groupUrl: voterGroupUrl } =
+    useHistoricSemaphoreUrl(
+      ballotConfig?.passportServerUrl,
+      ballotConfig?.voterGroupId,
+      onError
+    );
+
+  useEffect(() => {
+    async function doRequest() {
+      if (!voterGroupRootHash || !voterGroupUrl)
+        return console.warn(`NO GROUP URL OR HASH`);
+      if (!ballotFromUrl) return console.warn(`NO BALLOT FROM URL`);
+      const ballot = ballotFromUrl;
+      setBallotConfig(ballotConfig);
+
+      console.log({ ballot });
+      const parsedPcd = JSON.parse(decodeURIComponent(myPcdStr));
+      const finalRequest: CreateBallotRequest = {
+        ballot: {
+          ballotId: "",
+          ballotURL: 0,
+          ballotTitle: ballot.ballotTitle,
+          ballotDescription: ballot.ballotDescription,
+          createdAt: new Date(),
+          expiry: new Date(ballot.expiry),
+          proof: parsedPcd.pcd,
+          pollsterType: UserType.ANON,
+          pollsterNullifier: "",
+          pollsterName: null,
+          pollsterUuid: null,
+          pollsterCommitment: null,
+          expiryNotif: null,
+          pollsterSemaphoreGroupUrl: ballot.ballotConfig.creatorGroupUrl,
+          voterSemaphoreGroupUrls: [voterGroupUrl],
+          voterSemaphoreGroupRoots: [voterGroupRootHash],
+          ballotType: ballot.ballotType,
+        },
+        polls: ballot.polls,
+        proof: parsedPcd.pcd,
+      };
+      setServerLoading(true);
+      const res = await createBallot(finalRequest, loginState.token);
+      setServerLoading(false);
+      console.log(`res`, res);
+      router.push("/");
+    }
+
+    doRequest();
+  }, [
+    voterGroupRootHash,
+    voterGroupUrl,
+    loginState,
+    ballotConfig,
+    ballotFromUrl,
+    router,
+    myPcdStr,
+  ]);
 
   return (
     <>

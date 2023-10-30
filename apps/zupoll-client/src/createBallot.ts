@@ -1,3 +1,5 @@
+import { useZupassPopupMessages } from "@pcd/passport-interface/src/PassportPopup";
+import { generateSnarkMessageHash } from "@pcd/util";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { useRouter } from "next/router";
@@ -8,9 +10,8 @@ import { BallotType, Poll, UserType } from "./prismaTypes";
 import { BallotSignal, CreateBallotRequest, PollSignal } from "./requestTypes";
 import { LoginState, PCDState, ZupollError } from "./types";
 import { useHistoricSemaphoreUrl } from "./useHistoricSemaphoreUrl";
-import { generateSnarkMessageHash } from "@pcd/util";
-import { useZupassPopupMessages } from "@pcd/passport-interface/src/PassportPopup";
-import { openGroupMembershipPopup } from "@pcd/passport-interface/src/SemaphoreGroupIntegration";
+import { openGroupMembershipPopup } from "./util";
+
 /**
  * Hook that handles requesting a PCD for creating a ballot.
  *
@@ -31,6 +32,7 @@ export function useCreateBallot({
   onError,
   setServerLoading,
   loginState,
+  url,
 }: {
   ballotTitle: string;
   ballotDescription: string;
@@ -40,6 +42,7 @@ export function useCreateBallot({
   onError: (err: ZupollError) => void;
   setServerLoading: (loading: boolean) => void;
   loginState: LoginState;
+  url?: string;
 }) {
   const router = useRouter();
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
@@ -94,10 +97,12 @@ export function useCreateBallot({
       polls: polls,
       proof: parsedPcd.pcd,
     };
+    console.log(finalRequest);
 
     async function doRequest() {
       setServerLoading(true);
       const res = await createBallot(finalRequest, loginState.token);
+      console.log(`[CREATE BALLOT res]`, res);
       setServerLoading(false);
 
       if (res === undefined) {
@@ -178,7 +183,17 @@ export function useCreateBallot({
       ballotConfig.creatorGroupUrl,
       "zupoll",
       sigHashEnc,
-      sigHashEnc
+      sigHashEnc,
+      url +
+        `?ballot=${JSON.stringify({
+          ballotTitle,
+          ballotDescription,
+          expiry,
+          ballotConfig,
+          ballotType,
+          ballotSignal,
+          polls,
+        })}`
     );
   }, [
     voterGroupUrl,
@@ -188,9 +203,9 @@ export function useCreateBallot({
     ballotType,
     expiry,
     polls,
-    ballotConfig.passportAppUrl,
-    ballotConfig.creatorGroupUrl,
     onError,
+    url,
+    ballotConfig,
   ]);
 
   return { loadingVoterGroupUrl, createBallotPCD };
