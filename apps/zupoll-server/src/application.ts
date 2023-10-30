@@ -10,7 +10,9 @@ export async function startApplication() {
     bot: undefined,
   };
 
-  startBot(context);
+  startBot(context).catch((e) => {
+    console.log("failed to start bot", e);
+  });
 
   for (const service of services) {
     await service(context);
