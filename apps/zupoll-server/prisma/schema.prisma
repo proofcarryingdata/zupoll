@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Ballot {
-  ballotId                  String     @default(uuid())
+  ballotId                  String     @default(uuid()) @unique
   ballotURL                 Int        @id @default(autoincrement())
   ballotTitle               String
   ballotDescription         String
@@ -27,6 +27,8 @@ model Ballot {
   ballotType                BallotType
   polls                     Poll[]
   expiryNotif               ExpiryNotifStatus? @default(NONE)
+  messages TGMessage[]
+
 }
 
 model Poll {
@@ -41,7 +43,7 @@ model Poll {
 }
 
 model Vote {
-  id                     String   @id @default(uuid())
+  id                     String   @id @default(uuid()) 
   pollId                 String
   voterType              UserType
   voterNullifier         String
@@ -54,6 +56,21 @@ model Vote {
   poll                   Poll     @relation(fields: [pollId], references: [id])
 }
 
+model TGMessage {
+  id                     String   @id @default(uuid())
+  ballotId               String
+  Ballot                 Ballot?     @relation(fields: [ballotId], references: [ballotId])
+  chatId                 BigInt
+  topicId                BigInt? 
+  messageId              BigInt 
+  messageType            MessageType 
+
+}
+
+enum MessageType {
+  CREATE
+  RESULTS
+}
 enum UserType {
   ANON
   NONANON
