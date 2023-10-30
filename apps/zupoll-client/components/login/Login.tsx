@@ -1,7 +1,8 @@
 import {
-  openGroupMembershipPopup,
+
   useZupassPopupMessages,
-} from "@pcd/passport-interface";
+} from "@pcd/passport-interface/src/PassportPopup";
+import { openGroupMembershipPopup } from "@pcd/passport-interface/src/SemaphoreGroupIntegration";
 import { useEffect, useState } from "react";
 import { login } from "../../src/api";
 import { LoginConfig, LoginState, ZupollError } from "../../src/types";

@@ -1,7 +1,3 @@
-import {
-  openGroupMembershipPopup,
-  useZupassPopupMessages,
-} from "@pcd/passport-interface";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { useRouter } from "next/router";
@@ -13,6 +9,10 @@ import { BallotSignal, CreateBallotRequest, PollSignal } from "./requestTypes";
 import { LoginState, PCDState, ZupollError } from "./types";
 import { useHistoricSemaphoreUrl } from "./useHistoricSemaphoreUrl";
 import { generateSnarkMessageHash } from "@pcd/util";
+import {
+  useZupassPopupMessages,
+  openGroupMembershipPopup,
+} from "@pcd/passport-interface";
 
 /**
  * Hook that handles requesting a PCD for creating a ballot.
@@ -56,7 +56,7 @@ export function useCreateBallot({
   } = useHistoricSemaphoreUrl(
     ballotConfig.passportServerUrl,
     ballotConfig.voterGroupId,
-    onError
+    onError,
   );
 
   // only accept pcdStr if we were expecting one
@@ -181,7 +181,7 @@ export function useCreateBallot({
       ballotConfig.creatorGroupUrl,
       "zupoll",
       sigHashEnc,
-      sigHashEnc
+      sigHashEnc,
     );
   }, [
     voterGroupUrl,
