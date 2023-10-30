@@ -20,7 +20,7 @@ export async function sendMessage(message: string, bot?: Bot) {
       const message_thread_id = parseInt(channel_id);
       const chat_id = parseInt(supergroup_id);
       if (!isNaN(message_thread_id) && !isNaN(chat_id)) {
-        await bot.api.sendMessage(chat_id, message, {
+        return await bot.api.sendMessage(chat_id, message, {
           message_thread_id,
           parse_mode: "HTML",
         });
@@ -55,11 +55,11 @@ export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
   return ballotPost;
 };
 
-const question = "What's your favorite fruit?";
-const options = ["Apple", "Banana", "Cherry"];
-const votes = [5, 3, 7];
+export function generatePollHTML() {
+  const question = "What's your favorite fruit?";
+  const options = ["Apple", "Banana", "Cherry"];
+  const votes = [5, 3, 7 + Math.floor(Math.random() * 10)];
 
-function generatePollHTML(ballot: string, options: string[], votes: number[]) {
   const totalVotes = votes.reduce((a, b) => a + b, 0);
 
   let html = `<b>${question}</b> - <i>${totalVotes} votes </i>\n\n`;
@@ -73,8 +73,7 @@ function generatePollHTML(ballot: string, options: string[], votes: number[]) {
     html += `${`🟦`.repeat(rounded) + `⬜️`.repeat(numWhite)}`;
     html += ` (${percentage.toFixed(2)}%)\n\n`;
   }
+  console.log(`Votes`, votes);
 
   return html;
 }
-
-export const voteStr = generatePollHTML(question, options, votes);
