@@ -12,25 +12,30 @@ export const PARTICIPANTS_GROUP_ID = "1";
 export const ADMIN_GROUP_ID = "4";
 export const PCDPASS_GROUP_ID = "5";
 
+const BASE_URL =
+  process.env.IS_LOCAL_HTTPS === "true"
+    ? "https://dev.local:3002"
+    : "http://localhost:3002";
+
 export const ZUZALU_PARTICIPANTS_GROUP_URL = IS_DEPLOYED
   ? process.env.ZUZALU_PARTICIPANTS_GROUP_URL
-  : `http://localhost:3002/semaphore/${PARTICIPANTS_GROUP_ID}`;
+  : `${BASE_URL}/semaphore/${PARTICIPANTS_GROUP_ID}`;
 
 export const ZUZALU_ORGANIZERS_GROUP_URL = IS_DEPLOYED
   ? process.env.ZUZALU_ORGANIZERS_GROUP_URL
-  : `http://localhost:3002/semaphore/${ADMIN_GROUP_ID}`;
+  : `${BASE_URL}/semaphore/${ADMIN_GROUP_ID}`;
 
 export const PCDPASS_USERS_GROUP_URL = IS_DEPLOYED
   ? process.env.PCDPASS_USERS_GROUP_URL
-  : `http://localhost:3002/semaphore/${PCDPASS_GROUP_ID}`;
+  : `${BASE_URL}/semaphore/${PCDPASS_GROUP_ID}`;
 
 export const ZUZALU_HISTORIC_API_URL = IS_DEPLOYED
   ? process.env.SEMAPHORE_HISTORIC_URL
-  : "http://localhost:3002/semaphore/valid-historic/";
+  : `${BASE_URL}/semaphore/valid-historic/`;
 
 export const PCDPASS_HISTORIC_API_URL = IS_DEPLOYED
   ? process.env.PCDPASS_HISTORIC_API_URL
-  : "http://localhost:3002/semaphore/valid-historic/";
+  : `${BASE_URL}/semaphore/valid-historic/`;
 
 export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
 
