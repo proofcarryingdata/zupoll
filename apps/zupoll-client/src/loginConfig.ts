@@ -12,6 +12,7 @@ import {
 } from "./env";
 import { LoginConfig, LoginConfigurationName } from "./types";
 
+console.log({ ZUPASS_URL });
 export const ZUZALU_ORGANIZER_LOGIN_CONFIG: LoginConfig = {
   groupId: ZUZALU_ADMINS_GROUP_ID,
   groupUrl: ZUZALU_ADMINS_GROUP_URL,

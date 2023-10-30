@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3104",
+    "dev:https": "NEXT_PUBLIC_IS_LOCAL_HTTPS=true NODE_ENV=development nodemon server.ts",
     "build": "next build",
     "export": "next export",
     "start": "next start -p 3104",
