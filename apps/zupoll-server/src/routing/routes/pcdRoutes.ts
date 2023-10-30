@@ -20,6 +20,7 @@ import {
 import {
   formatPollCreated,
   generatePollHTML,
+  PollWithVotes,
   sendMessage,
 } from "../../util/bot";
 import { prisma } from "../../util/prisma";
@@ -211,7 +212,8 @@ export function initPCDRoutes(
       for (const vote of request.votes) {
         // To confirm there is at most one vote per poll
         if (votePollIds.has(vote.pollId)) {
-          throw new Error("Duplicate vote for a poll.");
+          if (process.env.NODE_ENV !== "development")
+            throw new Error("Duplicate vote for a poll.");
         }
         votePollIds.add(vote.pollId);
 
@@ -222,6 +224,8 @@ export function initPCDRoutes(
         multiVoteSignal.voteSignals.push(voteSignal);
       }
       const signalHash = sha256(stableStringify(multiVoteSignal));
+
+      const allVotes: PollWithVotes[] = [];
 
       try {
         for (const vote of request.votes) {
@@ -288,7 +292,8 @@ export function initPCDRoutes(
           // This error string is used in the frontend to determine whether to
           // show the "already voted" message and thus display the vote results.
           // Do not change without changing the corresponding check in frontend.
-          throw new Error("User has already voted on this ballot.");
+          if (process.env.NODE_ENV !== "development")
+            throw new Error("User has already voted on this ballot.");
         }
 
         for (const vote of request.votes) {
@@ -302,15 +307,20 @@ export function initPCDRoutes(
               proof: request.proof,
             },
           });
+
+          const poll = await prisma.poll.findUnique({
+            where: {
+              id: vote.pollId,
+            },
+            include: { votes: true },
+          });
+          if (poll) allVotes.push(poll);
         }
 
         const multiVoteResponse: MultiVoteResponse = {
           userVotes: multiVoteSignal.voteSignals,
         };
-        // await sendMessage(
-        //   `${nullifier.slice(0, 5)} just voted on ${ballot.ballotTitle}!`,
-        //   context.bot
-        // );
+
         const originalBallotMsg = await prisma.tGMessage.findFirst({
           where: {
             ballotId: ballot.ballotId,
@@ -330,7 +340,7 @@ export function initPCDRoutes(
           const msg = await context.bot?.api.editMessageText(
             voteBallotMsg.chatId.toString(),
             parseInt(voteBallotMsg.messageId.toString()),
-            generatePollHTML(),
+            generatePollHTML(allVotes),
             { parse_mode: "HTML" }
           );
           if (msg) console.log(`Edited vote msg`);
@@ -339,7 +349,7 @@ export function initPCDRoutes(
           // TODO: Include "Vote Here"
           const msg = await context.bot?.api.sendMessage(
             originalBallotMsg.chatId.toString(),
-            generatePollHTML(),
+            generatePollHTML(allVotes),
             {
               reply_to_message_id: parseInt(
                 originalBallotMsg.messageId.toString()
