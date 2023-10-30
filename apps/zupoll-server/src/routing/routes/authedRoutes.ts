@@ -19,10 +19,16 @@ export function initAuthedRoutes(
     "/login",
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as LoginRequest;
-
+      console.log(`req.body`, request);
+      console.log(`req.params / query`, req.params, req.query);
       try {
         // request.semaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
         // SEMAPHORE_ADMIN_GROUP_URL or PCDPASS_USERS_GROUP_URL
+        console.log(
+          `[POST LOGIN] url ${request.semaphoreGroupUrl}`,
+          `proof:\n`,
+          request.proof
+        );
         await verifyGroupProof(request.semaphoreGroupUrl, request.proof, {});
 
         const accessToken = sign(

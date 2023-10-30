@@ -1,10 +1,8 @@
-import {
-  openZuzaluMembershipPopup,
-  usePassportPopupMessages,
-} from "@pcd/passport-interface";
+import { usePassportPopupMessages } from "@pcd/passport-interface";
 import { useEffect, useState } from "react";
 import { login } from "../../src/api";
 import { LoginConfig, LoginState, ZupollError } from "../../src/types";
+import { openZuzaluMembershipPopup } from "../../src/util";
 import { Button } from "../core/Button";
 
 /**
@@ -31,15 +29,34 @@ export function Login({
 }) {
   const [loggingIn, setLoggingIn] = useState(false);
   const [pcdStr] = usePassportPopupMessages();
+  const [myPcdStr, setMyPcdStr] = useState("");
+  console.log({ pcdStr });
+  console.log({ myPcdStr });
+  console.log({ loggingIn });
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    // Use URLSearchParams to get the proof query parameter
+    const proofString = url.searchParams.get("proof");
+    if (proofString) {
+      // Decode the URL-encoded string
+      const decodedProofString = decodeURIComponent(proofString);
+      // Parse the decoded string into an object
+      const proofObject = JSON.parse(decodedProofString);
+      console.log(`proof object`, proofObject);
+      setMyPcdStr(JSON.stringify(proofObject));
+      setLoggingIn(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!loggingIn) return;
-    if (!pcdStr) return;
+    if (!(pcdStr || myPcdStr)) return;
 
     (async () => {
       try {
         setServerLoading(true);
-        const token = await fetchLoginToken(config, pcdStr);
+        const token = await fetchLoginToken(config, myPcdStr || pcdStr);
         onLogin({
           token,
           config,
@@ -54,7 +71,7 @@ export function Login({
       setLoggingIn(false);
       setServerLoading(false);
     })();
-  }, [pcdStr, loggingIn, onLogin, onError, setServerLoading, config]);
+  }, [pcdStr, myPcdStr, loggingIn, onLogin, onError, setServerLoading, config]);
 
   return (
     <>
@@ -66,7 +83,10 @@ export function Login({
             config.passportAppUrl,
             window.location.origin + "/popup",
             config.groupUrl,
-            "zupoll"
+            "zupoll",
+            undefined,
+            undefined,
+            "https://dev.local:3004"
           );
         }}
         disabled={loggingIn}
