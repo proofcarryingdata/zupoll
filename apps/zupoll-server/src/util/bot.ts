@@ -1,4 +1,4 @@
-import { Ballot, BallotType, Poll } from "@prisma/client";
+import { Ballot, BallotType, Poll, Vote } from "@prisma/client";
 import { Bot } from "grammy";
 
 export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
@@ -55,25 +55,51 @@ export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
   return ballotPost;
 };
 
-export function generatePollHTML() {
-  const question = "What's your favorite fruit?";
-  const options = ["Apple", "Banana", "Cherry"];
-  const votes = [5, 3, 7 + Math.floor(Math.random() * 10)];
+export type PollWithVotes =
+  | (Poll & {
+      votes: Vote[];
+    })
+  | null;
 
-  const totalVotes = votes.reduce((a, b) => a + b, 0);
+export function generatePollHTML(pollsWithVotes?: PollWithVotes[]) {
+  let html = "";
 
-  let html = `<b>${question}</b> - <i>${totalVotes} votes </i>\n\n`;
+  if (pollsWithVotes) {
+    for (const pollWithVotes of pollsWithVotes) {
+      if (pollWithVotes) {
+        const question = pollWithVotes.body;
+        const options = pollWithVotes.options.slice(0, -1);
+        console.log(`poll options`, options);
+        const votes = pollWithVotes.votes;
+        const votesPerQuestion: number[] = [];
+        for (const v of votes) {
+          const currVotes = votesPerQuestion[v.voteIdx];
+          if (currVotes) {
+            votesPerQuestion[v.voteIdx] = currVotes + 1;
+          } else {
+            votesPerQuestion[v.voteIdx] = 1;
+          }
+        }
+        const totalVotes = votesPerQuestion.reduce((a, b) => a + b, 0);
 
-  for (let i = 0; i < options.length; i++) {
-    const percentage = (votes[i] / totalVotes) * 100;
-    const rounded = Math.round(percentage / 10);
-    const numWhite = 10 - rounded;
+        console.log(`totalVotes`, totalVotes);
+        console.log(`votes`, votes);
+        console.log(`votes per question`, votesPerQuestion);
 
-    html += `<i>${options[i]}:</i>\n\n`;
-    html += `${`🟦`.repeat(rounded) + `⬜️`.repeat(numWhite)}`;
-    html += ` (${percentage.toFixed(2)}%)\n\n`;
+        html += `<b>${question}</b> - <i>${totalVotes} votes </i>\n\n`;
+
+        for (let i = 0; i < options.length; i++) {
+          const percentage = (votesPerQuestion[i] / totalVotes) * 100;
+          const rounded = Math.round(percentage / 10);
+          const numWhite = 10 - rounded;
+
+          html += `<i>${options[i]}:</i>\n\n`;
+          html += `${`🟦`.repeat(rounded) + `⬜️`.repeat(numWhite)}`;
+          html += ` (${percentage.toFixed(2)}%)\n\n`;
+        }
+      }
+      //
+    }
   }
-  console.log(`Votes`, votes);
-
   return html;
 }
