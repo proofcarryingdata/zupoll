@@ -7,6 +7,16 @@ import { MainScreen } from "../components/main/MainScreen";
 import { LoginState } from "../src/types";
 import { useSavedLoginState } from "../src/useLoginState";
 
+function removeQueryParameters() {
+  const currentUrl = new URL(window.location.toString());
+
+  // Clear all query parameters
+  currentUrl.search = "";
+
+  // Update the browser's address bar without refreshing the page
+  window.history.replaceState({}, document.title, currentUrl.toString());
+}
+
 export default function Index() {
   const router = useRouter();
   const {
@@ -30,6 +40,7 @@ export default function Index() {
       <LoginScreen
         onLogin={(state: LoginState) => {
           replaceLoginState(state);
+          removeQueryParameters();
         }}
       />
     );

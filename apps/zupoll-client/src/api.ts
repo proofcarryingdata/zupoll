@@ -61,7 +61,7 @@ export async function login(
   pcdStr: string
 ): Promise<Response | undefined> {
   const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
-
+  console.log(`[PARSED PCD]`, parsedPcd);
   const request = {
     semaphoreGroupUrl: config.groupUrl,
     proof: parsedPcd.pcd,
