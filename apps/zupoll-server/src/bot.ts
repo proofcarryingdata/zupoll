@@ -151,6 +151,7 @@ export async function startBot(context: ApplicationContext): Promise<void> {
   await sleep(5000);
 
   context.bot.start({
+    allowed_updates: ["message"],
     onStart(info) {
       console.log(`[TELEGRAM] Started bot '${info.username}' successfully!`);
     },

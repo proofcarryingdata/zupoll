@@ -28,7 +28,7 @@ export async function verifyGroupProof(
     allowedGroups?: string[];
     allowedRoots?: string[];
     claimedExtNullifier?: string;
-  },
+  }
 ): Promise<string> {
   if (
     options.allowedGroups &&
@@ -81,7 +81,7 @@ export async function verifyGroupProof(
       const validResidentRoot = await verifyRootValidity(
         PARTICIPANTS_GROUP_ID,
         pcd.claim.merkleRoot,
-        ZUZALU_HISTORIC_API_URL!,
+        ZUZALU_HISTORIC_API_URL!
       );
       if (validResidentRoot) {
         residentRootCache.add(pcd.claim.merkleRoot);
@@ -94,7 +94,7 @@ export async function verifyGroupProof(
       const validOrganizerRoot = await verifyRootValidity(
         ADMIN_GROUP_ID,
         pcd.claim.merkleRoot,
-        ZUZALU_HISTORIC_API_URL!,
+        ZUZALU_HISTORIC_API_URL!
       );
       if (validOrganizerRoot) {
         organizerRootCache.add(pcd.claim.merkleRoot);
@@ -107,7 +107,7 @@ export async function verifyGroupProof(
       const validPcdpassRoot = await verifyRootValidity(
         PCDPASS_GROUP_ID,
         pcd.claim.merkleRoot,
-        PCDPASS_HISTORIC_API_URL!,
+        PCDPASS_HISTORIC_API_URL!
       );
       if (validPcdpassRoot) {
         pcdpassUserRootCache.add(pcd.claim.merkleRoot);
@@ -117,7 +117,7 @@ export async function verifyGroupProof(
     }
   } else {
     throw new Error(
-      "No allowed roots specified and group is neither the organizer or resident group.",
+      "No allowed roots specified and group is neither the organizer or resident group."
     );
   }
 
@@ -128,7 +128,7 @@ export async function verifySignatureProof(
   commitment: string,
   proof: string,
   signal: string,
-  allowedGroups: string[],
+  allowedGroups: string[]
 ): Promise<string> {
   let found = false;
   for (const group of allowedGroups) {
@@ -166,7 +166,7 @@ export async function verifySignatureProof(
 async function verifyRootValidity(
   groupId: string,
   root: string,
-  historicAPI: string,
+  historicAPI: string
 ): Promise<boolean> {
   const url = historicAPI + groupId + "/" + root;
   const response = await fetch(url);

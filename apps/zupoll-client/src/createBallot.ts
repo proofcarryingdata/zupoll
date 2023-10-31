@@ -185,7 +185,7 @@ export function useCreateBallot({
       sigHashEnc,
       sigHashEnc,
       url +
-        `?ballot=${JSON.stringify({
+        `?ballot=${stableStringify({
           ballotTitle,
           ballotDescription,
           expiry,
