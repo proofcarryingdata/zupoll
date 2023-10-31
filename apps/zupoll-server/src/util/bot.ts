@@ -89,7 +89,9 @@ export function generatePollHTML(pollsWithVotes?: PollWithVotes[]) {
         html += `<b>${question}</b> - <i>${totalVotes} votes </i>\n\n`;
 
         for (let i = 0; i < options.length; i++) {
-          const percentage = (votesPerQuestion[i] / totalVotes) * 100;
+          const percentage = votesPerQuestion?.[i]
+            ? (votesPerQuestion[i] / totalVotes) * 100
+            : 0;
           const rounded = Math.round(percentage / 10);
           const numWhite = 10 - rounded;
 

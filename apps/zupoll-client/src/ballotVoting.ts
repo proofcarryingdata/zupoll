@@ -201,7 +201,7 @@ function getVoted(): Array<string> {
   return voted;
 }
 
-function setVoted(ballotId: string) {
+export function setVoted(ballotId: string) {
   const newVoted = getVoted();
   newVoted.push(ballotId);
   window.localStorage.setItem("voted", JSON.stringify(newVoted));
@@ -212,7 +212,7 @@ export function getBallotVotes(ballotId: string) {
   return allVotes[ballotId] || {};
 }
 
-function setBallotVotes(ballotId: string, userVotes: VoteSignal[]) {
+export function setBallotVotes(ballotId: string, userVotes: VoteSignal[]) {
   const allVotes = JSON.parse(window.localStorage.getItem("allVotes") || "{}");
   allVotes[ballotId] = {};
   for (const vote of userVotes) {
