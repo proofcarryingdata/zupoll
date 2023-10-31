@@ -1,5 +1,5 @@
 import { useZupassPopupMessages } from "@pcd/passport-interface/src/PassportPopup";
-import { openGroupMembershipPopup } from "@pcd/passport-interface/src/SemaphoreGroupIntegration";
+import { generateSnarkMessageHash } from "@pcd/util";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { useCallback, useEffect, useRef } from "react";
@@ -13,7 +13,7 @@ import {
   VoteSignal,
 } from "./requestTypes";
 import { LoginState, PCDState, ZupollError } from "./types";
-import { generateSnarkMessageHash } from "@pcd/util";
+import { openGroupMembershipPopup } from "./util";
 
 /**
  * Hook that handles requesting a PCD for voting on a set of polls on a ballot.
@@ -35,6 +35,7 @@ export function useBallotVoting({
   setServerLoading,
   refresh,
   loginState,
+  returnUrl,
 }: {
   ballotId: string;
   ballotURL: string;
@@ -45,6 +46,7 @@ export function useBallotVoting({
   setServerLoading: (loading: boolean) => void;
   refresh: (id: string) => void;
   loginState: LoginState;
+  returnUrl?: string;
 }) {
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
   const [pcdStr, _passportPendingPCDStr] = useZupassPopupMessages();
@@ -160,15 +162,30 @@ export function useBallotVoting({
     const sigHashEnc = generateSnarkMessageHash(signalHash).toString();
     const externalNullifier = generateSnarkMessageHash(ballotId).toString();
 
+    // @ts-expect-error poll to vote
+    const polltoVoteList = [...pollToVote];
+
     openGroupMembershipPopup(
       loginState.config.passportAppUrl,
       window.location.origin + "/popup",
       ballotVoterSemaphoreGroupUrl,
       "zupoll",
       sigHashEnc,
-      externalNullifier
+      externalNullifier,
+      // We know that ?ballotId=1 is the first query param
+      returnUrl
+        ? returnUrl +
+            `&vote=${JSON.stringify({ pollToVoteJSON: polltoVoteList, polls })}`
+        : undefined
     );
-  }, [loginState, polls, ballotId, ballotVoterSemaphoreGroupUrl, pollToVote]);
+  }, [
+    loginState,
+    polls,
+    ballotId,
+    ballotVoterSemaphoreGroupUrl,
+    pollToVote,
+    returnUrl,
+  ]);
 
   return createBallotVotePCD;
 }

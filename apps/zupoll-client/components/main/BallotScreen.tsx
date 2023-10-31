@@ -2,14 +2,18 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { listBallotPolls } from "../../src/api";
+import { listBallotPolls, voteBallot } from "../../src/api";
 import {
   getBallotVotes,
   useBallotVoting,
   votedOn,
 } from "../../src/ballotVoting";
-import { Ballot } from "../../src/prismaTypes";
-import { BallotPollResponse, PollWithCounts } from "../../src/requestTypes";
+import { Ballot, UserType, Vote } from "../../src/prismaTypes";
+import {
+  BallotPollResponse,
+  MultiVoteRequest,
+  PollWithCounts,
+} from "../../src/requestTypes";
 import { LoginState, ZupollError } from "../../src/types";
 import { Center } from "../core";
 import { ReturnHeader } from "../core/Headers";
@@ -44,6 +48,11 @@ export function BallotScreen({
     useState<string>("");
   const [expired, setExpired] = useState<boolean>(false);
   const [refresh, setRefresh] = useState<string>("");
+  const [parsedPcd, setMyparsedPcd] = useState<any>();
+  const [myVote, setMyVote] = useState<{
+    polls: PollWithCounts[];
+    pollToVote: Map<string, number | undefined>;
+  }>();
 
   // Retrieve polls under this ballot, refresh after user votes
   useEffect(() => {
@@ -134,6 +143,76 @@ export function BallotScreen({
   /**
    * VOTING LOGIC
    */
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    console.log({ url });
+    // Use URLSearchParams to get the proof query parameter
+    const proofString = url.searchParams.get("proof");
+    const voteString = url.searchParams.get("vote");
+    console.log({ proofString });
+    if (proofString && voteString) {
+      console.log(`Have proof and vote`);
+      const voteStr = JSON.parse(voteString) as {
+        polls: PollWithCounts[];
+        pollToVoteJSON: any; // TODO: actually type this
+      };
+      console.log(`vote str`, voteStr);
+      const vote = {
+        polls: voteStr.polls,
+        pollToVote: new Map(voteStr.pollToVoteJSON),
+      };
+      console.log({ vote });
+
+      const decodedProofString = decodeURIComponent(proofString);
+      // Parse the decoded string into an object
+      const proofObject = JSON.parse(decodedProofString);
+      // @ts-expect-error map type
+      setMyVote(vote);
+      setMyparsedPcd(proofObject);
+    }
+    // uwu
+  }, []);
+
+  useEffect(() => {
+    console.log(`parsedPCd`, parsedPcd);
+    if (!parsedPcd || !myVote || !ballotVoterSemaphoreGroupUrl) return;
+    console.log(`Got pcd str and vote, submitting...`);
+
+    const doRequest = async () => {
+      const request: MultiVoteRequest = {
+        votes: [],
+        ballotURL: ballotURL,
+        voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
+        proof: parsedPcd.pcd,
+      };
+      myVote.polls.forEach((poll: PollWithCounts) => {
+        const voteIdx = myVote.pollToVote.get(poll.id);
+        if (voteIdx !== undefined) {
+          const vote: Vote = {
+            id: "",
+            pollId: poll.id,
+            voterType: UserType.ANON,
+            voterNullifier: "",
+            voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
+            voterName: null,
+            voterUuid: null,
+            voterCommitment: null,
+            voteIdx: voteIdx,
+            proof: parsedPcd.pcd,
+          };
+          request.votes.push(vote);
+        }
+      });
+
+      setServerLoading(true);
+      console.log(`submitting req`, request);
+      const res = await voteBallot(request, loginState.token);
+      console.log(`submit res`, res);
+      setServerLoading(false);
+    };
+    doRequest();
+  }, [parsedPcd, loginState, myVote, ballotURL, ballotVoterSemaphoreGroupUrl]);
+
   const [canVote, setCanVote] = useState<boolean>(true);
   const [pollToVote, setPollToVote] = useState(
     new Map<string, number | undefined>()
@@ -172,6 +251,7 @@ export function BallotScreen({
       setRefresh(id);
     },
     loginState,
+    returnUrl: window.location.href, // If exists, will use returnUrl instead of pop up to get PCD.
   });
 
   return (
