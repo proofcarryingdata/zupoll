@@ -44,12 +44,6 @@ export async function verifyGroupProof(
   }
 
   // check externalNullifier
-  console.log(
-    `Nullifier check`,
-    options.claimedExtNullifier,
-    generateSnarkMessageHash(options?.claimedExtNullifier || ""),
-    pcd.claim.externalNullifier
-  );
   if (
     options.claimedExtNullifier &&
     generateSnarkMessageHash(options.claimedExtNullifier).toString() !==
