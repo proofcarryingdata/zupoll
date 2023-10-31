@@ -2,8 +2,12 @@ import { BallotType } from "@prisma/client";
 import { CronJob } from "cron";
 import { Api, Bot, Context, InlineKeyboard, RawApi } from "grammy";
 import { ApplicationContext } from "./types";
-import { SITE_URL } from "./util/auth";
-import { cleanString, formatPollCreated, sendMessage } from "./util/bot";
+import {
+  SITE_URL,
+  cleanString,
+  formatPollCreated,
+  sendMessage,
+} from "./util/bot";
 
 const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
   console.log(`Running find ballots: ${Date.now()}`);
@@ -32,6 +36,9 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
     const days = Math.ceil(minutes / (24 * 60));
 
     const pollUrl = `${SITE_URL}/ballot?id=${ballot.ballotURL}`;
+    const tgPollUrl = process.env.BOT_ZUPOLL_LINK
+      ? `${process.env.BOT_ZUPOLL_LINK}/?startapp=${ballot.ballotURL}`
+      : undefined;
 
     if (days === 7 && ballot.expiryNotif === "NONE") {
       await prisma.ballot.update({
@@ -45,7 +52,9 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
 
       const expiryMessage = `<b>${cleanString(
         ballot.ballotTitle
-      )}</b> will expire in less than 1 week. Vote at ${pollUrl}`;
+      )}</b> will expire in less than 1 week. Vote at ${
+        tgPollUrl + " or " || ""
+      }${pollUrl}`;
       await sendMessage(expiryMessage, bot);
     } else if (
       hours === 24 &&
@@ -62,7 +71,9 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
 
       const expiryMessage = `<b>${cleanString(
         ballot.ballotTitle
-      )}</b> will expire in less than 24 hours. Vote at ${pollUrl}`;
+      )}</b> will expire in less than 24 hours. Vote at ${
+        tgPollUrl + " or " || ""
+      }${pollUrl}`;
       await sendMessage(expiryMessage, bot);
     } else if (
       hours === 1 &&
@@ -79,7 +90,9 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
 
       const expiryMessage = `<b>${cleanString(
         ballot.ballotTitle
-      )}</b> will expire in less than 1 hour! Get your votes in at ${pollUrl}`;
+      )}</b> will expire in less than 1 hour! Get your votes in at ${
+        tgPollUrl + " or " || ""
+      }${pollUrl}`;
       await sendMessage(expiryMessage, bot);
     }
   }

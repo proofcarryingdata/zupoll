@@ -37,8 +37,6 @@ export const PCDPASS_HISTORIC_API_URL = IS_DEPLOYED
   ? process.env.PCDPASS_HISTORIC_API_URL
   : `${BASE_URL}/semaphore/valid-historic/`;
 
-export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
-
 export interface GroupJwtPayload extends JwtPayload {
   groupUrl: string;
 }
