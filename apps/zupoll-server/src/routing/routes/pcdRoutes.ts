@@ -1,4 +1,11 @@
-import { Ballot, BallotType, Poll, UserType, Vote } from "@prisma/client";
+import {
+  Ballot,
+  BallotType,
+  MessageType,
+  Poll,
+  UserType,
+  Vote,
+} from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
@@ -7,11 +14,15 @@ import {
   authenticateJWT,
   getVisibleBallotTypesForUser,
   PCDPASS_USERS_GROUP_URL,
-  SITE_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../../util/auth";
-import { cleanString, sendMessage } from "../../util/bot";
+import {
+  formatPollCreated,
+  generatePollHTML,
+  PollWithVotes,
+  sendMessage,
+} from "../../util/bot";
 import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
@@ -150,20 +161,29 @@ export function initPCDRoutes(
             newBallot.ballotType !== BallotType.ORGANIZERONLY
           ) {
             // send message on TG channel, if bot is setup
-            let ballotPost =
-              newBallot.ballotType === BallotType.STRAWPOLL
-                ? "New straw poll posted!"
-                : "New advisory vote posted!";
-            ballotPost =
-              ballotPost +
-              `\n\nTitle: <b>${cleanString(newBallot.ballotTitle)}</b>` +
-              `\nDescription: ${cleanString(newBallot.ballotDescription)}` +
-              `\nExpiry: ${new Date(newBallot.expiry).toLocaleString("en-US", {
-                timeZone: "Europe/Podgorica",
-              })}` +
-              `\n\nLink: ${SITE_URL}ballot?id=${newBallot.ballotURL}`;
+            const ballotPost = formatPollCreated(newBallot, request.polls);
             console.log(ballotPost);
-            await sendMessage(ballotPost, context.bot);
+            const msg = await sendMessage(ballotPost, context.bot);
+            if (msg) {
+              const chatId = process.env.BOT_SUPERGROUP_ID;
+              const threadId = process.env.BOT_CHANNEL_ID;
+              if (!chatId || !threadId) {
+                console.log(`No chatId or threadId found in .env`);
+              } else {
+                // Write to db
+                await prisma.tGMessage.create({
+                  data: {
+                    messageId: msg.message_id,
+                    chatId: msg.chat.id,
+                    topicId: msg.message_thread_id,
+                    ballotId: newBallot.ballotId,
+                    messageType: MessageType.CREATE,
+                  },
+                });
+                console.log(`[DB] message id stored`);
+              }
+              //
+            }
           }
 
           res.json({
@@ -192,7 +212,8 @@ export function initPCDRoutes(
       for (const vote of request.votes) {
         // To confirm there is at most one vote per poll
         if (votePollIds.has(vote.pollId)) {
-          throw new Error("Duplicate vote for a poll.");
+          if (process.env.NODE_ENV !== "development")
+            throw new Error("Duplicate vote for a poll.");
         }
         votePollIds.add(vote.pollId);
 
@@ -203,6 +224,8 @@ export function initPCDRoutes(
         multiVoteSignal.voteSignals.push(voteSignal);
       }
       const signalHash = sha256(stableStringify(multiVoteSignal));
+
+      const allVotes: PollWithVotes[] = [];
 
       try {
         for (const vote of request.votes) {
@@ -269,7 +292,8 @@ export function initPCDRoutes(
           // This error string is used in the frontend to determine whether to
           // show the "already voted" message and thus display the vote results.
           // Do not change without changing the corresponding check in frontend.
-          throw new Error("User has already voted on this ballot.");
+          if (process.env.NODE_ENV !== "development")
+            throw new Error("User has already voted on this ballot.");
         }
 
         for (const vote of request.votes) {
@@ -283,11 +307,70 @@ export function initPCDRoutes(
               proof: request.proof,
             },
           });
+
+          const poll = await prisma.poll.findUnique({
+            where: {
+              id: vote.pollId,
+            },
+            include: { votes: true },
+          });
+          if (poll) allVotes.push(poll);
         }
 
         const multiVoteResponse: MultiVoteResponse = {
           userVotes: multiVoteSignal.voteSignals,
         };
+
+        const originalBallotMsg = await prisma.tGMessage.findFirst({
+          where: {
+            ballotId: ballot.ballotId,
+            messageType: MessageType.CREATE,
+          },
+        });
+        const voteBallotMsg = await prisma.tGMessage.findFirst({
+          where: {
+            ballotId: ballot.ballotId,
+            messageType: MessageType.RESULTS,
+          },
+        });
+        if (voteBallotMsg) {
+          console.log(`Vote msg found`);
+
+          //
+          const msg = await context.bot?.api.editMessageText(
+            voteBallotMsg.chatId.toString(),
+            parseInt(voteBallotMsg.messageId.toString()),
+            generatePollHTML(allVotes),
+            { parse_mode: "HTML" }
+          );
+          if (msg) console.log(`Edited vote msg`);
+        } else if (originalBallotMsg) {
+          console.log(`No vote msg found`);
+          // TODO: Include "Vote Here"
+          const msg = await context.bot?.api.sendMessage(
+            originalBallotMsg.chatId.toString(),
+            generatePollHTML(allVotes),
+            {
+              reply_to_message_id: parseInt(
+                originalBallotMsg.messageId.toString()
+              ),
+              parse_mode: "HTML",
+            }
+          );
+          if (msg) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { id, messageId, ...resultsMsg } = originalBallotMsg;
+            await prisma.tGMessage.create({
+              data: {
+                ...resultsMsg,
+                messageId: msg.message_id,
+                messageType: MessageType.RESULTS,
+              },
+            });
+            console.log(`Updated DB with RESULTS`);
+          }
+          //
+        }
         res.json(multiVoteResponse);
       } catch (e) {
         console.error(e);

@@ -1,5 +1,7 @@
 import cors from "cors";
 import express, { NextFunction } from "express";
+import * as fs from "fs";
+import * as https from "https";
 import morgan from "morgan";
 import { ApplicationContext } from "../types";
 import { initAuthedRoutes } from "./routes/authedRoutes";
@@ -45,15 +47,29 @@ export async function startServer(
         res.status(500).send(err.message);
       }
     );
+    if (process.env.IS_LOCAL_HTTPS === "true") {
+      const localEndpoint = `https://dev.local:${port}`;
+      const httpsOptions = {
+        key: fs.readFileSync("../certificates/dev.local-key.pem"),
+        cert: fs.readFileSync("../certificates/dev.local.pem"),
+      };
 
-    app
-      .listen(port, () => {
-        console.log(`[INIT] HTTP server listening on port ${port}`);
+      const server = https.createServer(httpsOptions, app).listen(port, () => {
+        console.log(`[INIT] Local HTTPS server listening on ${localEndpoint}`);
         resolve(app);
-      })
-      .on("error", (e: Error) => {
+      });
+
+      server.on("error", (e: Error) => {
         reject(e);
       });
+    } else {
+      const server = app.listen(port, () => {
+        resolve(app);
+      });
+      server.on("error", (e: Error) => {
+        reject(e);
+      });
+    }
 
     return app;
   });

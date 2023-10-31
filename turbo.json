@@ -13,6 +13,9 @@
     "dev": {
       "cache": false
     },
+    "dev:https": {
+      "cache": false
+    },
     "test": {
       "outputs": [],
       "cache": false
@@ -39,6 +42,8 @@
     "PCDPASS_USERS_GROUP_URL",
     "PCDPASS_HISTORIC_API_URL",
     "ZUZALU_PARTICIPANTS_GROUP_URL",
-    "ZUZALU_ORGANIZERS_GROUP_URL"
+    "ZUZALU_ORGANIZERS_GROUP_URL",
+    "IS_LOCAL_HTTPS",
+    "NEXT_PUBLIC_IS_LOCAL_HTTPS"
   ]
 }

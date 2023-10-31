@@ -6,6 +6,7 @@ import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
 import { LoginState } from "../src/types";
 import { useSavedLoginState } from "../src/useLoginState";
+import { removeQueryParameters } from "../src/util";
 
 export default function Index() {
   const router = useRouter();
@@ -30,6 +31,7 @@ export default function Index() {
       <LoginScreen
         onLogin={(state: LoginState) => {
           replaceLoginState(state);
+          removeQueryParameters();
         }}
       />
     );
