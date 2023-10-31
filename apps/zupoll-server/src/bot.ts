@@ -1,4 +1,5 @@
 import { BallotType } from "@prisma/client";
+import { CronJob } from "cron";
 import { Api, Bot, Context, InlineKeyboard, RawApi } from "grammy";
 import { ApplicationContext } from "./types";
 import { SITE_URL } from "./util/auth";
@@ -102,7 +103,7 @@ export async function startBot(context: ApplicationContext): Promise<void> {
     });
   });
 
-  context.bot.command("latest", async (ctx) => {
+  context.bot.command("latest", async () => {
     const ballots = await prisma.ballot.findMany({
       select: {
         ballotTitle: true,
@@ -140,16 +141,15 @@ export async function startBot(context: ApplicationContext): Promise<void> {
   });
 
   // start up cron jobs
-  // const cronJob = new CronJob(
-  //   "0,15,30,45 * * * *", // every 15 minutes, check if any ballots are expiring soon
-  //   async () => {
-  //     if (context.bot) {
-  //       await findBallots(context.bot);
-  //     }
-  //   }
-  // );
+  const cronJob = new CronJob(
+    "0,15,30,45 * * * *", // every 15 minutes, check if any ballots are expiring soon
+    async () => {
+      if (context.bot) {
+        await findBallots(context.bot);
+      }
+    }
+  );
 
-  // cronJob.start();
-  // const res = setInterval(findBallots, 1000 * 10);
+  cronJob.start();
   console.log("started bot");
 }
