@@ -1,7 +1,4 @@
-import {
-  openZuzaluMembershipPopup,
-  usePassportPopupMessages,
-} from "@pcd/passport-interface";
+import { usePassportPopupMessages } from "@pcd/passport-interface";
 import { generateMessageHash } from "@pcd/semaphore-group-pcd";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
@@ -16,6 +13,7 @@ import {
   VoteSignal,
 } from "./requestTypes";
 import { LoginState, PCDState, ZupollError } from "./types";
+import { openZuzaluMembershipPopup } from "./util";
 
 /**
  * Hook that handles requesting a PCD for voting on a set of polls on a ballot.
@@ -37,6 +35,7 @@ export function useBallotVoting({
   setServerLoading,
   refresh,
   loginState,
+  returnUrl,
 }: {
   ballotId: string;
   ballotURL: string;
@@ -47,6 +46,7 @@ export function useBallotVoting({
   setServerLoading: (loading: boolean) => void;
   refresh: (id: string) => void;
   loginState: LoginState;
+  returnUrl?: string;
 }) {
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
   const [pcdStr, _passportPendingPCDStr] = usePassportPopupMessages();
@@ -162,15 +162,30 @@ export function useBallotVoting({
     const sigHashEnc = generateMessageHash(signalHash).toString();
     const externalNullifier = generateMessageHash(ballotId).toString();
 
+    // @ts-expect-error poll to vote
+    const polltoVoteList = [...pollToVote];
+
     openZuzaluMembershipPopup(
       loginState.config.passportAppUrl,
       window.location.origin + "/popup",
       ballotVoterSemaphoreGroupUrl,
       "zupoll",
       sigHashEnc,
-      externalNullifier
+      externalNullifier,
+      // We know that ?ballotId=1 is the first query param
+      returnUrl
+        ? returnUrl +
+            `&vote=${JSON.stringify({ pollToVoteJSON: polltoVoteList, polls })}`
+        : undefined
     );
-  }, [loginState, polls, ballotId, ballotVoterSemaphoreGroupUrl, pollToVote]);
+  }, [
+    loginState,
+    polls,
+    ballotId,
+    ballotVoterSemaphoreGroupUrl,
+    pollToVote,
+    returnUrl,
+  ]);
 
   return createBallotVotePCD;
 }
