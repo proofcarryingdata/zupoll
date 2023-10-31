@@ -5,6 +5,8 @@ import { SemaphoreGroupPCDPackage } from "@pcd/semaphore-group-pcd";
 import { SemaphoreIdentityPCDPackage } from "@pcd/semaphore-identity-pcd";
 import { generateSnarkMessageHash } from "@pcd/util";
 
+export const USE_CREATE_BALLOT_REDIRECT = false;
+
 export function openGroupMembershipPopup(
   urlToZupassClient: string,
   popupUrl: string,

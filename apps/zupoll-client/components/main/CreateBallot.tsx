@@ -24,6 +24,7 @@ import {
   StyledSelect,
 } from "../core/Form";
 import { RippleLoaderLight } from "../core/RippleLoader";
+import { USE_CREATE_BALLOT_REDIRECT } from "../../src/util";
 
 interface BallotFromUrl {
   ballotConfig: BallotConfig;
@@ -192,6 +193,13 @@ export function CreateBallot({
 
   return (
     <>
+      {USE_CREATE_BALLOT_REDIRECT ? (
+        ""
+      ) : (
+        <p style={{ color: "white" }}>
+          Can only create polls in the browser, not Telegram
+        </p>
+      )}
       <FormContainer>
         <StyledForm>
           <h2>Ballot Info</h2>
