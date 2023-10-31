@@ -8,6 +8,7 @@ import {
   formatPollCreated,
   sendMessage,
 } from "./util/bot";
+import { sleep } from "@pcd/util";
 
 const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
   console.log(`Running find ballots: ${Date.now()}`);
@@ -147,11 +148,15 @@ export async function startBot(context: ApplicationContext): Promise<void> {
     // List most recent ballots
   });
 
-  await context.bot.start({
+  await sleep(5000);
+
+  context.bot.start({
     onStart(info) {
       console.log(`[TELEGRAM] Started bot '${info.username}' successfully!`);
     },
   });
+
+  context.bot.catch((error) => console.log(`[TELEGRAM] Bot error`, error));
 
   // start up cron jobs
   const cronJob = new CronJob(
