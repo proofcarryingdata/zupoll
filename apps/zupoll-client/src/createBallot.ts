@@ -10,7 +10,7 @@ import { BallotType, Poll, UserType } from "./prismaTypes";
 import { BallotSignal, CreateBallotRequest, PollSignal } from "./requestTypes";
 import { LoginState, PCDState, ZupollError } from "./types";
 import { useHistoricSemaphoreUrl } from "./useHistoricSemaphoreUrl";
-import { openGroupMembershipPopup } from "./util";
+import { USE_CREATE_BALLOT_REDIRECT, openGroupMembershipPopup } from "./util";
 
 /**
  * Hook that handles requesting a PCD for creating a ballot.
@@ -184,16 +184,18 @@ export function useCreateBallot({
       "zupoll",
       sigHashEnc,
       sigHashEnc,
-      url +
-        `?ballot=${stableStringify({
-          ballotTitle,
-          ballotDescription,
-          expiry,
-          ballotConfig,
-          ballotType,
-          ballotSignal,
-          polls,
-        })}`
+      USE_CREATE_BALLOT_REDIRECT
+        ? url +
+            `?ballot=${stableStringify({
+              ballotTitle,
+              ballotDescription,
+              expiry,
+              ballotConfig,
+              ballotType,
+              ballotSignal,
+              polls,
+            })}`
+        : undefined
     );
   }, [
     voterGroupUrl,
