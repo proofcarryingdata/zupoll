@@ -10,6 +10,15 @@ import { removeQueryParameters } from "../src/util";
 
 export default function Index() {
   const router = useRouter();
+
+  useEffect(() => {
+    // Check if the query parameter exists
+    if (router.query.tgWebAppStartParam) {
+      console.log(`got start param`, router.query.tgWebAppStartParam);
+      router.push(`/ballot?id=${router.query.tgWebAppStartParam}`);
+    }
+  }, [router.query.tgWebAppStartParam, router]);
+
   const {
     loginState,
     replaceLoginState,
