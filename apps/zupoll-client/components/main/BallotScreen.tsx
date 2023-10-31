@@ -5,6 +5,8 @@ import styled from "styled-components";
 import { listBallotPolls, voteBallot } from "../../src/api";
 import {
   getBallotVotes,
+  setBallotVotes,
+  setVoted,
   useBallotVoting,
   votedOn,
 } from "../../src/ballotVoting";
@@ -12,9 +14,11 @@ import { Ballot, UserType, Vote } from "../../src/prismaTypes";
 import {
   BallotPollResponse,
   MultiVoteRequest,
+  MultiVoteResponse,
   PollWithCounts,
 } from "../../src/requestTypes";
 import { LoginState, ZupollError } from "../../src/types";
+import { removeQueryParameters } from "../../src/util";
 import { Center } from "../core";
 import { ReturnHeader } from "../core/Headers";
 import {
@@ -207,11 +211,30 @@ export function BallotScreen({
       setServerLoading(true);
       console.log(`submitting req`, request);
       const res = await voteBallot(request, loginState.token);
-      console.log(`submit res`, res);
-      setServerLoading(false);
+      if (res && res.status === 200) {
+        const multiVotesResponse: MultiVoteResponse = await res.json();
+
+        setVoted(ballotId);
+        setBallotVotes(ballotId, multiVotesResponse.userVotes);
+        setRefresh(ballotId);
+        setPollToVote(new Map());
+        setMyVote(undefined);
+        setMyparsedPcd(undefined);
+        console.log(`submit res`, res);
+        setServerLoading(false);
+        removeQueryParameters(["vote", "proof", "finished"]);
+      }
     };
     doRequest();
-  }, [parsedPcd, loginState, myVote, ballotURL, ballotVoterSemaphoreGroupUrl]);
+  }, [
+    parsedPcd,
+    loginState,
+    myVote,
+    ballotURL,
+    ballotVoterSemaphoreGroupUrl,
+    ballotId,
+    refresh,
+  ]);
 
   const [canVote, setCanVote] = useState<boolean>(true);
   const [pollToVote, setPollToVote] = useState(
