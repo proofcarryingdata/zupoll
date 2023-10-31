@@ -1,4 +1,4 @@
-import { useZupassPopupSetup } from "@pcd/passport-interface";
+import { useZupassPopupSetup } from "@pcd/passport-interface/src/PassportPopup";
 
 /**
  * This page is necessary to receive PCDs from the passport after requesting

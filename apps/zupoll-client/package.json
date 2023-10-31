@@ -11,6 +11,7 @@
     "staging-env-local": "./staging-env-local.sh"
   },
   "dependencies": {
+    "@pcd/email-pcd": "^0.3.0",
     "@pcd/passport-interface": "^0.8.0",
     "@pcd/pcd-types": "^0.8.0",
     "@pcd/semaphore-group-pcd": "^0.8.0",

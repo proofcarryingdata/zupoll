@@ -1,7 +1,5 @@
-import {
-  openGroupMembershipPopup,
-  useZupassPopupMessages,
-} from "@pcd/passport-interface";
+import { useZupassPopupMessages } from "@pcd/passport-interface/src/PassportPopup";
+import { openGroupMembershipPopup } from "@pcd/passport-interface/src/SemaphoreGroupIntegration";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { useCallback, useEffect, useRef } from "react";
@@ -168,7 +166,7 @@ export function useBallotVoting({
       ballotVoterSemaphoreGroupUrl,
       "zupoll",
       sigHashEnc,
-      externalNullifier,
+      externalNullifier
     );
   }, [loginState, polls, ballotId, ballotVoterSemaphoreGroupUrl, pollToVote]);
 
@@ -181,7 +179,7 @@ export function votedOn(ballotId: string): boolean {
 
 function getVoted(): Array<string> {
   const voted: Array<string> = JSON.parse(
-    window.localStorage.getItem("voted") || "[]",
+    window.localStorage.getItem("voted") || "[]"
   );
   return voted;
 }
