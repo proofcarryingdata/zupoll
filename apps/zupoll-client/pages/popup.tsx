@@ -1,4 +1,4 @@
-import { usePassportPopupSetup } from "@pcd/passport-interface";
+import { useZupassPopupSetup } from "@pcd/passport-interface/src/PassportPopup";
 
 /**
  * This page is necessary to receive PCDs from the passport after requesting
@@ -6,6 +6,6 @@ import { usePassportPopupSetup } from "@pcd/passport-interface";
  * the PCD it received back to the requesting tab.
  */
 export default function PassportPopupRedirect() {
-  const error = usePassportPopupSetup();
+  const error = useZupassPopupSetup();
   return <div>{error}</div>;
 }

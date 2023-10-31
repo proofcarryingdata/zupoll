@@ -1,7 +1,8 @@
 import {
-  openZuzaluMembershipPopup,
-  usePassportPopupMessages,
-} from "@pcd/passport-interface";
+
+  useZupassPopupMessages,
+} from "@pcd/passport-interface/src/PassportPopup";
+import { openGroupMembershipPopup } from "@pcd/passport-interface/src/SemaphoreGroupIntegration";
 import { useEffect, useState } from "react";
 import { login } from "../../src/api";
 import { LoginConfig, LoginState, ZupollError } from "../../src/types";
@@ -30,7 +31,7 @@ export function Login({
   config: LoginConfig;
 }) {
   const [loggingIn, setLoggingIn] = useState(false);
-  const [pcdStr] = usePassportPopupMessages();
+  const [pcdStr] = useZupassPopupMessages();
 
   useEffect(() => {
     if (!loggingIn) return;
@@ -62,7 +63,7 @@ export function Login({
         deemph={deemphasized}
         onClick={() => {
           setLoggingIn(true);
-          openZuzaluMembershipPopup(
+          openGroupMembershipPopup(
             config.passportAppUrl,
             window.location.origin + "/popup",
             config.groupUrl,
