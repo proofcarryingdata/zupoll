@@ -55,7 +55,7 @@ export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
     ballotPost += `\n\n<a href="${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}">Vote</a>`;
   }
 
-  ballotPost += `\n\n<a href="${SITE_URL}ballot?id=${ballot.ballotURL}">Browser link</a>`;
+  ballotPost += `\n\n<a href="${SITE_URL}ballot?id=${ballot.ballotURL}">(Vote via browser)</a>`;
 
   console.log(`Post`, ballotPost);
   return ballotPost;
