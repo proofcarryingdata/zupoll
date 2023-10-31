@@ -143,6 +143,7 @@ export function CreateBallot({
       if (!voterGroupRootHash || !voterGroupUrl)
         return console.warn(`NO GROUP URL OR HASH`);
       if (!ballotFromUrl) return console.warn(`NO BALLOT FROM URL`);
+      console.log(`DOING CREATE REQ`);
       const ballot = ballotFromUrl;
       setBallotConfig(ballotConfig);
 
@@ -173,9 +174,9 @@ export function CreateBallot({
       };
       setServerLoading(true);
       const res = await createBallot(finalRequest, loginState.token);
-      setServerLoading(false);
       console.log(`res`, res);
       router.push("/");
+      setServerLoading(false);
     }
 
     doRequest();
