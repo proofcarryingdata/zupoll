@@ -1,5 +1,4 @@
 import { BallotType } from "@prisma/client";
-import { CronJob } from "cron";
 import { Api, Bot, Context, InlineKeyboard, RawApi } from "grammy";
 import { ApplicationContext } from "./types";
 import {
@@ -171,5 +170,6 @@ export async function startBot(context: ApplicationContext): Promise<void> {
   // );
 
   // cronJob.start();
+  setInterval(() => findBallots, 15 * 60 * 1000); // 15 min
   console.log("started bot");
 }
