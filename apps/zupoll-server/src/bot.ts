@@ -170,6 +170,9 @@ export async function startBot(context: ApplicationContext): Promise<void> {
   // );
 
   // cronJob.start();
-  setInterval(() => findBallots, 15 * 60 * 1000); // 15 min
+  setInterval(
+    () => (context.bot ? findBallots(context.bot) : null),
+    15 * 60 * 1000
+  ); // 15 min
   console.log("started bot");
 }
