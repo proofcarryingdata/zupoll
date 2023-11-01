@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS=--max_old_space_size=4096 NODE_ENV=development ts-node-dev src/main.ts",
-    "dev:https": "NODE_OPTIONS=--max_old_space_size=4096 NODE_ENV=development IS_LOCAL_HTTPS=true NODE_TLS_REJECT_UNAUTHORIZED=0 ts-node-dev src/main.ts",
+    "dev": "NODE_OPTIONS=--max_old_space_size=4096 NODE_ENV=development nodemon",
+    "dev:https": "NODE_OPTIONS=--max_old_space_size=4096 NODE_ENV=development IS_LOCAL_HTTPS=true NODE_TLS_REJECT_UNAUTHORIZED=0 nodemon",
     "build": "tsc --noEmit",
     "start": "NODE_OPTIONS=--max_old_space_size=4096 NODE_ENV=production PORT=8080 ts-node src/main.ts",
     "lint": "eslint \"**/*.ts{,x}\"",
@@ -32,6 +32,7 @@
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "next": "^13.1.1",
+    "nodemon": "^3.0.1",
     "p-queue": "6",
     "pg": "^8.8.0",
     "postgres-migrations": "^5.3.0",
@@ -62,7 +63,6 @@
     "mocha": "^10.2.0",
     "prisma": "^4.12.0",
     "ts-mocha": "^10.0.0",
-    "ts-node-dev": "^2.0.0",
     "typescript": "^4.9.5"
   }
 }

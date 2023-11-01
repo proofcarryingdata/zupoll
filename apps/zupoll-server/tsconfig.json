@@ -19,7 +19,8 @@
       "src/util/declarations/",
       "./node_modules/@types/",
       "../../node_modules/@types/"
-    ]
+    ],
+    "baseUrl": "./"
   },
   "include": ["**/*.ts", "**/*.d.ts"],
   "exclude": ["node_modules"]
