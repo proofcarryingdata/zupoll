@@ -160,15 +160,16 @@ export async function startBot(context: ApplicationContext): Promise<void> {
   context.bot.catch((error) => console.log(`[TELEGRAM] Bot error`, error));
 
   // start up cron jobs
-  const cronJob = new CronJob(
-    "0,15,30,45 * * * *", // every 15 minutes, check if any ballots are expiring soon
-    async () => {
-      if (context.bot) {
-        await findBallots(context.bot);
-      }
-    }
-  );
+  // const cronJob = new CronJob(
+  //   "* * * * *",
+  //   // "0,15,30,45 * * * *", // every 15 minutes, check if any ballots are expiring soon
+  //   async () => {
+  //     if (context.bot) {
+  //       await findBallots(context.bot);
+  //     }
+  //   }
+  // );
 
-  cronJob.start();
+  // cronJob.start();
   console.log("started bot");
 }
