@@ -1,9 +1,9 @@
 import { useZupassPopupMessages } from "@pcd/passport-interface/src/PassportPopup";
 import { useEffect, useState } from "react";
-import { login } from "../../src/api";
 import { LoginConfig, LoginState, ZupollError } from "../../src/types";
 import { openGroupMembershipPopup } from "../../src/util";
 import { Button } from "../core/Button";
+import useLoginProcess from "../../src/useLogin";
 
 /**
  * Login for the user who belongs to the specified semaphore group.
@@ -33,6 +33,7 @@ export function Login({
   console.log({ pcdStr });
   console.log({ myPcdStr });
   console.log({ loggingIn });
+  console.log({ config });
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -49,29 +50,46 @@ export function Login({
     }
   }, []);
 
-  useEffect(() => {
-    if (!loggingIn) return;
-    if (!(pcdStr || myPcdStr)) return;
+  const { login } = useLoginProcess(
+    config,
+    onLogin,
+    onError,
+    setServerLoading,
+    setLoggingIn,
+    loggingIn,
+    myPcdStr,
+    pcdStr
+  );
 
-    (async () => {
-      try {
-        setServerLoading(true);
-        const token = await fetchLoginToken(config, myPcdStr || pcdStr);
-        onLogin({
-          token,
-          config,
-        });
-      } catch (err: any) {
-        const loginError: ZupollError = {
-          title: "Login failed",
-          message: err.message,
-        };
-        onError(loginError);
-      }
-      setLoggingIn(false);
-      setServerLoading(false);
-    })();
-  }, [pcdStr, myPcdStr, loggingIn, onLogin, onError, setServerLoading, config]);
+  // Use the login function in an effect
+  useEffect(() => {
+    console.log(`Calling login`);
+    login();
+  }, [login]);
+
+  // useEffect(() => {
+  //   if (!loggingIn) return;
+  //   if (!(pcdStr || myPcdStr)) return;
+
+  //   (async () => {
+  //     try {
+  //       setServerLoading(true);
+  //       const token = await fetchLoginToken(config, myPcdStr || pcdStr);
+  //       onLogin({
+  //         token,
+  //         config,
+  //       });
+  //     } catch (err: any) {
+  //       const loginError: ZupollError = {
+  //         title: "Login failed",
+  //         message: err.message,
+  //       };
+  //       onError(loginError);
+  //     }
+  //     setLoggingIn(false);
+  //     setServerLoading(false);
+  //   })();
+  // }, [pcdStr, myPcdStr, loggingIn, onLogin, onError, setServerLoading, config]);
 
   return (
     <>
@@ -86,7 +104,7 @@ export function Login({
             "zupoll",
             undefined,
             undefined,
-            window.location.origin
+            window.location.origin + `?config=${JSON.stringify(config)}`
           );
         }}
         disabled={loggingIn}
@@ -95,18 +113,4 @@ export function Login({
       </Button>
     </>
   );
-}
-
-async function fetchLoginToken(configuration: LoginConfig, pcdStr: string) {
-  const res = await login(configuration, pcdStr);
-  if (res === undefined) {
-    throw new Error("Server is down. Contact passport@0xparc.org.");
-  }
-  if (!res.ok) {
-    const resErr = await res.text();
-    console.error("Login error", resErr);
-    throw new Error("Login failed. " + resErr);
-  }
-  const token = await res.json();
-  return token.accessToken;
 }
