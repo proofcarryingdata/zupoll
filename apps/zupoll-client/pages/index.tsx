@@ -41,6 +41,9 @@ export default function Index() {
         onLogin={(state: LoginState) => {
           replaceLoginState(state);
           removeQueryParameters();
+          const redirectUrl = localStorage.getItem("preLoginRoute") || "/";
+          delete localStorage["preLoginRoute"];
+          router.push(redirectUrl);
         }}
       />
     );
