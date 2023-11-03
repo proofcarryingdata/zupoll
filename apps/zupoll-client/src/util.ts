@@ -62,13 +62,18 @@ export function openGroupMembershipPopup(
 
 export function removeQueryParameters(paramsToRemove?: string[]) {
   if (window?.location) {
-    const currentUrl = new URL(window.location.toString());
+    const currentUrl = new URL(window.location.href);
 
-    // Loop through the list and remove each parameter
-    paramsToRemove &&
+    // If no parameters to remove are provided, redirect to root
+    if (!paramsToRemove || paramsToRemove.length === 0) {
+      currentUrl.pathname = "/";
+      currentUrl.search = ""; // Clear any existing query parameters
+    } else {
+      // Loop through the list and remove each parameter
       paramsToRemove.forEach((param) => {
         currentUrl.searchParams.delete(param);
       });
+    }
 
     // Update the browser's address bar without refreshing the page
     window.history.replaceState({}, document.title, currentUrl.toString());

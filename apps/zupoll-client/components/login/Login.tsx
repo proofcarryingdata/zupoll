@@ -4,6 +4,7 @@ import { login } from "../../src/api";
 import { LoginConfig, LoginState, ZupollError } from "../../src/types";
 import { openGroupMembershipPopup } from "../../src/util";
 import { Button } from "../core/Button";
+import stableStringify from "json-stable-stringify";
 
 /**
  * Login for the user who belongs to the specified semaphore group.
@@ -29,20 +30,29 @@ export function Login({
 }) {
   const [loggingIn, setLoggingIn] = useState(false);
   const [pcdStr] = useZupassPopupMessages();
-  const [myPcdStr, setMyPcdStr] = useState("");
+  const [pcdFromUrl, setMyPcdStr] = useState("");
+  const [configFromUrl, setMyConfig] = useState<LoginConfig>();
   console.log({ pcdStr });
-  console.log({ myPcdStr });
+  console.log({ pcdFromUrl });
   console.log({ loggingIn });
 
   useEffect(() => {
     const url = new URL(window.location.href);
     // Use URLSearchParams to get the proof query parameter
     const proofString = url.searchParams.get("proof");
-    if (proofString) {
+    const configString = url.searchParams.get("config");
+
+    if (proofString && configString) {
       // Decode the URL-encoded string
       const decodedProofString = decodeURIComponent(proofString);
       // Parse the decoded string into an object
       const proofObject = JSON.parse(decodedProofString);
+
+      const decodedConfig = decodeURIComponent(configString);
+      const configObject = JSON.parse(decodedConfig) as LoginConfig;
+      console.log({ configObject });
+      setMyConfig(configObject);
+
       console.log(`proof object`, proofObject);
       setMyPcdStr(JSON.stringify(proofObject));
       setLoggingIn(true);
@@ -51,12 +61,15 @@ export function Login({
 
   useEffect(() => {
     if (!loggingIn) return;
-    if (!(pcdStr || myPcdStr)) return;
+    if (!(pcdStr || pcdFromUrl)) return;
+    if (configFromUrl) {
+      if (configFromUrl.groupId !== config.groupId) return;
+    }
 
     (async () => {
       try {
         setServerLoading(true);
-        const token = await fetchLoginToken(config, myPcdStr || pcdStr);
+        const token = await fetchLoginToken(config, pcdFromUrl || pcdStr);
         onLogin({
           token,
           config,
@@ -71,7 +84,16 @@ export function Login({
       setLoggingIn(false);
       setServerLoading(false);
     })();
-  }, [pcdStr, myPcdStr, loggingIn, onLogin, onError, setServerLoading, config]);
+  }, [
+    pcdStr,
+    pcdFromUrl,
+    loggingIn,
+    onLogin,
+    onError,
+    setServerLoading,
+    config,
+    configFromUrl,
+  ]);
 
   return (
     <>
@@ -86,7 +108,8 @@ export function Login({
             "zupoll",
             undefined,
             undefined,
-            window.location.origin
+            window.location.origin +
+              `?config=${encodeURIComponent(stableStringify(config))}`
           );
         }}
         disabled={loggingIn}
