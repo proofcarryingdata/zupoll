@@ -66,6 +66,7 @@ export function useSavedLoginState(router: NextRouter): SavedLoginState {
   const logout = useCallback(() => {
     replaceLoginState(undefined);
     router.push("/");
+    delete localStorage.preLoginRoute;
   }, [replaceLoginState, router]);
 
   const definitelyNotLoggedIn = useMemo(() => {

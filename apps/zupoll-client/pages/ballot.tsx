@@ -22,10 +22,20 @@ export default function BallotPage() {
       if (id === undefined) {
         window.location.href = "/";
       } else {
+        if (!loginState || definitelyNotLoggedIn) {
+          console.log(`[STORING BALLOT URL]`, router.asPath);
+          localStorage.setItem("preLoginRoute", router.asPath);
+        }
         setBallotURL(id.toString());
       }
     }
-  }, [router.isReady, router.query.id]);
+  }, [
+    router.isReady,
+    router.query.id,
+    router.asPath,
+    loginState,
+    definitelyNotLoggedIn,
+  ]);
 
   return (
     <>
