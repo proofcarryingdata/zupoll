@@ -176,6 +176,25 @@ export function useCreateBallot({
     console.log(stableStringify(ballotSignal));
     console.log(signalHash);
     const sigHashEnc = generateSnarkMessageHash(signalHash).toString();
+    console.log(`[CREATED BALLOT]`, {
+      ballotSignal,
+      signalHash,
+      sigHashEnc,
+      ballotConfig,
+    });
+    localStorage.setItem("lastBallotSignal", stableStringify(ballotSignal));
+    localStorage.setItem("lastBallotSignalHash", signalHash);
+    localStorage.setItem("lastBallotSignalHashEnc", sigHashEnc);
+    localStorage.setItem("lastBallotConfig", stableStringify(ballotConfig));
+    localStorage.setItem("lastBallotPolls", stableStringify(polls));
+    const ballotUrl = `?ballot=${encodeURIComponent(
+      stableStringify({
+        ballotConfig,
+        ballotSignal,
+        polls,
+      })
+    )}`;
+    console.log({ ballotUrl });
 
     openGroupMembershipPopup(
       ballotConfig.passportAppUrl,
@@ -184,18 +203,7 @@ export function useCreateBallot({
       "zupoll",
       sigHashEnc,
       sigHashEnc,
-      USE_CREATE_BALLOT_REDIRECT
-        ? url +
-            `?ballot=${stableStringify({
-              ballotTitle,
-              ballotDescription,
-              expiry,
-              ballotConfig,
-              ballotType,
-              ballotSignal,
-              polls,
-            })}`
-        : undefined
+      USE_CREATE_BALLOT_REDIRECT ? url + ballotUrl : undefined
     );
   }, [
     voterGroupUrl,

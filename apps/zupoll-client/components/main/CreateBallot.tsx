@@ -28,10 +28,6 @@ import { USE_CREATE_BALLOT_REDIRECT } from "../../src/util";
 
 interface BallotFromUrl {
   ballotConfig: BallotConfig;
-  ballotDescription: string;
-  ballotTitle: string;
-  ballotType: BallotType;
-  expiry: string;
   ballotSignal: BallotSignal;
   polls: Poll[];
 }
@@ -124,7 +120,10 @@ export function CreateBallot({
       console.log(`proof object`, proofObject);
       const pcdStr = JSON.stringify(proofObject);
 
-      const ballot = JSON.parse(ballotString) as BallotFromUrl;
+      const ballot = JSON.parse(
+        decodeURIComponent(ballotString)
+      ) as BallotFromUrl;
+      console.log(`[RECEIVED BALLOT]`, ballot);
       setMyPcdStr(pcdStr);
       setBallotFromUrl(ballot);
       setBallotConfig(ballot.ballotConfig);
@@ -145,19 +144,18 @@ export function CreateBallot({
         return console.warn(`NO GROUP URL OR HASH`);
       if (!ballotFromUrl) return console.warn(`NO BALLOT FROM URL`);
       console.log(`DOING CREATE REQ`);
-      const ballot = ballotFromUrl;
+      const { ballotSignal, ballotConfig, polls } = ballotFromUrl;
       setBallotConfig(ballotConfig);
 
-      console.log({ ballot });
       const parsedPcd = JSON.parse(decodeURIComponent(myPcdStr));
       const finalRequest: CreateBallotRequest = {
         ballot: {
           ballotId: "",
           ballotURL: 0,
-          ballotTitle: ballot.ballotTitle,
-          ballotDescription: ballot.ballotDescription,
+          ballotTitle: ballotSignal.ballotTitle,
+          ballotDescription: ballotSignal.ballotDescription,
           createdAt: new Date(),
-          expiry: new Date(ballot.expiry),
+          expiry: new Date(ballotSignal.expiry),
           proof: parsedPcd.pcd,
           pollsterType: UserType.ANON,
           pollsterNullifier: "",
@@ -165,12 +163,12 @@ export function CreateBallot({
           pollsterUuid: null,
           pollsterCommitment: null,
           expiryNotif: null,
-          pollsterSemaphoreGroupUrl: ballot.ballotConfig.creatorGroupUrl,
+          pollsterSemaphoreGroupUrl: ballotConfig.creatorGroupUrl,
           voterSemaphoreGroupUrls: [voterGroupUrl],
           voterSemaphoreGroupRoots: [voterGroupRootHash],
-          ballotType: ballot.ballotType,
+          ballotType: ballotSignal.ballotType,
         },
-        polls: ballot.polls,
+        polls: polls,
         proof: parsedPcd.pcd,
       };
       setServerLoading(true);
