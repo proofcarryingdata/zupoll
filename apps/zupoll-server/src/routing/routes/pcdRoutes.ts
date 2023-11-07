@@ -293,7 +293,7 @@ export function initPCDRoutes(
           // This error string is used in the frontend to determine whether to
           // show the "already voted" message and thus display the vote results.
           // Do not change without changing the corresponding check in frontend.
-          if (process.env.NODE_ENV !== "development")
+          if (!process.env.ALLOW_REPEAT_VOTES)
             throw new Error("User has already voted on this ballot.");
         }
 
