@@ -345,7 +345,7 @@ export function initPCDRoutes(
             );
             if (msg) console.log(`Edited vote msg`);
           } catch (error) {
-            console.log(`ERROR`, error)
+            console.log(`GRAMMY ERROR`, error)
           } 
  
         } else if (originalBallotMsg) {
