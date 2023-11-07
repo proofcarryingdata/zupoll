@@ -162,8 +162,7 @@ export async function startBot(context: ApplicationContext): Promise<void> {
 
   // start up cron jobs
   const cronJob = new CronJob(
-    "* * * * *",
-    // "0,15,30,45 * * * *", // every 15 minutes, check if any ballots are expiring soon
+    "0,15,30,45 * * * *", // every 15 minutes, check if any ballots are expiring soon
     async () => {
       if (context.bot) {
         await findBallots(context.bot);
