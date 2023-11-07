@@ -25,7 +25,7 @@ export interface LoginConfig {
 }
 
 const prisma = new PrismaClient({
-  datasources: { db: { url: process.env.DATABASE_URL } },
+  datasources: { db: { url: process.env.STAGING_DATABASE_URL } },
 });
 
 const ZUPOLL_SERVER_URL = "https://api-staging.zupoll.org/";
@@ -37,7 +37,6 @@ const loadLoginFile = () => {
     fs.readFileSync("./login.json", "utf-8")
   ) as unknown as Login;
   if (data) {
-    console.log(data);
     const login: LoginRequest = {
       semaphoreGroupUrl: data.config.groupUrl,
       proof: data.proof.pcd,
@@ -46,20 +45,16 @@ const loadLoginFile = () => {
   } else {
     throw new Error(`Login file not found. Run the build login command first`);
   }
-  console.log(data);
 };
 
 const loadVoteFile = () => {
   console.log(`LOADING VOTE`);
   const data = JSON.parse(fs.readFileSync("./vote.json", "utf-8")) as any;
   if (data) {
-    console.log(data);
     const vote = {
       polls: data.vote.polls,
       pollToVote: new Map(data.vote.pollToVoteJSON),
     };
-    console.log({ vote });
-    console.log(data.proof);
     return { vote, pcd: data.proof.pcd };
   } else {
     throw new Error(`Vote file not found. Run the build command first`);
@@ -69,10 +64,8 @@ const loadVoteFile = () => {
 const vote = async (ballotURL: string, accessToken: string) => {
   const url = `${ZUPOLL_SERVER_URL}vote-ballot`;
   const { vote, pcd } = loadVoteFile();
-  console.log(`vote polls [0]`, vote.polls[0]);
   if (vote.polls[0].ballotURL != ballotURL)
     throw new Error(`Can only vote on ballot ${vote.polls[0].ballotURL}`);
-  console.log(vote, pcd);
 
   const request: MultiVoteRequest = {
     votes: [],
@@ -82,7 +75,6 @@ const vote = async (ballotURL: string, accessToken: string) => {
   };
   vote.polls.forEach((poll: any) => {
     const voteIdx = vote.pollToVote.get(poll.id);
-    console.log(`[VOTE IDX]`, voteIdx);
     if (voteIdx) {
       const vote: Vote = {
         id: "",
@@ -101,8 +93,6 @@ const vote = async (ballotURL: string, accessToken: string) => {
     }
   });
 
-  console.log(request);
-
   const res = await fetch(url, {
     method: "POST",
     body: JSON.stringify(request),
@@ -112,12 +102,11 @@ const vote = async (ballotURL: string, accessToken: string) => {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  console.log(`vote res`, res.status, res);
+  console.log(`vote res`, res.status);
 };
 
 const login = async () => {
   const loginReq = loadLoginFile();
-  console.log(`[LOGGING IN]`);
 
   const url = `${ZUPOLL_SERVER_URL}login`;
 
