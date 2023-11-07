@@ -202,6 +202,7 @@ export function CreateBallot({
       const lastBallotSignalHash = localStorage.getItem("lastBallotSignalHash");
       if (signalHash !== lastBallotSignalHash)
         throw new Error(`Signal hashes did not match`);
+      console.log(`[CLIENT SIGNAL HASH of BALLOT]`, signalHash);
       setServerLoading(true);
       const res = await createBallot(finalRequest, loginState.token);
       console.log(`res`, res);
