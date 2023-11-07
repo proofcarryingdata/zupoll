@@ -163,7 +163,6 @@ export function initPCDRoutes(
           ) {
             // send message on TG channel, if bot is setup
             const ballotPost = formatPollCreated(newBallot, request.polls);
-            console.log(ballotPost);
             const msg = await sendMessage(ballotPost, context.bot);
             if (msg) {
               const chatId = process.env.BOT_SUPERGROUP_ID;
@@ -337,14 +336,18 @@ export function initPCDRoutes(
         if (voteBallotMsg) {
           console.log(`Vote msg found`);
 
-          //
-          const msg = await context.bot?.api.editMessageText(
-            voteBallotMsg.chatId.toString(),
-            parseInt(voteBallotMsg.messageId.toString()),
-            generatePollHTML(allVotes),
-            { parse_mode: "HTML" }
-          );
-          if (msg) console.log(`Edited vote msg`);
+          try {
+            const msg = await context.bot?.api.editMessageText(
+              voteBallotMsg.chatId.toString(),
+              parseInt(voteBallotMsg.messageId.toString()),
+              generatePollHTML(allVotes),
+              { parse_mode: "HTML" }
+            );
+            if (msg) console.log(`Edited vote msg`);
+          } catch (error) {
+            console.log(`ERROR`, error)
+          } 
+ 
         } else if (originalBallotMsg) {
           console.log(`No vote msg found`);
           // TODO: Include "Vote Here"

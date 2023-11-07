@@ -37,7 +37,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
     const hours = Math.ceil(minutes / 60);
     const days = Math.ceil(minutes / (24 * 60));
 
-    const pollUrl = `${SITE_URL}/ballot?id=${ballot.ballotURL}`;
+    const pollUrl = `${SITE_URL}ballot?id=${ballot.ballotURL}`;
     const tgPollUrl = process.env.BOT_ZUPOLL_LINK
       ? `${process.env.BOT_ZUPOLL_LINK}/?startapp=${ballot.ballotURL}`
       : undefined;

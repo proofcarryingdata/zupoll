@@ -103,6 +103,7 @@ const vote = async (ballotURL: string, accessToken: string) => {
     },
   });
   console.log(`vote res`, res.status);
+  return res;
 };
 
 const login = async () => {
@@ -173,7 +174,7 @@ const buildVoteFile = () => {
 
 yargs(hideBin(process.argv))
   .command(
-    "vote <url>",
+    "vote <url> <count>",
     "vote on a ballot",
     () => {},
     async (argv) => {
@@ -190,9 +191,20 @@ yargs(hideBin(process.argv))
         console.log(`[GOT BALLOT]`, ballot.ballotTitle);
 
         console.log(`[VOTING ON BALLOT]`, ballot.ballotTitle);
-        await vote(ballot.ballotURL.toString(), token);
-
-        // const login: LoginRequest = {};
+        const numVotes = (argv.count || 1) as number;
+        const votes = [];
+        console.log(`[VOTING ${numVotes}] TIMES`);
+        for (let i = 0; i < numVotes; i++) {
+          votes.push(vote(ballot.ballotURL.toString(), token));
+        }
+        const res = await Promise.allSettled(votes);
+        const numFulfilled = res.filter((r) => r.status === "fulfilled").length;
+        console.log(
+          `Successfully voted ${numFulfilled} / ${numVotes} (${(
+            (100 * numFulfilled) /
+            numVotes
+          ).toFixed(2)} %)`
+        );
       } else {
         console.warn(`Ballot ${argv.url} not found`);
       }
