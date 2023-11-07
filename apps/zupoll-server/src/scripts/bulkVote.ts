@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { PrismaClient, UserType, Vote } from "@prisma/client";
 import { LoginRequest } from "src/routing/routes/authedRoutes";
 import yargs from "yargs";
@@ -92,7 +93,7 @@ const vote = async (ballotURL: string, accessToken: string) => {
         voterName: null,
         voterUuid: null,
         voterCommitment: null,
-        // @ts-expect-error
+        // @ts-expect-error number type
         voteIdx: voteIdx,
         proof: pcd,
       };
