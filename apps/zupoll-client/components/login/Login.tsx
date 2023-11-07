@@ -32,9 +32,6 @@ export function Login({
   const [pcdStr] = useZupassPopupMessages();
   const [pcdFromUrl, setMyPcdStr] = useState("");
   const [configFromUrl, setMyConfig] = useState<LoginConfig>();
-  console.log({ pcdStr });
-  console.log({ pcdFromUrl });
-  console.log({ loggingIn });
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -53,7 +50,6 @@ export function Login({
       console.log({ configObject });
       setMyConfig(configObject);
 
-      console.log(`proof object`, proofObject);
       setMyPcdStr(JSON.stringify(proofObject));
       setLoggingIn(true);
     }
