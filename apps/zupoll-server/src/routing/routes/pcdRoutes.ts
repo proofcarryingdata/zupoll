@@ -95,6 +95,7 @@ export function initPCDRoutes(
       });
 
       const signalHash = sha256(stableStringify(ballotSignal));
+      console.log(`[SERVER BALLOT SIGNAL]`, ballotSignal);
 
       try {
         if (request.ballot.pollsterType == UserType.ANON) {

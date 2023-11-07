@@ -121,7 +121,6 @@ export function CreateBallot({
       const decodedProofString = decodeURIComponent(proofString);
       // Parse the decoded string into an object
       const proofObject = JSON.parse(decodedProofString);
-      console.log(`proof object`, proofObject);
       const pcdStr = JSON.stringify(proofObject);
 
       const ballot = JSON.parse(
@@ -163,11 +162,14 @@ export function CreateBallot({
 
   useEffect(() => {
     async function doRequest() {
-      if (!voterGroupRootHash || !voterGroupUrl)
-        return console.warn(`NO GROUP URL OR HASH`);
       if (!ballotFromUrl) return console.warn(`NO BALLOT FROM URL`);
-      console.log(`DOING CREATE REQ`);
       const { ballotSignal, ballotConfig, polls } = ballotFromUrl;
+      console.log(
+        `Ballot signal roots`,
+        ballotSignal.voterSemaphoreGroupRoots,
+        ballotSignal.voterSemaphoreGroupUrls
+      );
+      console.log(`Current roots`, [voterGroupRootHash], [voterGroupUrl]);
 
       const parsedPcd = JSON.parse(decodeURIComponent(myPcdStr));
       const finalRequest: CreateBallotRequest = {
@@ -186,8 +188,8 @@ export function CreateBallot({
           pollsterCommitment: null,
           expiryNotif: null,
           pollsterSemaphoreGroupUrl: ballotConfig.creatorGroupUrl,
-          voterSemaphoreGroupUrls: [voterGroupUrl],
-          voterSemaphoreGroupRoots: [voterGroupRootHash],
+          voterSemaphoreGroupUrls: ballotSignal.voterSemaphoreGroupUrls,
+          voterSemaphoreGroupRoots: ballotSignal.voterSemaphoreGroupRoots,
           ballotType: ballotSignal.ballotType,
         },
         polls: polls,
@@ -195,16 +197,16 @@ export function CreateBallot({
       };
       const ballotSignalString = localStorage.getItem("lastBallotSignal");
       if (ballotSignalString) {
-        console.log(`PREV BALLOT SIGNAL`, JSON.parse(ballotSignalString));
         console.log(`CURR BALLOT SIGNAL`, ballotSignal);
       }
       const signalHash = sha256(stableStringify(ballotSignal));
       const lastBallotSignalHash = localStorage.getItem("lastBallotSignalHash");
       if (signalHash !== lastBallotSignalHash)
         throw new Error(`Signal hashes did not match`);
+      console.log(`[CLIENT SIGNAL HASH of BALLOT]`, signalHash);
       setServerLoading(true);
       const res = await createBallot(finalRequest, loginState.token);
-      console.log(`res`, res);
+      console.log(`[CREATE BALLOT RES]`, res);
       router.push("/");
       setServerLoading(false);
     }
