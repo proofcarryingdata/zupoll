@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 import {
+  PCDPASS_USER_CONFIG,
   ZUZALU_ORGANIZER_LOGIN_CONFIG,
   ZUZALU_PARTICIPANT_LOGIN_CONFIG,
 } from "../../src/loginConfig";
@@ -53,13 +54,21 @@ export function LoginScreen({
                 prompt="Organizer login"
                 deemphasized
               />
+              <Login
+                onLogin={onLogin}
+                onError={setError}
+                setServerLoading={setServerLoading}
+                config={PCDPASS_USER_CONFIG}
+                prompt="Devconnect Login"
+                deemphasized
+              />
             </>
           )}
         </LoginRow>
         <br />
         <Description>
-          PCDPass users don't see any of the Zuzalu ballots. They have their own
-          private ballot section.
+          Devconnect users don't see any of the Zuzalu ballots. They have their
+          own private ballot section.
         </Description>
       </Body>
 

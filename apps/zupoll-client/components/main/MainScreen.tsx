@@ -190,10 +190,10 @@ export function MainScreen({
       {loginState.config.name === LoginConfigurationName.PCDPASS_USER && (
         <BallotListContainer>
           <TitleContainer>
-            <H1>PCDPass Polls</H1>
+            <H1>Devconnnect Polls</H1>
             <p>
-              Ballots created by users of PCDPass. These are not visible to
-              Zuzalu participants.
+              Ballots created by Devconnect attendees. These are not visible to
+              Zuconnect participants.
             </p>
           </TitleContainer>
 
