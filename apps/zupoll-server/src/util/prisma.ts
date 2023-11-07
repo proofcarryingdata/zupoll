@@ -10,15 +10,5 @@ declare global {
   var prisma: PrismaClient;
 }
 
-function getPrismaClient() {
-  if (process.env.NODE_ENV === "production") {
-    return new PrismaClient();
-  } else if (global.prisma instanceof PrismaClient) {
-    return global.prisma;
-  } else {
-    global.prisma = new PrismaClient();
-    return global.prisma;
-  }
-}
-
-export const prisma = getPrismaClient();
+export const prisma = global.prisma || new PrismaClient({ log: ["info"] });
+if (process.env.NODE_ENV !== "production") global.prisma = prisma;
