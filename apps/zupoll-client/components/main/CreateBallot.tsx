@@ -25,6 +25,9 @@ import {
 } from "../core/Form";
 import { RippleLoaderLight } from "../core/RippleLoader";
 import { USE_CREATE_BALLOT_REDIRECT } from "../../src/util";
+import { sha256 } from "js-sha256";
+import stableStringify from "json-stable-stringify";
+import { Button } from "../core/Button";
 
 interface BallotFromUrl {
   ballotConfig: BallotConfig;
@@ -65,6 +68,7 @@ export function CreateBallot({
       ? BallotType.PCDPASSUSER
       : BallotType.STRAWPOLL
   );
+  const [useLastBallot, setUseLastBallot] = useState(false);
 
   const getDateString = (date: Date) => {
     const newDate = new Date(date);
@@ -139,13 +143,31 @@ export function CreateBallot({
     );
 
   useEffect(() => {
+    if (useLastBallot) {
+      const ballotSignalString = localStorage.getItem("lastBallotSignal");
+      const ballotPollsString = localStorage.getItem("lastBallotPolls");
+
+      if (ballotSignalString && ballotPollsString) {
+        const ballotSignal = JSON.parse(ballotSignalString) as BallotSignal;
+        console.log({ ballotSignal });
+        setBallotTitle(ballotSignal.ballotTitle);
+        setBallotDescription(ballotSignal.ballotDescription);
+        setBallotExpiry(new Date(ballotSignal.expiry));
+
+        const ballotPolls = JSON.parse(ballotPollsString) as Poll[];
+        console.log({ ballotPolls });
+        setPolls(ballotPolls);
+      }
+    }
+  }, [useLastBallot]);
+
+  useEffect(() => {
     async function doRequest() {
       if (!voterGroupRootHash || !voterGroupUrl)
         return console.warn(`NO GROUP URL OR HASH`);
       if (!ballotFromUrl) return console.warn(`NO BALLOT FROM URL`);
       console.log(`DOING CREATE REQ`);
       const { ballotSignal, ballotConfig, polls } = ballotFromUrl;
-      setBallotConfig(ballotConfig);
 
       const parsedPcd = JSON.parse(decodeURIComponent(myPcdStr));
       const finalRequest: CreateBallotRequest = {
@@ -171,6 +193,15 @@ export function CreateBallot({
         polls: polls,
         proof: parsedPcd.pcd,
       };
+      const ballotSignalString = localStorage.getItem("lastBallotSignal");
+      if (ballotSignalString) {
+        console.log(`PREV BALLOT SIGNAL`, JSON.parse(ballotSignalString));
+        console.log(`CURR BALLOT SIGNAL`, ballotSignal);
+      }
+      const signalHash = sha256(stableStringify(ballotSignal));
+      const lastBallotSignalHash = localStorage.getItem("lastBallotSignalHash");
+      if (signalHash !== lastBallotSignalHash)
+        throw new Error(`Signal hashes did not match`);
       setServerLoading(true);
       const res = await createBallot(finalRequest, loginState.token);
       console.log(`res`, res);
@@ -191,6 +222,9 @@ export function CreateBallot({
 
   return (
     <>
+      <Button onClick={() => setUseLastBallot(true)}>
+        Autofill from previous ballot
+      </Button>
       {USE_CREATE_BALLOT_REDIRECT ? (
         ""
       ) : (
@@ -264,7 +298,6 @@ export function CreateBallot({
           </StyledLabel>
         </StyledForm>
       </FormContainer>
-
       {polls.map((poll, i) => {
         return (
           <FormContainer key={i}>
@@ -323,7 +356,6 @@ export function CreateBallot({
           </FormContainer>
         );
       })}
-
       <QuestionContainer>
         <QuestionChangeButton
           onClick={() =>
@@ -355,7 +387,6 @@ export function CreateBallot({
           Remove question
         </QuestionChangeButton>
       </QuestionContainer>
-
       {loadingVoterGroupUrl || serverLoading ? (
         <RippleLoaderLight />
       ) : (
