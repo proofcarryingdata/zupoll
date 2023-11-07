@@ -149,23 +149,18 @@ export function BallotScreen({
    */
   useEffect(() => {
     const url = new URL(window.location.href);
-    console.log({ url });
     // Use URLSearchParams to get the proof query parameter
     const proofString = url.searchParams.get("proof");
     const voteString = url.searchParams.get("vote");
-    console.log({ proofString });
     if (proofString && voteString) {
-      console.log(`Have proof and vote`);
       const voteStr = JSON.parse(voteString) as {
         polls: PollWithCounts[];
         pollToVoteJSON: any; // TODO: actually type this
       };
-      console.log(`vote str`, voteStr);
       const vote = {
         polls: voteStr.polls,
         pollToVote: new Map(voteStr.pollToVoteJSON),
       };
-      console.log({ vote });
 
       const decodedProofString = decodeURIComponent(proofString);
       // Parse the decoded string into an object
@@ -220,7 +215,7 @@ export function BallotScreen({
         setPollToVote(new Map());
         setMyVote(undefined);
         setMyparsedPcd(undefined);
-        console.log(`submit res`, res);
+        console.log(`[RES]`, res);
         setServerLoading(false);
         removeQueryParameters(["vote", "proof", "finished"]);
       }

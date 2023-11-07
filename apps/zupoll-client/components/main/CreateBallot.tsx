@@ -121,7 +121,6 @@ export function CreateBallot({
       const decodedProofString = decodeURIComponent(proofString);
       // Parse the decoded string into an object
       const proofObject = JSON.parse(decodedProofString);
-      console.log(`proof object`, proofObject);
       const pcdStr = JSON.stringify(proofObject);
 
       const ballot = JSON.parse(
@@ -163,10 +162,7 @@ export function CreateBallot({
 
   useEffect(() => {
     async function doRequest() {
-      if (!voterGroupRootHash || !voterGroupUrl)
-        return console.warn(`NO GROUP URL OR HASH`);
       if (!ballotFromUrl) return console.warn(`NO BALLOT FROM URL`);
-      console.log(`DOING CREATE REQ`);
       const { ballotSignal, ballotConfig, polls } = ballotFromUrl;
       console.log(
         `Ballot signal roots`,
@@ -201,7 +197,6 @@ export function CreateBallot({
       };
       const ballotSignalString = localStorage.getItem("lastBallotSignal");
       if (ballotSignalString) {
-        console.log(`PREV BALLOT SIGNAL`, JSON.parse(ballotSignalString));
         console.log(`CURR BALLOT SIGNAL`, ballotSignal);
       }
       const signalHash = sha256(stableStringify(ballotSignal));
@@ -211,7 +206,7 @@ export function CreateBallot({
       console.log(`[CLIENT SIGNAL HASH of BALLOT]`, signalHash);
       setServerLoading(true);
       const res = await createBallot(finalRequest, loginState.token);
-      console.log(`res`, res);
+      console.log(`[CREATE BALLOT RES]`, res);
       router.push("/");
       setServerLoading(false);
     }
