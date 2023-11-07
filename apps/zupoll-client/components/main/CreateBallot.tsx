@@ -168,6 +168,12 @@ export function CreateBallot({
       if (!ballotFromUrl) return console.warn(`NO BALLOT FROM URL`);
       console.log(`DOING CREATE REQ`);
       const { ballotSignal, ballotConfig, polls } = ballotFromUrl;
+      console.log(
+        `Ballot signal roots`,
+        ballotSignal.voterSemaphoreGroupRoots,
+        ballotSignal.voterSemaphoreGroupUrls
+      );
+      console.log(`Current roots`, [voterGroupRootHash], [voterGroupUrl]);
 
       const parsedPcd = JSON.parse(decodeURIComponent(myPcdStr));
       const finalRequest: CreateBallotRequest = {
@@ -186,8 +192,8 @@ export function CreateBallot({
           pollsterCommitment: null,
           expiryNotif: null,
           pollsterSemaphoreGroupUrl: ballotConfig.creatorGroupUrl,
-          voterSemaphoreGroupUrls: [voterGroupUrl],
-          voterSemaphoreGroupRoots: [voterGroupRootHash],
+          voterSemaphoreGroupUrls: ballotSignal.voterSemaphoreGroupUrls,
+          voterSemaphoreGroupRoots: ballotSignal.voterSemaphoreGroupRoots,
           ballotType: ballotSignal.ballotType,
         },
         polls: polls,
