@@ -11,7 +11,6 @@ import {
   LoginState,
   ZupollError,
 } from "../../src/types";
-import { useHistoricSemaphoreUrl } from "../../src/useHistoricSemaphoreUrl";
 import {
   FormButtonContainer,
   FormContainer,
@@ -114,8 +113,8 @@ export function CreateBallot({
     const url = new URL(window.location.href);
     console.log({ url });
     // Use URLSearchParams to get the proof query parameter
-    const proofString = url.searchParams.get("proof");
-    const ballotString = url.searchParams.get("ballot");
+    const proofString = router.query.proof as string;
+    const ballotString = router.query.ballot as string;
     if (proofString && ballotString) {
       // Decode the URL-encoded string
       const decodedProofString = decodeURIComponent(proofString);
@@ -132,14 +131,7 @@ export function CreateBallot({
       setBallotConfig(ballot.ballotConfig);
     }
     // uwu
-  }, []);
-
-  const { rootHash: voterGroupRootHash, groupUrl: voterGroupUrl } =
-    useHistoricSemaphoreUrl(
-      ballotConfig?.passportServerUrl,
-      ballotConfig?.voterGroupId,
-      onError
-    );
+  }, [router.query.proof, router.query.ballot]);
 
   useEffect(() => {
     if (useLastBallot) {
@@ -162,14 +154,14 @@ export function CreateBallot({
 
   useEffect(() => {
     async function doRequest() {
-      if (!ballotFromUrl) return console.warn(`NO BALLOT FROM URL`);
+      if (!ballotFromUrl || !myPcdStr)
+        return console.warn(`NO BALLOT OR PCD STRING`);
       const { ballotSignal, ballotConfig, polls } = ballotFromUrl;
       console.log(
         `Ballot signal roots`,
         ballotSignal.voterSemaphoreGroupRoots,
         ballotSignal.voterSemaphoreGroupUrls
       );
-      console.log(`Current roots`, [voterGroupRootHash], [voterGroupUrl]);
 
       const parsedPcd = JSON.parse(decodeURIComponent(myPcdStr));
       const finalRequest: CreateBallotRequest = {
@@ -209,18 +201,12 @@ export function CreateBallot({
       console.log(`[CREATE BALLOT RES]`, res);
       router.push("/");
       setServerLoading(false);
+      setBallotFromUrl(undefined);
+      setMyPcdStr("");
     }
 
     doRequest();
-  }, [
-    voterGroupRootHash,
-    voterGroupUrl,
-    loginState,
-    ballotConfig,
-    ballotFromUrl,
-    router,
-    myPcdStr,
-  ]);
+  }, [loginState, ballotConfig, ballotFromUrl, router, myPcdStr]);
 
   return (
     <>
