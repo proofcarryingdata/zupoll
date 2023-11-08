@@ -56,11 +56,6 @@ export function LoginScreen({
             </>
           )}
         </LoginRow>
-        <br />
-        <Description>
-          Zupass users don't see any of the Zuzalu ballots. They have their own
-          private ballot section.
-        </Description>
       </Body>
 
       {error && (
