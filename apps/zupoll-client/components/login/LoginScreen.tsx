@@ -58,7 +58,7 @@ export function LoginScreen({
         </LoginRow>
         <br />
         <Description>
-          PCDPass users don't see any of the Zuzalu ballots. They have their own
+          Zupass users don't see any of the Zuzalu ballots. They have their own
           private ballot section.
         </Description>
       </Body>
