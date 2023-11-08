@@ -1,12 +1,10 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { createBallot } from "../../src/api";
-import { useCreateBallot } from "../../src/createBallot";
-import { BallotType, Poll, UserType } from "../../src/prismaTypes";
-import { BallotSignal, CreateBallotRequest } from "../../src/requestTypes";
+import { BallotFromUrl, useCreateBallot } from "../../src/createBallot";
+import { BallotType, Poll } from "../../src/prismaTypes";
+import { BallotSignal } from "../../src/requestTypes";
 import {
-  BallotConfig,
   LoginConfigurationName,
   LoginState,
   ZupollError,
@@ -24,15 +22,7 @@ import {
 } from "../core/Form";
 import { RippleLoaderLight } from "../core/RippleLoader";
 import { USE_CREATE_BALLOT_REDIRECT } from "../../src/util";
-import { sha256 } from "js-sha256";
-import stableStringify from "json-stable-stringify";
 import { Button } from "../core/Button";
-
-interface BallotFromUrl {
-  ballotConfig: BallotConfig;
-  ballotSignal: BallotSignal;
-  polls: Poll[];
-}
 
 export function CreateBallot({
   onError,
@@ -58,9 +48,8 @@ export function CreateBallot({
     new Date(new Date().getTime() + 1000 * 60 * 60 * 24)
   );
   const [ballotFromUrl, setBallotFromUrl] = useState<BallotFromUrl>();
-  const [ballotConfig, setBallotConfig] = useState<BallotConfig>();
 
-  const [myPcdStr, setMyPcdStr] = useState("");
+  const [pcdFromUrl, setPcdFromUrl] = useState("");
 
   const [ballotType, setBallotType] = useState<BallotType>(
     loginState.config.name === LoginConfigurationName.PCDPASS_USER
@@ -97,18 +86,6 @@ export function CreateBallot({
 
   const [serverLoading, setServerLoading] = useState(false);
 
-  const { loadingVoterGroupUrl, createBallotPCD } = useCreateBallot({
-    ballotTitle,
-    ballotDescription,
-    ballotType,
-    expiry: ballotExpiry,
-    polls,
-    onError,
-    setServerLoading,
-    loginState,
-    url: window.location.href, // If exists, will use redirect instead of pop up
-  });
-
   useEffect(() => {
     const url = new URL(window.location.href);
     console.log({ url });
@@ -126,12 +103,27 @@ export function CreateBallot({
         decodeURIComponent(ballotString)
       ) as BallotFromUrl;
       console.log(`[RECEIVED BALLOT]`, ballot);
-      setMyPcdStr(pcdStr);
+      setPcdFromUrl(pcdStr);
       setBallotFromUrl(ballot);
-      setBallotConfig(ballot.ballotConfig);
     }
     // uwu
   }, [router.query.proof, router.query.ballot]);
+
+  const { loadingVoterGroupUrl, createBallotPCD } = useCreateBallot({
+    ballotTitle,
+    ballotDescription,
+    ballotType,
+    expiry: ballotExpiry,
+    polls,
+    onError,
+    setServerLoading,
+    loginState,
+    ballotFromUrl,
+    pcdFromUrl,
+    setBallotFromUrl,
+    setPcdFromUrl,
+    url: window.location.href, // If exists, will use redirect instead of pop up
+  });
 
   useEffect(() => {
     if (useLastBallot) {
@@ -151,62 +143,6 @@ export function CreateBallot({
       }
     }
   }, [useLastBallot]);
-
-  useEffect(() => {
-    async function doRequest() {
-      if (!ballotFromUrl || !myPcdStr)
-        return console.warn(`NO BALLOT OR PCD STRING`);
-      const { ballotSignal, ballotConfig, polls } = ballotFromUrl;
-      console.log(
-        `Ballot signal roots`,
-        ballotSignal.voterSemaphoreGroupRoots,
-        ballotSignal.voterSemaphoreGroupUrls
-      );
-
-      const parsedPcd = JSON.parse(decodeURIComponent(myPcdStr));
-      const finalRequest: CreateBallotRequest = {
-        ballot: {
-          ballotId: "",
-          ballotURL: 0,
-          ballotTitle: ballotSignal.ballotTitle,
-          ballotDescription: ballotSignal.ballotDescription,
-          createdAt: new Date(),
-          expiry: new Date(ballotSignal.expiry),
-          proof: parsedPcd.pcd,
-          pollsterType: UserType.ANON,
-          pollsterNullifier: "",
-          pollsterName: null,
-          pollsterUuid: null,
-          pollsterCommitment: null,
-          expiryNotif: null,
-          pollsterSemaphoreGroupUrl: ballotConfig.creatorGroupUrl,
-          voterSemaphoreGroupUrls: ballotSignal.voterSemaphoreGroupUrls,
-          voterSemaphoreGroupRoots: ballotSignal.voterSemaphoreGroupRoots,
-          ballotType: ballotSignal.ballotType,
-        },
-        polls: polls,
-        proof: parsedPcd.pcd,
-      };
-      const ballotSignalString = localStorage.getItem("lastBallotSignal");
-      if (ballotSignalString) {
-        console.log(`CURR BALLOT SIGNAL`, ballotSignal);
-      }
-      const signalHash = sha256(stableStringify(ballotSignal));
-      const lastBallotSignalHash = localStorage.getItem("lastBallotSignalHash");
-      if (signalHash !== lastBallotSignalHash)
-        throw new Error(`Signal hashes did not match`);
-      console.log(`[CLIENT SIGNAL HASH of BALLOT]`, signalHash);
-      setServerLoading(true);
-      const res = await createBallot(finalRequest, loginState.token);
-      console.log(`[CREATE BALLOT RES]`, res);
-      router.push("/");
-      setServerLoading(false);
-      setBallotFromUrl(undefined);
-      setMyPcdStr("");
-    }
-
-    doRequest();
-  }, [loginState, ballotConfig, ballotFromUrl, router, myPcdStr]);
 
   return (
     <>
