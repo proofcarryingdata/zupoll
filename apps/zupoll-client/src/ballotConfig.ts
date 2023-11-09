@@ -1,22 +1,22 @@
 import {
+  DEVCONNECT_ADMINS_GROUP_URL,
+  DEVCONNECT_ATTENDEES_GROUP_URL,
   PCDPASS_SERVER_URL,
   PCDPASS_URL,
-  PCDPASS_USERS_GROUP_ID,
   PCDPASS_USERS_GROUP_URL,
+  SemaphoreGroups,
   ZUPASS_SERVER_URL,
   ZUPASS_URL,
-  ZUZALU_ADMINS_GROUP_ID,
   ZUZALU_ADMINS_GROUP_URL,
-  ZUZALU_PARTICIPANTS_GROUP_ID,
   ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "./env";
 import { BallotType } from "./prismaTypes";
 import { BallotConfig } from "./types";
 
 export const STRAWPOLL_BALLOT_CONFIG: BallotConfig = {
-  voterGroupId: ZUZALU_PARTICIPANTS_GROUP_ID,
+  voterGroupId: SemaphoreGroups.ZuzaluParticipants,
   voterGroupUrl: ZUZALU_PARTICIPANTS_GROUP_URL,
-  creatorGroupId: ZUZALU_PARTICIPANTS_GROUP_ID,
+  creatorGroupId: SemaphoreGroups.ZuzaluParticipants,
   creatorGroupUrl: ZUZALU_PARTICIPANTS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
@@ -24,9 +24,9 @@ export const STRAWPOLL_BALLOT_CONFIG: BallotConfig = {
 };
 
 export const ADVISORY_VOTE_BALLOT_CONFIG: BallotConfig = {
-  voterGroupId: ZUZALU_PARTICIPANTS_GROUP_ID,
+  voterGroupId: SemaphoreGroups.ZuzaluParticipants,
   voterGroupUrl: ZUZALU_PARTICIPANTS_GROUP_URL,
-  creatorGroupId: ZUZALU_ADMINS_GROUP_ID,
+  creatorGroupId: SemaphoreGroups.ZuzaluOrganizers,
   creatorGroupUrl: ZUZALU_ADMINS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
@@ -34,9 +34,9 @@ export const ADVISORY_VOTE_BALLOT_CONFIG: BallotConfig = {
 };
 
 export const ORGANIZER_ONLY_BALLOT_CONFIG: BallotConfig = {
-  voterGroupId: ZUZALU_ADMINS_GROUP_ID,
+  voterGroupId: SemaphoreGroups.ZuzaluOrganizers,
   voterGroupUrl: ZUZALU_ADMINS_GROUP_URL,
-  creatorGroupId: ZUZALU_ADMINS_GROUP_ID,
+  creatorGroupId: SemaphoreGroups.ZuzaluOrganizers,
   creatorGroupUrl: ZUZALU_ADMINS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
@@ -44,13 +44,33 @@ export const ORGANIZER_ONLY_BALLOT_CONFIG: BallotConfig = {
 };
 
 export const PCDPASS_BALLOT_CONFIG: BallotConfig = {
-  voterGroupId: PCDPASS_USERS_GROUP_ID,
+  voterGroupId: SemaphoreGroups.Everyone,
   voterGroupUrl: PCDPASS_USERS_GROUP_URL,
-  creatorGroupId: PCDPASS_USERS_GROUP_ID,
+  creatorGroupId: SemaphoreGroups.Everyone,
   creatorGroupUrl: PCDPASS_USERS_GROUP_URL,
   passportServerUrl: PCDPASS_SERVER_URL,
   passportAppUrl: PCDPASS_URL,
   ballotType: BallotType.PCDPASSUSER,
+};
+
+export const DEVCONNECT_ATTENDEE_BALLOT_CONFIG: BallotConfig = {
+  voterGroupId: SemaphoreGroups.DevconnectAttendees,
+  voterGroupUrl: DEVCONNECT_ATTENDEES_GROUP_URL,
+  creatorGroupId: SemaphoreGroups.DevconnectAttendees,
+  creatorGroupUrl: DEVCONNECT_ATTENDEES_GROUP_URL,
+  passportServerUrl: ZUPASS_SERVER_URL,
+  passportAppUrl: ZUPASS_URL,
+  ballotType: BallotType.DEVCONNECT_STRAW,
+};
+
+export const DEVCONNECT_ORGANIZER_BALLOT_CONFIG: BallotConfig = {
+  voterGroupId: SemaphoreGroups.DevconnectAttendees,
+  voterGroupUrl: DEVCONNECT_ATTENDEES_GROUP_URL,
+  creatorGroupId: SemaphoreGroups.DevconnectOrganizers,
+  creatorGroupUrl: DEVCONNECT_ADMINS_GROUP_URL,
+  passportServerUrl: ZUPASS_SERVER_URL,
+  passportAppUrl: ZUPASS_URL,
+  ballotType: BallotType.DEVCONNECT_ORGANIZER,
 };
 
 export const BALLOT_CONFIGS = {
@@ -58,4 +78,6 @@ export const BALLOT_CONFIGS = {
   [BallotType.ORGANIZERONLY]: ORGANIZER_ONLY_BALLOT_CONFIG,
   [BallotType.PCDPASSUSER]: PCDPASS_BALLOT_CONFIG,
   [BallotType.STRAWPOLL]: STRAWPOLL_BALLOT_CONFIG,
+  [BallotType.DEVCONNECT_STRAW]: DEVCONNECT_ATTENDEE_BALLOT_CONFIG,
+  [BallotType.DEVCONNECT_ORGANIZER]: DEVCONNECT_ORGANIZER_BALLOT_CONFIG,
 };

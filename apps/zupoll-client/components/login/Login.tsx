@@ -2,7 +2,10 @@ import { useZupassPopupMessages } from "@pcd/passport-interface/src/PassportPopu
 import { useEffect, useState } from "react";
 import { login } from "../../src/api";
 import { LoginConfig, LoginState, ZupollError } from "../../src/types";
-import { openGroupMembershipPopup } from "../../src/util";
+import {
+  openGroupMembershipPopup,
+  removeQueryParameters,
+} from "../../src/util";
 import { Button } from "../core/Button";
 import stableStringify from "json-stable-stringify";
 
@@ -76,6 +79,7 @@ export function Login({
           message: err.message,
         };
         onError(loginError);
+        removeQueryParameters();
       }
       setLoggingIn(false);
       setServerLoading(false);

@@ -12,6 +12,9 @@ import {
   ZUZALU_HISTORIC_API_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
+  DEVCONNECT_ORGANIZERS_GROUP_URL,
+  DEVCONNECT_PARTICIPANTS_GROUP_URL,
+  SemaphoreGroups,
 } from "./auth";
 import { generateSnarkMessageHash } from "@pcd/util";
 
@@ -30,6 +33,7 @@ export async function verifyGroupProof(
     claimedExtNullifier?: string;
   }
 ): Promise<string> {
+  console.log(`VERIFY`, semaphoreGroupUrl, options);
   if (
     options.allowedGroups &&
     !options.allowedGroups.includes(semaphoreGroupUrl)
@@ -93,6 +97,32 @@ export async function verifyGroupProof(
     if (!organizerRootCache.has(pcd.claim.merkleRoot)) {
       const validOrganizerRoot = await verifyRootValidity(
         ADMIN_GROUP_ID,
+        pcd.claim.merkleRoot,
+        ZUZALU_HISTORIC_API_URL!
+      );
+      if (validOrganizerRoot) {
+        organizerRootCache.add(pcd.claim.merkleRoot);
+      } else {
+        throw new Error("Claim root isn't a valid organizer root.");
+      }
+    }
+  } else if (semaphoreGroupUrl === DEVCONNECT_PARTICIPANTS_GROUP_URL) {
+    if (!residentRootCache.has(pcd.claim.merkleRoot)) {
+      const validResidentRoot = await verifyRootValidity(
+        SemaphoreGroups.DevconnectAttendees,
+        pcd.claim.merkleRoot,
+        ZUZALU_HISTORIC_API_URL!
+      );
+      if (validResidentRoot) {
+        residentRootCache.add(pcd.claim.merkleRoot);
+      } else {
+        throw new Error("Claim root isn't a valid resident root.");
+      }
+    }
+  } else if (semaphoreGroupUrl === DEVCONNECT_ORGANIZERS_GROUP_URL) {
+    if (!organizerRootCache.has(pcd.claim.merkleRoot)) {
+      const validOrganizerRoot = await verifyRootValidity(
+        SemaphoreGroups.DevconnectOrganizers,
         pcd.claim.merkleRoot,
         ZUZALU_HISTORIC_API_URL!
       );

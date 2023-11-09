@@ -1,6 +1,8 @@
 import { useState } from "react";
 import styled from "styled-components";
 import {
+  DEVCONNECT_ORGANIZER_CONFIG,
+  DEVCONNECT_USER_CONFIG,
   ZUZALU_ORGANIZER_LOGIN_CONFIG,
   ZUZALU_PARTICIPANT_LOGIN_CONFIG,
 } from "../../src/loginConfig";
@@ -25,12 +27,15 @@ export function LoginScreen({
       <Body>
         <Description>
           <p>
-            <strong>This app lets Zuzalu vote anonymously.</strong>
+            <strong>This app lets Zupass users vote anonymously.</strong>
           </p>
           <p>
-            The server never learns who you are. The Zuzalu Passport creates a
+            The server never learns who you are. From Zupass, you create a
             zero-knowledge proof that you're a participant without revealing
             which one.
+          </p>
+          <p>
+            <strong>Choose a group to get started </strong>
           </p>
         </Description>
         <LoginRow>
@@ -43,15 +48,37 @@ export function LoginScreen({
                 onError={setError}
                 setServerLoading={setServerLoading}
                 config={ZUZALU_PARTICIPANT_LOGIN_CONFIG}
-                prompt="Resident login"
+                prompt="ZuConnect Resident"
               />
               <Login
                 onLogin={onLogin}
                 onError={setError}
                 setServerLoading={setServerLoading}
                 config={ZUZALU_ORGANIZER_LOGIN_CONFIG}
-                prompt="Organizer login"
-                deemphasized
+                prompt="ZuConnect Organizer"
+              />
+            </>
+          )}
+        </LoginRow>
+        <br></br>
+        <LoginRow>
+          {serverLoading ? (
+            <RippleLoader />
+          ) : (
+            <>
+              <Login
+                onLogin={onLogin}
+                onError={setError}
+                setServerLoading={setServerLoading}
+                config={DEVCONNECT_USER_CONFIG}
+                prompt="Devconnect Resident"
+              />
+              <Login
+                onLogin={onLogin}
+                onError={setError}
+                setServerLoading={setServerLoading}
+                config={DEVCONNECT_ORGANIZER_CONFIG}
+                prompt="Devconnect Organizer"
               />
             </>
           )}
