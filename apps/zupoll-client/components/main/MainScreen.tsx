@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import styled from "styled-components";
 import { listBallots } from "../../src/api";
 import { Ballot, BallotType } from "../../src/prismaTypes";
@@ -218,6 +218,7 @@ export function MainScreen({
           )}
         </BallotListContainer>
       )}
+
       {loginState.config.name ===
         LoginConfigurationName.DEVCONNECT_PARTICIPANT && (
         <BallotListContainer>
@@ -234,17 +235,19 @@ export function MainScreen({
                 (ballot) => ballot.ballotType === BallotType.DEVCONNECT_STRAW
               )
               .map((ballot) => (
-                <BallotListButton
-                  key={ballot.ballotId}
-                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                >
-                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                  <div style={{ fontStyle: "italic" }}>
-                    {new Date(ballot.expiry) < new Date()
-                      ? "Expired"
-                      : getTimeBeforeExpiry(ballot.expiry)}
-                  </div>
-                </BallotListButton>
+                <Fragment key={ballot.ballotURL}>
+                  <BallotListButton
+                    key={ballot.ballotId}
+                    onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
+                  >
+                    <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
+                    <div style={{ fontStyle: "italic" }}>
+                      {new Date(ballot.expiry) < new Date()
+                        ? "Expired"
+                        : getTimeBeforeExpiry(ballot.expiry)}
+                    </div>
+                  </BallotListButton>
+                </Fragment>
               ))
           )}
         </BallotListContainer>
