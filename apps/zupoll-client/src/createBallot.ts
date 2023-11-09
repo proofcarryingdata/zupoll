@@ -145,7 +145,6 @@ export function useCreateBallot({
       router.push("/");
       setBallotFromUrl(undefined);
       setPcdFromUrl("");
-      //
     },
     [
       loginState.token,
@@ -164,13 +163,10 @@ export function useCreateBallot({
     }
   }, [pcdStr]);
 
-  // process pcdStr
+  // process ballot
   useEffect(() => {
     if (ballotFromUrl && pcdFromUrl) {
-      //
       const parsedPcd = JSON.parse(decodeURIComponent(pcdFromUrl));
-
-      console.log(`GOT URL INFO`, ballotFromUrl);
       const { ballotSignal, ballotConfig, polls } = ballotFromUrl;
       const request = generateBallotRequest({
         ballotConfig,
@@ -185,8 +181,6 @@ export function useCreateBallot({
       submitBallot(request);
       setBallotFromUrl(undefined);
       setPcdFromUrl("");
-
-      return;
     } else {
       if (pcdState.current !== PCDState.RECEIVED_PCDSTR) return;
       if (voterGroupUrl == null || voterGroupRootHash == null) return;
