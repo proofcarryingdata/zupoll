@@ -10,7 +10,11 @@ import { BallotType, Poll, UserType } from "./prismaTypes";
 import { BallotSignal, CreateBallotRequest, PollSignal } from "./requestTypes";
 import { BallotConfig, LoginState, PCDState, ZupollError } from "./types";
 import { useHistoricSemaphoreUrl } from "./useHistoricSemaphoreUrl";
-import { USE_CREATE_BALLOT_REDIRECT, openGroupMembershipPopup } from "./util";
+import {
+  USE_CREATE_BALLOT_REDIRECT,
+  openGroupMembershipPopup,
+  removeQueryParameters,
+} from "./util";
 
 /**
  * Hook that handles requesting a PCD for creating a ballot.
@@ -124,10 +128,11 @@ export function useCreateBallot({
 
       if (res === undefined) {
         const serverDownError: ZupollError = {
-          title: "Voting failed",
+          title: "Creating ballot failed",
           message: "Server is down. Contact passport@0xparc.org.",
         };
         onError(serverDownError);
+        removeQueryParameters(["ballot", "proof", "finished"]);
         return;
       }
 
@@ -135,10 +140,11 @@ export function useCreateBallot({
         const resErr = await res.text();
         console.error("error posting vote to the server: ", resErr);
         const err: ZupollError = {
-          title: "Voting failed",
+          title: "Creating ballot failed",
           message: `Server Error: ${resErr}`,
         };
         onError(err);
+        removeQueryParameters(["ballot", "proof", "finished"]);
         return;
       }
 
