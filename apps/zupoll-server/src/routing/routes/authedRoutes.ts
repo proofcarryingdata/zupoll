@@ -76,10 +76,11 @@ export function initAuthedRoutes(
         AuthType.DEVCONNECT_PARTICIPANT,
       ].includes(req.authUserType as any)
     ) {
-      console.log(`AUTH `, req.authUserType);
       res.sendStatus(403);
       return;
     }
+
+    console.log(`BALLOTS`, req.authUserType);
 
     const ballots = await prisma.ballot.findMany({
       select: {

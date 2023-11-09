@@ -1,3 +1,6 @@
+import { BallotType } from "./prismaTypes";
+import { LoginConfigurationName } from "./types";
+
 export enum DEPLOYMENT_TYPE {
   LOCAL = "local",
   LOCAL_HTTPS = "localHttps",
@@ -60,6 +63,17 @@ export const enum SemaphoreGroups {
   DevconnectAttendees = "6",
   DevconnectOrganizers = "7",
 }
+export const BALLOT_TYPE_FROM_LOGIN_CONFIG: Record<
+  LoginConfigurationName,
+  BallotType
+> = {
+  [LoginConfigurationName.PCDPASS_USER]: BallotType.PCDPASSUSER,
+  [LoginConfigurationName.ZUZALU_PARTICIPANT]: BallotType.STRAWPOLL,
+  [LoginConfigurationName.ZUZALU_ORGANIZER]: BallotType.ADVISORYVOTE,
+  [LoginConfigurationName.DEVCONNECT_ORGANIZER]:
+    BallotType.DEVCONNECT_ORGANIZER,
+  [LoginConfigurationName.DEVCONNECT_PARTICIPANT]: BallotType.DEVCONNECT_STRAW,
+};
 
 export const ZUPASS_URL = zupassUrl[DEPLOYMENT];
 export const PCDPASS_URL = pcdpassUrl[DEPLOYMENT];

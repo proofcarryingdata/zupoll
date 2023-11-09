@@ -136,6 +136,13 @@ export function getVisibleBallotTypesForUser(
     ];
   } else if (userAuth === AuthType.ZUZALU_PARTICIPANT) {
     relevantBallots = [BallotType.ADVISORYVOTE, BallotType.STRAWPOLL];
+  } else if (userAuth === AuthType.DEVCONNECT_PARTICIPANT) {
+    relevantBallots = [BallotType.DEVCONNECT_STRAWPOLL];
+  } else if (userAuth === AuthType.DEVCONNECT_ORGANIZER) {
+    relevantBallots = [
+      BallotType.DEVCONNECT_STRAWPOLL,
+      BallotType.DEVCONNECT_FEEDBACK,
+    ];
   }
 
   return relevantBallots;
