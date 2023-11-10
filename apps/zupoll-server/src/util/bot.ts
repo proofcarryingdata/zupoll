@@ -31,11 +31,13 @@ export async function sendMessage(message: string, bot?: Bot) {
   }
 }
 
-export async function sendMessageV2(ballot: Ballot, polls: Poll[], bot?: Bot) {
+export async function sendMessageV2(
+  message: string,
+  ballotType: BallotType,
+  bot?: Bot
+) {
   if (!bot) throw new Error(`Bot not found`);
-  const ballotType = ballot.ballotType;
   if (!ballotType) throw new Error(`No ballot type found`);
-  console.log(`Ballot type`, ballotType);
   // Look up recipients based on ballot
 
   async function findPollReceiversByBallotType(ballotType: BallotType) {
@@ -46,12 +48,9 @@ export async function sendMessageV2(ballot: Ballot, polls: Poll[], bot?: Bot) {
   }
 
   const recipients = await findPollReceiversByBallotType(ballotType);
-  console.log(`Found recipients for update`, recipients);
   const res = recipients.map((r) => {
-    const post = formatPollCreated(ballot, polls);
-
     const [chatId, topicId] = r.tgTopicId.split("_");
-    return bot.api.sendMessage(chatId, post, {
+    return bot.api.sendMessage(chatId, message, {
       message_thread_id: parseInt(topicId) || undefined,
       parse_mode: "HTML",
     });

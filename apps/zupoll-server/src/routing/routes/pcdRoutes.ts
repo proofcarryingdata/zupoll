@@ -19,7 +19,12 @@ import {
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../../util/auth";
-import { generatePollHTML, PollWithVotes, sendMessageV2 } from "../../util/bot";
+import {
+  formatPollCreated,
+  generatePollHTML,
+  PollWithVotes,
+  sendMessageV2,
+} from "../../util/bot";
 import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
@@ -167,9 +172,10 @@ export function initPCDRoutes(
             newBallot.ballotType !== BallotType.ORGANIZERONLY
           ) {
             // send message on TG channel, if bot is setup
+            const post = formatPollCreated(newBallot, request.polls);
             const msgs = await sendMessageV2(
-              newBallot,
-              request.polls,
+              post,
+              newBallot.ballotType,
               context.bot
             );
             if (msgs) {

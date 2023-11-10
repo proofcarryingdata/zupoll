@@ -1,7 +1,13 @@
 import { BallotType } from "@prisma/client";
 import { Api, Bot, Context, InlineKeyboard, RawApi } from "grammy";
 import { ApplicationContext } from "./types";
-import { SITE_URL, cleanString, sendMessage, sendMessageV2 } from "./util/bot";
+import {
+  SITE_URL,
+  cleanString,
+  formatPollCreated,
+  sendMessage,
+  sendMessageV2,
+} from "./util/bot";
 import { sleep } from "@pcd/util";
 import { prisma } from "./util/prisma";
 import { CronJob } from "cron";
@@ -129,7 +135,8 @@ export async function startBot(context: ApplicationContext): Promise<void> {
       console.log(`[BALLOTS]`, ballots);
       for (const ballot of ballots) {
         // @ts-expect-error prisma
-        await sendMessageV2(ballot, context.bot);
+        const post = formatPollCreated(ballot, ballot.polls);
+        await sendMessageV2(post, ballot.ballotType, context.bot);
       }
     } catch (error) {
       //
