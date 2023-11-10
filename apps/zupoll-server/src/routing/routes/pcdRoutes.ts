@@ -134,33 +134,6 @@ export function initPCDRoutes(
 
           console.log("Valid proof with nullifier", nullifier);
 
-          // Send MSG first, so if it fails, we don't add poll to DB.
-          if (
-            request.ballot.ballotType !== BallotType.PCDPASSUSER &&
-            request.ballot.ballotType !== BallotType.ORGANIZERONLY
-          ) {
-            // send message on TG channel, if bot is setup
-            const post = formatPollCreated(request.ballot, request.polls);
-            const msgs = await sendMessageV2(
-              post,
-              request.ballot.ballotType,
-              context.bot
-            );
-            if (msgs) {
-              for (const msg of msgs) {
-                await prisma.tGMessage.create({
-                  data: {
-                    messageId: msg.message_id,
-                    chatId: msg.chat.id,
-                    topicId: msg.message_thread_id,
-                    ballotId: request.ballot.ballotId,
-                    messageType: MessageType.CREATE,
-                  },
-                });
-              }
-            }
-          }
-
           const newBallot = await prisma.ballot.create({
             data: {
               ballotTitle: request.ballot.ballotTitle,
@@ -193,6 +166,33 @@ export function initPCDRoutes(
               });
             })
           );
+
+          // Send MSG first, so if it fails, we don't add poll to DB.
+          if (
+            request.ballot.ballotType !== BallotType.PCDPASSUSER &&
+            request.ballot.ballotType !== BallotType.ORGANIZERONLY
+          ) {
+            // send message on TG channel, if bot is setup
+            const post = formatPollCreated(request.ballot, request.polls);
+            const msgs = await sendMessageV2(
+              post,
+              request.ballot.ballotType,
+              context.bot
+            );
+            if (msgs) {
+              for (const msg of msgs) {
+                await prisma.tGMessage.create({
+                  data: {
+                    messageId: msg.message_id,
+                    chatId: msg.chat.id,
+                    topicId: msg.message_thread_id,
+                    ballotId: newBallot.ballotId,
+                    messageType: MessageType.CREATE,
+                  },
+                });
+              }
+            }
+          }
 
           res.json({
             url: newBallot.ballotURL,
@@ -347,8 +347,8 @@ export function initPCDRoutes(
               const msg = await context.bot?.api.editMessageText(
                 voteMsg.chatId.toString(),
                 parseInt(voteMsg.messageId.toString()),
-                generatePollHTML(allVotes),
-                { parse_mode: "HTML" }
+                generatePollHTML(ballot, allVotes),
+                { parse_mode: "HTML", disable_web_page_preview: true }
               );
               if (msg) console.log(`Edited vote msg`);
             } catch (error) {
@@ -362,10 +362,11 @@ export function initPCDRoutes(
 
             const msg = await context.bot?.api.sendMessage(
               voteMsg.chatId.toString(),
-              generatePollHTML(allVotes),
+              generatePollHTML(ballot, allVotes),
               {
                 reply_to_message_id: parseInt(voteMsg.messageId.toString()),
                 parse_mode: "HTML",
+                disable_web_page_preview: true,
               }
             );
             if (msg) {

@@ -78,7 +78,6 @@ export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
     }
     return pollStr;
   };
-  console.log(`polls`, polls);
   let ballotPost = `A ${BallotTypeNames[ballot.ballotType]} was created!`;
   ballotPost =
     ballotPost +
@@ -95,7 +94,6 @@ export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
 
   ballotPost += `\n\n<a href="${SITE_URL}ballot?id=${ballot.ballotURL}">(Vote via browser)</a>`;
 
-  console.log(`Post`, ballotPost);
   return ballotPost;
 };
 
@@ -105,7 +103,10 @@ export type PollWithVotes =
     })
   | null;
 
-export function generatePollHTML(pollsWithVotes?: PollWithVotes[]) {
+export function generatePollHTML(
+  ballot: Ballot,
+  pollsWithVotes?: PollWithVotes[]
+) {
   let html = "";
 
   if (pollsWithVotes) {
@@ -143,8 +144,8 @@ export function generatePollHTML(pollsWithVotes?: PollWithVotes[]) {
           html += `${`🟦`.repeat(rounded) + `⬜️`.repeat(numWhite)}`;
           html += ` (${percentage.toFixed(2)}%)\n\n`;
         }
+        html += `<a href="${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}">Vote</a>`;
       }
-      //
     }
   }
   return html;
