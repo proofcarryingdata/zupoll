@@ -119,7 +119,7 @@ export async function startBot(context: ApplicationContext): Promise<void> {
     });
   });
 
-  context.bot.command("latest", async () => {
+  context.bot.command("latest", async (ctx) => {
     try {
       const ballots = await prisma.ballot.findMany({
         select: {
@@ -132,11 +132,10 @@ export async function startBot(context: ApplicationContext): Promise<void> {
           ballotType: true,
         },
       });
-      console.log(`[BALLOTS]`, ballots);
       for (const ballot of ballots) {
         // @ts-expect-error prisma
         const post = formatPollCreated(ballot, ballot.polls);
-        await sendMessageV2(post, ballot.ballotType, context.bot);
+        await sendMessageV2(post, ballot.ballotType, context.bot, ctx.from?.id);
       }
     } catch (error) {
       //
