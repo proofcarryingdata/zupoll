@@ -2,6 +2,7 @@ import { Ballot, BallotType, Poll, Vote } from "@prisma/client";
 import { Bot } from "grammy";
 import { prisma } from "./prisma";
 import { BallotTypeNames } from "./types";
+import { InlineKeyboardMarkup, ReplyKeyboardMarkup } from "grammy/types";
 
 export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
 
@@ -35,14 +36,18 @@ export async function sendMessageV2(
   message: string,
   ballotType: BallotType,
   bot?: Bot,
-  userId?: number
+  opts?: {
+    reply_markup?: ReplyKeyboardMarkup | InlineKeyboardMarkup;
+    userId?: number;
+  }
 ) {
   if (!bot) throw new Error(`Bot not found`);
   if (!ballotType) throw new Error(`No ballot type found`);
-  if (userId) {
+  if (opts?.userId) {
     return [
-      await bot.api.sendMessage(userId, message, {
+      await bot.api.sendMessage(opts.userId, message, {
         parse_mode: "HTML",
+        ...opts,
       }),
     ];
   }
@@ -58,7 +63,7 @@ export async function sendMessageV2(
   const recipients = await findPollReceiversByBallotType(ballotType);
   const res = recipients.map((r) => {
     const [chatId, topicId] = r.tgTopicId.split("_");
-    return bot.api.sendMessage(userId || chatId, message, {
+    return bot.api.sendMessage(chatId, message, {
       message_thread_id: parseInt(topicId) || undefined,
       parse_mode: "HTML",
     });
@@ -110,7 +115,9 @@ export function generatePollHTML(
   let html = "";
 
   if (pollsWithVotes) {
-    for (const pollWithVotes of pollsWithVotes) {
+    const moreThan1 = pollsWithVotes.length > 1;
+    const pollsLite = pollsWithVotes.slice(0, 1);
+    for (const pollWithVotes of pollsLite) {
       if (pollWithVotes) {
         const question = pollWithVotes.body;
         const options = pollWithVotes.options.slice(0, -1);
@@ -144,9 +151,9 @@ export function generatePollHTML(
           html += `${`🟦`.repeat(rounded) + `⬜️`.repeat(numWhite)}`;
           html += ` (${percentage.toFixed(2)}%)\n\n`;
         }
-        html += `<a href="${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}">Vote</a>`;
       }
     }
+    if (moreThan1) html += `\n<b>${pollsWithVotes[1]?.body}</b>\n\n⬇\n\n`;
   }
   return html;
 }

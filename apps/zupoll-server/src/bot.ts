@@ -135,7 +135,9 @@ export async function startBot(context: ApplicationContext): Promise<void> {
       for (const ballot of ballots) {
         // @ts-expect-error prisma
         const post = formatPollCreated(ballot, ballot.polls);
-        await sendMessageV2(post, ballot.ballotType, context.bot, ctx.from?.id);
+        await sendMessageV2(post, ballot.ballotType, context.bot, {
+          userId: ctx.from?.id,
+        });
       }
     } catch (error) {
       //

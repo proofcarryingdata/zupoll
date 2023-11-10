@@ -28,6 +28,7 @@ import {
 import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
+import { InlineKeyboard } from "grammy";
 
 /**
  * The endpoints in this function accepts proof (PCD) in the request. It verifies
@@ -348,7 +349,14 @@ export function initPCDRoutes(
                 voteMsg.chatId.toString(),
                 parseInt(voteMsg.messageId.toString()),
                 generatePollHTML(ballot, allVotes),
-                { parse_mode: "HTML", disable_web_page_preview: true }
+                {
+                  parse_mode: "HTML",
+                  disable_web_page_preview: true,
+                  reply_markup: new InlineKeyboard().url(
+                    `See more / Vote`,
+                    `${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}`
+                  ),
+                }
               );
               if (msg) console.log(`Edited vote msg`);
             } catch (error) {
@@ -367,6 +375,10 @@ export function initPCDRoutes(
                 reply_to_message_id: parseInt(voteMsg.messageId.toString()),
                 parse_mode: "HTML",
                 disable_web_page_preview: true,
+                reply_markup: new InlineKeyboard().url(
+                  `See more / Vote`,
+                  `${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}`
+                ),
               }
             );
             if (msg) {
