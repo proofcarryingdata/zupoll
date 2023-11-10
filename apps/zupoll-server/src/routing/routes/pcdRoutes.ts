@@ -12,6 +12,8 @@ import stableStringify from "json-stable-stringify";
 import { ApplicationContext } from "../../types";
 import {
   authenticateJWT,
+  DEVCONNECT_ORGANIZERS_GROUP_URL,
+  DEVCONNECT_PARTICIPANTS_GROUP_URL,
   getVisibleBallotTypesForUser,
   PCDPASS_USERS_GROUP_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
@@ -108,6 +110,14 @@ export function initPCDRoutes(
             groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
           } else if (request.ballot.ballotType === BallotType.PCDPASSUSER) {
             groupUrl = PCDPASS_USERS_GROUP_URL;
+          } else if (
+            request.ballot.ballotType === BallotType.DEVCONNECT_STRAWPOLL
+          ) {
+            groupUrl = DEVCONNECT_PARTICIPANTS_GROUP_URL;
+          } else if (
+            request.ballot.ballotType === BallotType.DEVCONNECT_FEEDBACK
+          ) {
+            groupUrl = DEVCONNECT_ORGANIZERS_GROUP_URL;
           }
 
           // pollsterSemaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
@@ -345,9 +355,8 @@ export function initPCDRoutes(
             );
             if (msg) console.log(`Edited vote msg`);
           } catch (error) {
-            console.log(`GRAMMY ERROR`, error)
-          } 
- 
+            console.log(`GRAMMY ERROR`, error);
+          }
         } else if (originalBallotMsg) {
           console.log(`No vote msg found`);
           // TODO: Include "Vote Here"

@@ -1,3 +1,6 @@
+import { BallotType } from "./prismaTypes";
+import { LoginConfigurationName } from "./types";
+
 export enum DEPLOYMENT_TYPE {
   LOCAL = "local",
   LOCAL_HTTPS = "localHttps",
@@ -51,6 +54,27 @@ export const DEPLOYMENT: DEPLOYMENT_TYPE =
 
 console.log({ DEPLOYMENT }, process.env.NEXT_PUBLIC_IS_LOCAL_HTTPS);
 
+export const enum SemaphoreGroups {
+  ZuzaluParticipants = "1",
+  ZuzaluResidents = "2",
+  ZuzaluVisitors = "3",
+  ZuzaluOrganizers = "4",
+  Everyone = "5",
+  DevconnectAttendees = "6",
+  DevconnectOrganizers = "7",
+}
+export const BALLOT_TYPE_FROM_LOGIN_CONFIG: Record<
+  LoginConfigurationName,
+  BallotType
+> = {
+  [LoginConfigurationName.PCDPASS_USER]: BallotType.PCDPASSUSER,
+  [LoginConfigurationName.ZUZALU_PARTICIPANT]: BallotType.STRAWPOLL,
+  [LoginConfigurationName.ZUZALU_ORGANIZER]: BallotType.ADVISORYVOTE,
+  [LoginConfigurationName.DEVCONNECT_ORGANIZER]:
+    BallotType.DEVCONNECT_ORGANIZER,
+  [LoginConfigurationName.DEVCONNECT_PARTICIPANT]: BallotType.DEVCONNECT_STRAW,
+};
+
 export const ZUPASS_URL = zupassUrl[DEPLOYMENT];
 export const PCDPASS_URL = pcdpassUrl[DEPLOYMENT];
 
@@ -58,10 +82,8 @@ export const ZUPASS_SERVER_URL = zuzaluPassportServerURL[DEPLOYMENT];
 export const PCDPASS_SERVER_URL = pcdpassServerUrl[DEPLOYMENT];
 export const ZUPOLL_SERVER_URL = zupollServerURL[DEPLOYMENT];
 
-export const ZUZALU_PARTICIPANTS_GROUP_ID = "1";
-export const ZUZALU_ADMINS_GROUP_ID = "4";
-export const PCDPASS_USERS_GROUP_ID = "5";
-
-export const ZUZALU_PARTICIPANTS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${ZUZALU_PARTICIPANTS_GROUP_ID}`;
-export const ZUZALU_ADMINS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${ZUZALU_ADMINS_GROUP_ID}`;
-export const PCDPASS_USERS_GROUP_URL = `${PCDPASS_SERVER_URL}semaphore/${PCDPASS_USERS_GROUP_ID}`;
+export const ZUZALU_PARTICIPANTS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${SemaphoreGroups.ZuzaluParticipants}`;
+export const ZUZALU_ADMINS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${SemaphoreGroups.ZuzaluOrganizers}`;
+export const DEVCONNECT_ADMINS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${SemaphoreGroups.DevconnectOrganizers}`;
+export const DEVCONNECT_ATTENDEES_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${SemaphoreGroups.DevconnectAttendees}`;
+export const PCDPASS_USERS_GROUP_URL = `${PCDPASS_SERVER_URL}semaphore/${SemaphoreGroups.Everyone}`;

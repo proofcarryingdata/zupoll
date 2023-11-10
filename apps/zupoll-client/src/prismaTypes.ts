@@ -64,6 +64,8 @@ export const BallotType = {
   STRAWPOLL: "STRAWPOLL",
   PCDPASSUSER: "PCDPASSUSER",
   ORGANIZERONLY: "ORGANIZERONLY",
+  DEVCONNECT_STRAW: "DEVCONNECT_STRAWPOLL",
+  DEVCONNECT_ORGANIZER: "DEVCONNECT_FEEDBACK",
 };
 
 export type BallotType = (typeof BallotType)[keyof typeof BallotType];

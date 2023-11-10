@@ -72,11 +72,15 @@ export function initAuthedRoutes(
         AuthType.ZUZALU_ORGANIZER,
         AuthType.ZUZALU_PARTICIPANT,
         AuthType.PCDPASS,
+        AuthType.DEVCONNECT_ORGANIZER,
+        AuthType.DEVCONNECT_PARTICIPANT,
       ].includes(req.authUserType as any)
     ) {
       res.sendStatus(403);
       return;
     }
+
+    console.log(`BALLOTS`, req.authUserType);
 
     const ballots = await prisma.ballot.findMany({
       select: {
@@ -105,6 +109,8 @@ export function initAuthedRoutes(
           AuthType.ZUZALU_ORGANIZER,
           AuthType.ZUZALU_PARTICIPANT,
           AuthType.PCDPASS,
+          AuthType.DEVCONNECT_ORGANIZER,
+          AuthType.DEVCONNECT_PARTICIPANT,
         ].includes(req.authUserType as any)
       ) {
         res.sendStatus(403);

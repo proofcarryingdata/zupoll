@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import styled from "styled-components";
 import { listBallots } from "../../src/api";
 import { Ballot, BallotType } from "../../src/prismaTypes";
@@ -202,6 +202,73 @@ export function MainScreen({
           ) : (
             ballots
               .filter((ballot) => ballot.ballotType === BallotType.PCDPASSUSER)
+              .map((ballot) => (
+                <BallotListButton
+                  key={ballot.ballotId}
+                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
+                >
+                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
+                  <div style={{ fontStyle: "italic" }}>
+                    {new Date(ballot.expiry) < new Date()
+                      ? "Expired"
+                      : getTimeBeforeExpiry(ballot.expiry)}
+                  </div>
+                </BallotListButton>
+              ))
+          )}
+        </BallotListContainer>
+      )}
+
+      {loginState.config.name ===
+        LoginConfigurationName.DEVCONNECT_PARTICIPANT && (
+        <BallotListContainer>
+          <TitleContainer>
+            <H1>Community Polls</H1>
+            <p>Ballots created by Devconnect Users.</p>
+          </TitleContainer>
+
+          {loadingBallots || ballots === undefined ? (
+            <RippleLoader />
+          ) : (
+            ballots
+              .filter(
+                (ballot) => ballot.ballotType === BallotType.DEVCONNECT_STRAW
+              )
+              .map((ballot) => (
+                <Fragment key={ballot.ballotURL}>
+                  <BallotListButton
+                    key={ballot.ballotId}
+                    onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
+                  >
+                    <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
+                    <div style={{ fontStyle: "italic" }}>
+                      {new Date(ballot.expiry) < new Date()
+                        ? "Expired"
+                        : getTimeBeforeExpiry(ballot.expiry)}
+                    </div>
+                  </BallotListButton>
+                </Fragment>
+              ))
+          )}
+        </BallotListContainer>
+      )}
+
+      {loginState.config.name ===
+        LoginConfigurationName.DEVCONNECT_ORGANIZER && (
+        <BallotListContainer>
+          <TitleContainer>
+            <H1>Community Polls</H1>
+            <p>Ballots created by Devconnect Users.</p>
+          </TitleContainer>
+
+          {loadingBallots || ballots === undefined ? (
+            <RippleLoader />
+          ) : (
+            ballots
+              .filter(
+                (ballot) =>
+                  ballot.ballotType === BallotType.DEVCONNECT_ORGANIZER
+              )
               .map((ballot) => (
                 <BallotListButton
                   key={ballot.ballotId}

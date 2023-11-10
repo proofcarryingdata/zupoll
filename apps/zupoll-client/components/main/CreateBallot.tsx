@@ -23,6 +23,7 @@ import {
 import { RippleLoaderLight } from "../core/RippleLoader";
 import { USE_CREATE_BALLOT_REDIRECT } from "../../src/util";
 import { Button } from "../core/Button";
+import { BALLOT_TYPE_FROM_LOGIN_CONFIG } from "../../src/env";
 
 export function CreateBallot({
   onError,
@@ -52,10 +53,10 @@ export function CreateBallot({
   const [pcdFromUrl, setPcdFromUrl] = useState("");
 
   const [ballotType, setBallotType] = useState<BallotType>(
-    loginState.config.name === LoginConfigurationName.PCDPASS_USER
-      ? BallotType.PCDPASSUSER
-      : BallotType.STRAWPOLL
+    BALLOT_TYPE_FROM_LOGIN_CONFIG[loginState.config.name]
   );
+
+  console.log({ ballotType });
   const [useLastBallot, setUseLastBallot] = useState(false);
 
   const getDateString = (date: Date) => {
@@ -217,6 +218,23 @@ export function CreateBallot({
               {loginState.config.name ===
                 LoginConfigurationName.PCDPASS_USER && (
                 <option value={BallotType.PCDPASSUSER}>PCDPass Poll</option>
+              )}
+              {loginState.config.name ===
+                LoginConfigurationName.DEVCONNECT_PARTICIPANT && (
+                <option value={BallotType.DEVCONNECT_STRAW}>
+                  Devconnect Community Poll
+                </option>
+              )}
+              {loginState.config.name ===
+                LoginConfigurationName.DEVCONNECT_ORGANIZER && (
+                <>
+                  <option value={BallotType.DEVCONNECT_STRAW}>
+                    Community Poll
+                  </option>
+                  <option value={BallotType.DEVCONNECT_ORGANIZER}>
+                    Organizer Feedback
+                  </option>
+                </>
               )}
             </StyledSelect>
           </StyledLabel>
