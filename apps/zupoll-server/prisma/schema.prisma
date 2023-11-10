@@ -64,7 +64,22 @@ model TGMessage {
   topicId                BigInt? 
   messageId              BigInt 
   messageType            MessageType 
+}
 
+model TGTopic {
+   id                     String   @id 
+   chatId                 BigInt
+   topicId                BigInt?
+   topicName              String 
+   pollReceive            PollReceiver?
+   
+   @@unique([topicId, chatId])
+}
+
+model PollReceiver {
+  tgTopicId String  @unique
+  TGTopic   TGTopic @relation(fields: [tgTopicId], references: [id])
+  ballotTypes BallotType[]
 }
 
 enum MessageType {

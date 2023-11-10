@@ -149,6 +149,85 @@ export async function startBot(context: ApplicationContext): Promise<void> {
     // List most recent ballots
   });
 
+  context.bot.command("listen", async (ctx) => {
+    const message_thread_id = ctx.message?.message_thread_id;
+    const chatId = ctx.chat.id;
+    const topicId = ctx.update.message?.message_thread_id || 0;
+    const tgTopicId = `${chatId}_${topicId}`;
+    try {
+      if (!ctx.match) throw new Error(`No polls to listen to found`);
+      const ballotTypes = ctx.match.split(",") as BallotType[];
+      ballotTypes.forEach((p) => {
+        if (!Object.values(BallotType).includes(p))
+          throw new Error(`POLL TYPE INVALID`);
+      });
+      // Upsert in DB
+      await prisma.pollReceiver.upsert({
+        where: {
+          tgTopicId,
+        },
+        update: {
+          ballotTypes,
+        },
+        create: {
+          tgTopicId,
+          ballotTypes,
+        },
+      });
+      ctx.reply(`Listening to ${ballotTypes}`, {
+        message_thread_id,
+      });
+    } catch (error) {
+      ctx.reply(`${error}`, {
+        message_thread_id,
+      });
+    }
+  });
+
+  context.bot.command("stoplisten", async (ctx) => {
+    const message_thread_id = ctx.message?.message_thread_id;
+    const chatId = ctx.chat.id;
+    const topicId = ctx.update.message?.message_thread_id || 0;
+    const tgTopicId = `${chatId}_${topicId}`;
+    try {
+      await prisma.pollReceiver.delete({ where: { tgTopicId } });
+
+      ctx.reply(`No longer listening to polls`, { message_thread_id });
+    } catch (error) {
+      ctx.reply(`${error}`, {
+        message_thread_id,
+      });
+    }
+
+    //
+  });
+
+  context.bot.on(":forum_topic_edited", async (ctx) => {
+    try {
+      const topicName = ctx.update?.message?.forum_topic_edited.name;
+      const chatId = ctx.chat.id;
+      const topicId = ctx.update.message?.message_thread_id || 0;
+      if (!topicName) throw new Error(`No topic name found`);
+      console.log(`EDITED`, topicName);
+      const id = `${chatId}_${topicId}`;
+      await prisma.tGTopic.upsert({
+        where: {
+          id,
+        },
+        update: {
+          topicName,
+        },
+        create: {
+          id,
+          topicId,
+          chatId,
+          topicName,
+        },
+      });
+    } catch (error) {
+      console.log(`[TOPIC EDITED ERROR]`, error);
+    }
+  });
   await sleep(5000);
 
   context.bot.start({
