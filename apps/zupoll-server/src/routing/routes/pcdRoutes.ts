@@ -19,12 +19,7 @@ import {
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../../util/auth";
-import {
-  formatPollCreated,
-  generatePollHTML,
-  PollWithVotes,
-  sendMessage,
-} from "../../util/bot";
+import { generatePollHTML, PollWithVotes, sendMessageV2 } from "../../util/bot";
 import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
@@ -172,15 +167,13 @@ export function initPCDRoutes(
             newBallot.ballotType !== BallotType.ORGANIZERONLY
           ) {
             // send message on TG channel, if bot is setup
-            const ballotPost = formatPollCreated(newBallot, request.polls);
-            const msg = await sendMessage(ballotPost, context.bot);
-            if (msg) {
-              const chatId = process.env.BOT_SUPERGROUP_ID;
-              const threadId = process.env.BOT_CHANNEL_ID;
-              if (!chatId || !threadId) {
-                console.log(`No chatId or threadId found in .env`);
-              } else {
-                // Write to db
+            const msgs = await sendMessageV2(
+              newBallot,
+              request.polls,
+              context.bot
+            );
+            if (msgs) {
+              for (const msg of msgs) {
                 await prisma.tGMessage.create({
                   data: {
                     messageId: msg.message_id,
@@ -190,9 +183,7 @@ export function initPCDRoutes(
                     messageType: MessageType.CREATE,
                   },
                 });
-                console.log(`[DB] message id stored`);
               }
-              //
             }
           }
 

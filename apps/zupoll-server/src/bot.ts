@@ -1,12 +1,7 @@
 import { BallotType } from "@prisma/client";
 import { Api, Bot, Context, InlineKeyboard, RawApi } from "grammy";
 import { ApplicationContext } from "./types";
-import {
-  SITE_URL,
-  cleanString,
-  formatPollCreated,
-  sendMessage,
-} from "./util/bot";
+import { SITE_URL, cleanString, sendMessage, sendMessageV2 } from "./util/bot";
 import { sleep } from "@pcd/util";
 import { prisma } from "./util/prisma";
 import { CronJob } from "cron";
@@ -119,34 +114,26 @@ export async function startBot(context: ApplicationContext): Promise<void> {
   });
 
   context.bot.command("latest", async () => {
-    const ballots = await prisma.ballot.findMany({
-      select: {
-        ballotTitle: true,
-        ballotURL: true,
-        expiry: true,
-        expiryNotif: true,
-        ballotDescription: true,
-        polls: true,
-      },
-      orderBy: { expiry: "desc" },
-      where: {
-        NOT: {
-          ballotType: {
-            in: [BallotType.PCDPASSUSER, BallotType.ORGANIZERONLY],
-          },
+    try {
+      const ballots = await prisma.ballot.findMany({
+        select: {
+          ballotTitle: true,
+          ballotURL: true,
+          expiry: true,
+          expiryNotif: true,
+          ballotDescription: true,
+          polls: true,
+          ballotType: true,
         },
-      },
-    });
-    console.log(`[BALLOTS]`, ballots);
-    for (const ballot of ballots.slice(0, 1)) {
-      // @ts-expect-error prisma
-      const post = formatPollCreated(ballot, ballot.polls);
-      await sendMessage(post, context.bot);
+      });
+      console.log(`[BALLOTS]`, ballots);
+      for (const ballot of ballots) {
+        // @ts-expect-error prisma
+        await sendMessageV2(ballot, context.bot);
+      }
+    } catch (error) {
+      //
     }
-    // await ctx.reply(`Check console for ballots`, {
-    //   message_thread_id: ctx.message?.message_thread_id,
-    // });
-    // List most recent ballots
   });
 
   context.bot.command("listen", async (ctx) => {
@@ -161,6 +148,11 @@ export async function startBot(context: ApplicationContext): Promise<void> {
         if (!Object.values(BallotType).includes(p))
           throw new Error(`POLL TYPE INVALID`);
       });
+      const topicExists = await prisma.tGTopic.findFirst({
+        where: { id: tgTopicId },
+      });
+      if (!topicExists)
+        throw new Error(`Topic not found in DB. Edit it and try again`);
       // Upsert in DB
       await prisma.pollReceiver.upsert({
         where: {
@@ -198,8 +190,6 @@ export async function startBot(context: ApplicationContext): Promise<void> {
         message_thread_id,
       });
     }
-
-    //
   });
 
   context.bot.on(":forum_topic_edited", async (ctx) => {

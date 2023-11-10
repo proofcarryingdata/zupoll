@@ -1,5 +1,7 @@
 import { Ballot, BallotType, Poll, Vote } from "@prisma/client";
 import { Bot } from "grammy";
+import { prisma } from "./prisma";
+import { BallotTypeNames } from "./types";
 
 export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
 
@@ -29,7 +31,41 @@ export async function sendMessage(message: string, bot?: Bot) {
   }
 }
 
+export async function sendMessageV2(ballot: Ballot, polls: Poll[], bot?: Bot) {
+  if (!bot) throw new Error(`Bot not found`);
+  const ballotType = ballot.ballotType;
+  if (!ballotType) throw new Error(`No ballot type found`);
+  console.log(`Ballot type`, ballotType);
+  // Look up recipients based on ballot
+
+  async function findPollReceiversByBallotType(ballotType: BallotType) {
+    const pollReceivers = await prisma.pollReceiver.findMany();
+    return pollReceivers.filter((receiver) =>
+      receiver.ballotTypes.includes(ballotType)
+    );
+  }
+
+  const recipients = await findPollReceiversByBallotType(ballotType);
+  console.log(`Found recipients for update`, recipients);
+  const res = recipients.map((r) => {
+    const post = formatPollCreated(ballot, polls);
+
+    const [chatId, topicId] = r.tgTopicId.split("_");
+    return bot.api.sendMessage(chatId, post, {
+      message_thread_id: parseInt(topicId) || undefined,
+      parse_mode: "HTML",
+    });
+  });
+
+  const finished = await Promise.all(res);
+  console.log(`Sent poll created msg to ${res.length} chats`);
+  return finished;
+
+  return;
+}
+
 export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
+  if (!polls) throw new Error(`No polls found`);
   const formatPolls = (polls: Poll[]) => {
     let pollStr = "";
     for (const poll of polls) {
@@ -38,10 +74,7 @@ export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
     return pollStr;
   };
   console.log(`polls`, polls);
-  let ballotPost =
-    ballot.ballotType === BallotType.STRAWPOLL
-      ? "New straw poll posted!"
-      : "New advisory vote posted!";
+  let ballotPost = `A ${BallotTypeNames[ballot.ballotType]} was created!`;
   ballotPost =
     ballotPost +
     `\n\nTitle: <b>${cleanString(ballot.ballotTitle)}</b>` +
