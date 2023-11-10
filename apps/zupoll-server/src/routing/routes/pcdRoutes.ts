@@ -134,6 +134,33 @@ export function initPCDRoutes(
 
           console.log("Valid proof with nullifier", nullifier);
 
+          // Send MSG first, so if it fails, we don't add poll to DB.
+          if (
+            request.ballot.ballotType !== BallotType.PCDPASSUSER &&
+            request.ballot.ballotType !== BallotType.ORGANIZERONLY
+          ) {
+            // send message on TG channel, if bot is setup
+            const post = formatPollCreated(request.ballot, request.polls);
+            const msgs = await sendMessageV2(
+              post,
+              request.ballot.ballotType,
+              context.bot
+            );
+            if (msgs) {
+              for (const msg of msgs) {
+                await prisma.tGMessage.create({
+                  data: {
+                    messageId: msg.message_id,
+                    chatId: msg.chat.id,
+                    topicId: msg.message_thread_id,
+                    ballotId: request.ballot.ballotId,
+                    messageType: MessageType.CREATE,
+                  },
+                });
+              }
+            }
+          }
+
           const newBallot = await prisma.ballot.create({
             data: {
               ballotTitle: request.ballot.ballotTitle,
@@ -166,32 +193,6 @@ export function initPCDRoutes(
               });
             })
           );
-
-          if (
-            newBallot.ballotType !== BallotType.PCDPASSUSER &&
-            newBallot.ballotType !== BallotType.ORGANIZERONLY
-          ) {
-            // send message on TG channel, if bot is setup
-            const post = formatPollCreated(newBallot, request.polls);
-            const msgs = await sendMessageV2(
-              post,
-              newBallot.ballotType,
-              context.bot
-            );
-            if (msgs) {
-              for (const msg of msgs) {
-                await prisma.tGMessage.create({
-                  data: {
-                    messageId: msg.message_id,
-                    chatId: msg.chat.id,
-                    topicId: msg.message_thread_id,
-                    ballotId: newBallot.ballotId,
-                    messageType: MessageType.CREATE,
-                  },
-                });
-              }
-            }
-          }
 
           res.json({
             url: newBallot.ballotURL,
@@ -328,56 +329,57 @@ export function initPCDRoutes(
           userVotes: multiVoteSignal.voteSignals,
         };
 
-        const originalBallotMsg = await prisma.tGMessage.findFirst({
+        const originalBallotMsg = await prisma.tGMessage.findMany({
           where: {
             ballotId: ballot.ballotId,
             messageType: MessageType.CREATE,
           },
         });
-        const voteBallotMsg = await prisma.tGMessage.findFirst({
+        const voteBallotMsg = await prisma.tGMessage.findMany({
           where: {
             ballotId: ballot.ballotId,
             messageType: MessageType.RESULTS,
           },
         });
-        if (voteBallotMsg) {
-          console.log(`Vote msg found`);
-
-          try {
-            const msg = await context.bot?.api.editMessageText(
-              voteBallotMsg.chatId.toString(),
-              parseInt(voteBallotMsg.messageId.toString()),
-              generatePollHTML(allVotes),
-              { parse_mode: "HTML" }
-            );
-            if (msg) console.log(`Edited vote msg`);
-          } catch (error) {
-            console.log(`GRAMMY ERROR`, error);
-          }
-        } else if (originalBallotMsg) {
-          console.log(`No vote msg found`);
-          // TODO: Include "Vote Here"
-          const msg = await context.bot?.api.sendMessage(
-            originalBallotMsg.chatId.toString(),
-            generatePollHTML(allVotes),
-            {
-              reply_to_message_id: parseInt(
-                originalBallotMsg.messageId.toString()
-              ),
-              parse_mode: "HTML",
+        if (voteBallotMsg?.length > 0) {
+          for (const voteMsg of voteBallotMsg) {
+            try {
+              const msg = await context.bot?.api.editMessageText(
+                voteMsg.chatId.toString(),
+                parseInt(voteMsg.messageId.toString()),
+                generatePollHTML(allVotes),
+                { parse_mode: "HTML" }
+              );
+              if (msg) console.log(`Edited vote msg`);
+            } catch (error) {
+              console.log(`GRAMMY ERROR`, error);
             }
-          );
-          if (msg) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { id, messageId, ...resultsMsg } = originalBallotMsg;
-            await prisma.tGMessage.create({
-              data: {
-                ...resultsMsg,
-                messageId: msg.message_id,
-                messageType: MessageType.RESULTS,
-              },
-            });
-            console.log(`Updated DB with RESULTS`);
+          }
+        } else if (originalBallotMsg?.length > 0) {
+          for (const voteMsg of originalBallotMsg) {
+            console.log(`No vote msg found`);
+            // TODO: Include "Vote Here"
+
+            const msg = await context.bot?.api.sendMessage(
+              voteMsg.chatId.toString(),
+              generatePollHTML(allVotes),
+              {
+                reply_to_message_id: parseInt(voteMsg.messageId.toString()),
+                parse_mode: "HTML",
+              }
+            );
+            if (msg) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { id, messageId, ...resultsMsg } = voteMsg;
+              await prisma.tGMessage.create({
+                data: {
+                  ...resultsMsg,
+                  messageId: msg.message_id,
+                  messageType: MessageType.RESULTS,
+                },
+              });
+              console.log(`Updated DB with RESULTS`);
+            }
           }
           //
         }
