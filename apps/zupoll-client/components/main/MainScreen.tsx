@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { listBallots } from "../../src/api";
 import { Ballot, BallotType } from "../../src/prismaTypes";
@@ -13,6 +13,7 @@ import { Center } from "../core";
 import { MainScreenHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "./ErrorOverlay";
+import { BallotList } from "./BallotList";
 
 export function MainScreen({
   loginState,
@@ -26,24 +27,6 @@ export function MainScreen({
   const [loadingBallots, setLoadingBallots] = useState<boolean>(true);
   const [ballots, setBallots] = useState<Ballot[]>([]);
   const [error, setError] = useState<ZupollError>();
-
-  function getTimeBeforeExpiry(expiry: Date) {
-    const minutes = Math.ceil(
-      (new Date(expiry).getTime() - Date.now()) / 60000
-    );
-    const hours = Math.ceil(minutes / 60);
-    const days = Math.ceil(minutes / (24 * 60));
-
-    if (days > 1) {
-      return "Expires in <" + days + " days";
-    } else if (hours > 1) {
-      return "Expires in <" + hours + " hours";
-    } else if (minutes > 1) {
-      return "Expires in <" + minutes + " minutes";
-    } else {
-      return "Expires in <1 minute";
-    }
-  }
 
   useEffect(() => {
     async function getBallots() {
@@ -106,23 +89,7 @@ export function MainScreen({
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            ballots
-              .filter(
-                (ballot) => ballot.ballotType === BallotType.ORGANIZERONLY
-              )
-              .map((ballot) => (
-                <BallotListButton
-                  key={ballot.ballotId}
-                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                >
-                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                  <div style={{ fontStyle: "italic" }}>
-                    {new Date(ballot.expiry) < new Date()
-                      ? "Expired"
-                      : getTimeBeforeExpiry(ballot.expiry)}
-                  </div>
-                </BallotListButton>
-              ))
+            <BallotList ballots={ballots} filter={BallotType.ORGANIZERONLY} />
           )}
         </BallotListContainer>
       )}
@@ -139,21 +106,7 @@ export function MainScreen({
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            ballots
-              .filter((ballot) => ballot.ballotType === BallotType.ADVISORYVOTE)
-              .map((ballot) => (
-                <BallotListButton
-                  key={ballot.ballotId}
-                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                >
-                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                  <div style={{ fontStyle: "italic" }}>
-                    {new Date(ballot.expiry) < new Date()
-                      ? "Expired"
-                      : getTimeBeforeExpiry(ballot.expiry)}
-                  </div>
-                </BallotListButton>
-              ))
+            <BallotList ballots={ballots} filter={BallotType.ADVISORYVOTE} />
           )}
         </BallotListContainer>
       )}
@@ -169,21 +122,7 @@ export function MainScreen({
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            ballots
-              .filter((ballot) => ballot.ballotType === BallotType.STRAWPOLL)
-              .map((ballot) => (
-                <BallotListButton
-                  key={ballot.ballotId}
-                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                >
-                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                  <div style={{ fontStyle: "italic" }}>
-                    {new Date(ballot.expiry) < new Date()
-                      ? "Expired"
-                      : getTimeBeforeExpiry(ballot.expiry)}
-                  </div>
-                </BallotListButton>
-              ))
+            <BallotList ballots={ballots} filter={BallotType.STRAWPOLL} />
           )}
         </BallotListContainer>
       )}
@@ -201,58 +140,7 @@ export function MainScreen({
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            ballots
-              .filter((ballot) => ballot.ballotType === BallotType.PCDPASSUSER)
-              .map((ballot) => (
-                <BallotListButton
-                  key={ballot.ballotId}
-                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                >
-                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                  <div style={{ fontStyle: "italic" }}>
-                    {new Date(ballot.expiry) < new Date()
-                      ? "Expired"
-                      : getTimeBeforeExpiry(ballot.expiry)}
-                  </div>
-                </BallotListButton>
-              ))
-          )}
-        </BallotListContainer>
-      )}
-
-      {(loginState.config.name ===
-        LoginConfigurationName.DEVCONNECT_PARTICIPANT ||
-        loginState.config.name ===
-          LoginConfigurationName.DEVCONNECT_ORGANIZER) && (
-        <BallotListContainer>
-          <TitleContainer>
-            <H1>Community Polls</H1>
-            <p>Ballots created by Devconnect attendees.</p>
-          </TitleContainer>
-
-          {loadingBallots || ballots === undefined ? (
-            <RippleLoader />
-          ) : (
-            ballots
-              .filter(
-                (ballot) => ballot.ballotType === BallotType.DEVCONNECT_STRAW
-              )
-              .reverse()
-              .map((ballot) => (
-                <Fragment key={ballot.ballotURL}>
-                  <BallotListButton
-                    key={ballot.ballotId}
-                    onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                  >
-                    <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                    <div style={{ fontStyle: "italic" }}>
-                      {new Date(ballot.expiry) < new Date()
-                        ? "Expired"
-                        : getTimeBeforeExpiry(ballot.expiry)}
-                    </div>
-                  </BallotListButton>
-                </Fragment>
-              ))
+            <BallotList ballots={ballots} filter={BallotType.PCDPASSUSER} />
           )}
         </BallotListContainer>
       )}
@@ -270,25 +158,31 @@ export function MainScreen({
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            ballots
-              .filter(
-                (ballot) =>
-                  ballot.ballotType === BallotType.DEVCONNECT_ORGANIZER
-              )
-              .reverse()
-              .map((ballot) => (
-                <BallotListButton
-                  key={ballot.ballotId}
-                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                >
-                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                  <div style={{ fontStyle: "italic" }}>
-                    {new Date(ballot.expiry) < new Date()
-                      ? "Expired"
-                      : getTimeBeforeExpiry(ballot.expiry)}
-                  </div>
-                </BallotListButton>
-              ))
+            <BallotList
+              ballots={ballots}
+              filter={BallotType.DEVCONNECT_ORGANIZER}
+            />
+          )}
+        </BallotListContainer>
+      )}
+
+      {(loginState.config.name ===
+        LoginConfigurationName.DEVCONNECT_PARTICIPANT ||
+        loginState.config.name ===
+          LoginConfigurationName.DEVCONNECT_ORGANIZER) && (
+        <BallotListContainer>
+          <TitleContainer>
+            <H1>Community Polls</H1>
+            <p>Ballots created by Devconnect attendees.</p>
+          </TitleContainer>
+
+          {loadingBallots || ballots === undefined ? (
+            <RippleLoader />
+          ) : (
+            <BallotList
+              ballots={ballots}
+              filter={BallotType.DEVCONNECT_STRAW}
+            />
           )}
         </BallotListContainer>
       )}
@@ -344,29 +238,4 @@ const TitleContainer = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 0.5rem;
-`;
-
-const BallotListButton = styled.div`
-  display: flex;
-  justify-content: space-between;
-
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid #888;
-  opacity: 1;
-  margin-bottom: 1rem;
-  gap: 0.5rem;
-
-  font-family: OpenSans;
-  font-weight: 400;
-  background-color: #fff;
-
-  cursor: pointer;
-  &:hover {
-    background-color: #d8d8d8;
-  }
-  &:active {
-    background-color: #c3c3c3;
-  }
 `;

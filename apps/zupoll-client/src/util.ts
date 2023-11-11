@@ -48,7 +48,7 @@ export function openGroupMembershipPopup(
       },
     },
     {
-      title: "Voting Auth",
+      title: "Anon Voting Auth",
       description: originalSiteName,
     }
   );

@@ -88,6 +88,7 @@ export function initAuthedRoutes(
         ballotURL: true,
         expiry: true,
         ballotType: true,
+        createdAt: true,
       },
       orderBy: { expiry: "desc" },
       where: {

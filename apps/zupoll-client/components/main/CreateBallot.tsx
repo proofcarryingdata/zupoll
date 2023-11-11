@@ -56,7 +56,6 @@ export function CreateBallot({
     BALLOT_TYPE_FROM_LOGIN_CONFIG[loginState.config.name]
   );
 
-  console.log({ ballotType });
   const [useLastBallot, setUseLastBallot] = useState(false);
 
   const getDateString = (date: Date) => {
