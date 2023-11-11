@@ -347,7 +347,11 @@ export function BallotScreen({
             onClose={() => {
               setError(undefined);
             }}
-            showLogout={true}
+            onLogout={() => {
+              localStorage.setItem("preLoginRoute", router.asPath);
+              console.log(`Saved ballot id`, router.asPath);
+              logout();
+            }}
           />
         )}
       </Center>
