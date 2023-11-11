@@ -112,17 +112,15 @@ export function generatePollHTML(
   ballot: Ballot,
   pollsWithVotes?: PollWithVotes[]
 ) {
-  let html = "";
+  let html = `🦉 <b>${ballot.ballotTitle}</b>\n\n`;
 
   if (pollsWithVotes) {
-    const moreThan1 = pollsWithVotes.length > 1;
-    const pollsLite = pollsWithVotes.slice(0, 1);
-    for (const pollWithVotes of pollsLite) {
-      if (pollWithVotes) {
-        const question = pollWithVotes.body;
-        const options = pollWithVotes.options.slice(0, -1);
-        console.log(`poll options`, options);
-        const votes = pollWithVotes.votes;
+    const pollsLite = pollsWithVotes.slice(0, 2);
+    pollsLite.map((poll, idx) => {
+      if (poll) {
+        const question = poll.body;
+        const options = poll.options.slice(0, -1);
+        const votes = poll.votes;
         const votesPerQuestion: number[] = [];
         for (const v of votes) {
           const currVotes = votesPerQuestion[v.voteIdx];
@@ -134,26 +132,23 @@ export function generatePollHTML(
         }
         const totalVotes = votesPerQuestion.reduce((a, b) => a + b, 0);
 
-        console.log(`totalVotes`, totalVotes);
-        console.log(`votes`, votes);
-        console.log(`votes per question`, votesPerQuestion);
+        html += `❔ ${question} - <i>${totalVotes} votes </i>\n\n`;
 
-        html += `<b>${question}</b> - <i>${totalVotes} votes </i>\n\n`;
+        if (idx < 1) {
+          for (let i = 0; i < options.length; i++) {
+            const percentage = votesPerQuestion?.[i]
+              ? (votesPerQuestion[i] / totalVotes) * 100
+              : 0;
+            const rounded = Math.round(percentage / 10);
+            const numWhite = 10 - rounded;
 
-        for (let i = 0; i < options.length; i++) {
-          const percentage = votesPerQuestion?.[i]
-            ? (votesPerQuestion[i] / totalVotes) * 100
-            : 0;
-          const rounded = Math.round(percentage / 10);
-          const numWhite = 10 - rounded;
-
-          html += `<i>${options[i]}:</i>\n\n`;
-          html += `${`🟦`.repeat(rounded) + `⬜️`.repeat(numWhite)}`;
-          html += ` (${percentage.toFixed(2)}%)\n\n`;
-        }
+            html += `<i>${options[i]}:</i>\n\n`;
+            html += `${`🟦`.repeat(rounded) + `⬜️`.repeat(numWhite)}`;
+            html += ` (${percentage.toFixed(2)}%)\n\n`;
+          }
+        } else if (idx == 1) html += `⬇`;
       }
-    }
-    if (moreThan1) html += `\n<b>${pollsWithVotes[1]?.body}</b>\n\n⬇\n\n`;
+    });
   }
   return html;
 }
