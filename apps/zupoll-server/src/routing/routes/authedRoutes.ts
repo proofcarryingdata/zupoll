@@ -137,7 +137,7 @@ export function initAuthedRoutes(
           )
         ) {
           throw new Error(
-            `Your role of ${req.authUserType} is not authorized to view ${ballot.ballotType}. Click close to logout and try again!`
+            `Your role of ${req.authUserType} is not authorized to view ${ballot.ballotType}. Logout and try again!`
           );
         }
         if (ballot === null) {
