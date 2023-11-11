@@ -142,6 +142,14 @@ export function useBallotVoting({
   ]);
 
   const createBallotVotePCD = useCallback(async () => {
+    if (pollToVote.size === 0) {
+      const emptyBallotError: ZupollError = {
+        title: "Empty Ballot",
+        message: "Answer at least one question",
+      };
+      onError(emptyBallotError);
+      return;
+    }
     pcdState.current = PCDState.AWAITING_PCDSTR;
 
     const multiVoteSignal: MultiVoteSignal = {
@@ -188,6 +196,7 @@ export function useBallotVoting({
     ballotVoterSemaphoreGroupUrl,
     pollToVote,
     returnUrl,
+    onError,
   ]);
 
   return createBallotVotePCD;

@@ -345,9 +345,9 @@ export function BallotScreen({
           <ErrorOverlay
             error={error}
             onClose={() => {
-              logout();
               setError(undefined);
             }}
+            showLogout={true}
           />
         )}
       </Center>
