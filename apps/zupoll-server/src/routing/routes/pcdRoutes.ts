@@ -23,11 +23,12 @@ import {
   formatPollCreated,
   generatePollHTML,
   PollWithVotes,
-  sendMessage,
+  sendMessageV2,
 } from "../../util/bot";
 import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
+import { InlineKeyboard } from "grammy";
 
 /**
  * The endpoints in this function accepts proof (PCD) in the request. It verifies
@@ -167,20 +168,20 @@ export function initPCDRoutes(
             })
           );
 
+          // Send MSG first, so if it fails, we don't add poll to DB.
           if (
-            newBallot.ballotType !== BallotType.PCDPASSUSER &&
-            newBallot.ballotType !== BallotType.ORGANIZERONLY
+            request.ballot.ballotType !== BallotType.PCDPASSUSER &&
+            request.ballot.ballotType !== BallotType.ORGANIZERONLY
           ) {
             // send message on TG channel, if bot is setup
-            const ballotPost = formatPollCreated(newBallot, request.polls);
-            const msg = await sendMessage(ballotPost, context.bot);
-            if (msg) {
-              const chatId = process.env.BOT_SUPERGROUP_ID;
-              const threadId = process.env.BOT_CHANNEL_ID;
-              if (!chatId || !threadId) {
-                console.log(`No chatId or threadId found in .env`);
-              } else {
-                // Write to db
+            const post = formatPollCreated(newBallot, request.polls);
+            const msgs = await sendMessageV2(
+              post,
+              request.ballot.ballotType,
+              context.bot
+            );
+            if (msgs) {
+              for (const msg of msgs) {
                 await prisma.tGMessage.create({
                   data: {
                     messageId: msg.message_id,
@@ -190,9 +191,7 @@ export function initPCDRoutes(
                     messageType: MessageType.CREATE,
                   },
                 });
-                console.log(`[DB] message id stored`);
               }
-              //
             }
           }
 
@@ -331,56 +330,69 @@ export function initPCDRoutes(
           userVotes: multiVoteSignal.voteSignals,
         };
 
-        const originalBallotMsg = await prisma.tGMessage.findFirst({
+        const originalBallotMsg = await prisma.tGMessage.findMany({
           where: {
             ballotId: ballot.ballotId,
             messageType: MessageType.CREATE,
           },
         });
-        const voteBallotMsg = await prisma.tGMessage.findFirst({
+        const voteBallotMsg = await prisma.tGMessage.findMany({
           where: {
             ballotId: ballot.ballotId,
             messageType: MessageType.RESULTS,
           },
         });
-        if (voteBallotMsg) {
-          console.log(`Vote msg found`);
-
-          try {
-            const msg = await context.bot?.api.editMessageText(
-              voteBallotMsg.chatId.toString(),
-              parseInt(voteBallotMsg.messageId.toString()),
-              generatePollHTML(allVotes),
-              { parse_mode: "HTML" }
-            );
-            if (msg) console.log(`Edited vote msg`);
-          } catch (error) {
-            console.log(`GRAMMY ERROR`, error);
-          }
-        } else if (originalBallotMsg) {
-          console.log(`No vote msg found`);
-          // TODO: Include "Vote Here"
-          const msg = await context.bot?.api.sendMessage(
-            originalBallotMsg.chatId.toString(),
-            generatePollHTML(allVotes),
-            {
-              reply_to_message_id: parseInt(
-                originalBallotMsg.messageId.toString()
-              ),
-              parse_mode: "HTML",
+        if (voteBallotMsg?.length > 0) {
+          for (const voteMsg of voteBallotMsg) {
+            try {
+              const msg = await context.bot?.api.editMessageText(
+                voteMsg.chatId.toString(),
+                parseInt(voteMsg.messageId.toString()),
+                generatePollHTML(ballot, allVotes),
+                {
+                  parse_mode: "HTML",
+                  disable_web_page_preview: true,
+                  reply_markup: new InlineKeyboard().url(
+                    `See more / Vote`,
+                    `${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}`
+                  ),
+                }
+              );
+              if (msg) console.log(`Edited vote msg`);
+            } catch (error) {
+              console.log(`GRAMMY ERROR`, error);
             }
-          );
-          if (msg) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { id, messageId, ...resultsMsg } = originalBallotMsg;
-            await prisma.tGMessage.create({
-              data: {
-                ...resultsMsg,
-                messageId: msg.message_id,
-                messageType: MessageType.RESULTS,
-              },
-            });
-            console.log(`Updated DB with RESULTS`);
+          }
+        } else if (originalBallotMsg?.length > 0) {
+          for (const voteMsg of originalBallotMsg) {
+            console.log(`No vote msg found`);
+            // TODO: Include "Vote Here"
+
+            const msg = await context.bot?.api.sendMessage(
+              voteMsg.chatId.toString(),
+              generatePollHTML(ballot, allVotes),
+              {
+                reply_to_message_id: parseInt(voteMsg.messageId.toString()),
+                parse_mode: "HTML",
+                disable_web_page_preview: true,
+                reply_markup: new InlineKeyboard().url(
+                  `See more / Vote`,
+                  `${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}`
+                ),
+              }
+            );
+            if (msg) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { id, messageId, ...resultsMsg } = voteMsg;
+              await prisma.tGMessage.create({
+                data: {
+                  ...resultsMsg,
+                  messageId: msg.message_id,
+                  messageType: MessageType.RESULTS,
+                },
+              });
+              console.log(`Updated DB with RESULTS`);
+            }
           }
           //
         }

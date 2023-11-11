@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { listBallots } from "../../src/api";
 import { Ballot, BallotType } from "../../src/prismaTypes";
@@ -13,6 +13,7 @@ import { Center } from "../core";
 import { MainScreenHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "./ErrorOverlay";
+import { BallotList } from "./BallotList";
 
 export function MainScreen({
   loginState,
@@ -26,24 +27,6 @@ export function MainScreen({
   const [loadingBallots, setLoadingBallots] = useState<boolean>(true);
   const [ballots, setBallots] = useState<Ballot[]>([]);
   const [error, setError] = useState<ZupollError>();
-
-  function getTimeBeforeExpiry(expiry: Date) {
-    const minutes = Math.ceil(
-      (new Date(expiry).getTime() - Date.now()) / 60000
-    );
-    const hours = Math.ceil(minutes / 60);
-    const days = Math.ceil(minutes / (24 * 60));
-
-    if (days > 1) {
-      return "Expires in <" + days + " days";
-    } else if (hours > 1) {
-      return "Expires in <" + hours + " hours";
-    } else if (minutes > 1) {
-      return "Expires in <" + minutes + " minutes";
-    } else {
-      return "Expires in <1 minute";
-    }
-  }
 
   useEffect(() => {
     async function getBallots() {
@@ -90,9 +73,10 @@ export function MainScreen({
         createBallot={() => router.push("/create-ballot")}
       />
       <GuarenteeContainer>
-        <Guarentee>🕵️‍♂️🛡️ The server never learns your identity.</Guarentee>
-        <Guarentee>🗳️👤 One vote per Zuzalu participant.</Guarentee>
-        <Guarentee>🚫🔗 Unlinkable votes across ballots/devices. </Guarentee>
+        <Guarentee>✅ Login Status: {loginState.config.name}</Guarentee>
+        <Guarentee>️‍️🛡️ The server never learns your identity.</Guarentee>
+        <Guarentee>🗳️ One vote per participant.</Guarentee>
+        <Guarentee>❌ Unlinkable votes across ballots/devices. </Guarentee>
       </GuarenteeContainer>
 
       {loginState.config.name === LoginConfigurationName.ZUZALU_ORGANIZER && (
@@ -105,23 +89,7 @@ export function MainScreen({
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            ballots
-              .filter(
-                (ballot) => ballot.ballotType === BallotType.ORGANIZERONLY
-              )
-              .map((ballot) => (
-                <BallotListButton
-                  key={ballot.ballotId}
-                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                >
-                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                  <div style={{ fontStyle: "italic" }}>
-                    {new Date(ballot.expiry) < new Date()
-                      ? "Expired"
-                      : getTimeBeforeExpiry(ballot.expiry)}
-                  </div>
-                </BallotListButton>
-              ))
+            <BallotList ballots={ballots} filter={BallotType.ORGANIZERONLY} />
           )}
         </BallotListContainer>
       )}
@@ -131,28 +99,14 @@ export function MainScreen({
           LoginConfigurationName.ZUZALU_PARTICIPANT) && (
         <BallotListContainer>
           <TitleContainer>
-            <H1>Advisory Votes</H1>
-            <p>Official advisory ballots from the Zuzalu organizers</p>
+            <H1>Organizer Polls</H1>
+            <p>Official ballots from Zuconnect organizers</p>
           </TitleContainer>
 
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            ballots
-              .filter((ballot) => ballot.ballotType === BallotType.ADVISORYVOTE)
-              .map((ballot) => (
-                <BallotListButton
-                  key={ballot.ballotId}
-                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                >
-                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                  <div style={{ fontStyle: "italic" }}>
-                    {new Date(ballot.expiry) < new Date()
-                      ? "Expired"
-                      : getTimeBeforeExpiry(ballot.expiry)}
-                  </div>
-                </BallotListButton>
-              ))
+            <BallotList ballots={ballots} filter={BallotType.ADVISORYVOTE} />
           )}
         </BallotListContainer>
       )}
@@ -162,27 +116,13 @@ export function MainScreen({
         <BallotListContainer>
           <TitleContainer>
             <H1>Straw Polls</H1>
-            <p>Unofficial ballots from all Zuzalu residents</p>
+            <p>Unofficial ballots from event participants</p>
           </TitleContainer>
 
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            ballots
-              .filter((ballot) => ballot.ballotType === BallotType.STRAWPOLL)
-              .map((ballot) => (
-                <BallotListButton
-                  key={ballot.ballotId}
-                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                >
-                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                  <div style={{ fontStyle: "italic" }}>
-                    {new Date(ballot.expiry) < new Date()
-                      ? "Expired"
-                      : getTimeBeforeExpiry(ballot.expiry)}
-                  </div>
-                </BallotListButton>
-              ))
+            <BallotList ballots={ballots} filter={BallotType.STRAWPOLL} />
           )}
         </BallotListContainer>
       )}
@@ -200,88 +140,49 @@ export function MainScreen({
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            ballots
-              .filter((ballot) => ballot.ballotType === BallotType.PCDPASSUSER)
-              .map((ballot) => (
-                <BallotListButton
-                  key={ballot.ballotId}
-                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                >
-                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                  <div style={{ fontStyle: "italic" }}>
-                    {new Date(ballot.expiry) < new Date()
-                      ? "Expired"
-                      : getTimeBeforeExpiry(ballot.expiry)}
-                  </div>
-                </BallotListButton>
-              ))
+            <BallotList ballots={ballots} filter={BallotType.PCDPASSUSER} />
           )}
         </BallotListContainer>
       )}
 
-      {loginState.config.name ===
-        LoginConfigurationName.DEVCONNECT_PARTICIPANT && (
+      {(loginState.config.name ===
+        LoginConfigurationName.DEVCONNECT_PARTICIPANT ||
+        loginState.config.name ===
+          LoginConfigurationName.DEVCONNECT_ORGANIZER) && (
         <BallotListContainer>
           <TitleContainer>
-            <H1>Community Polls</H1>
-            <p>Ballots created by Devconnect Users.</p>
+            <H1>Organizer Polls</H1>
+            <p>Ballots created by Devconnect organizers.</p>
           </TitleContainer>
 
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            ballots
-              .filter(
-                (ballot) => ballot.ballotType === BallotType.DEVCONNECT_STRAW
-              )
-              .map((ballot) => (
-                <Fragment key={ballot.ballotURL}>
-                  <BallotListButton
-                    key={ballot.ballotId}
-                    onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                  >
-                    <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                    <div style={{ fontStyle: "italic" }}>
-                      {new Date(ballot.expiry) < new Date()
-                        ? "Expired"
-                        : getTimeBeforeExpiry(ballot.expiry)}
-                    </div>
-                  </BallotListButton>
-                </Fragment>
-              ))
+            <BallotList
+              ballots={ballots}
+              filter={BallotType.DEVCONNECT_ORGANIZER}
+            />
           )}
         </BallotListContainer>
       )}
 
-      {loginState.config.name ===
-        LoginConfigurationName.DEVCONNECT_ORGANIZER && (
+      {(loginState.config.name ===
+        LoginConfigurationName.DEVCONNECT_PARTICIPANT ||
+        loginState.config.name ===
+          LoginConfigurationName.DEVCONNECT_ORGANIZER) && (
         <BallotListContainer>
           <TitleContainer>
             <H1>Community Polls</H1>
-            <p>Ballots created by Devconnect Users.</p>
+            <p>Ballots created by Devconnect attendees.</p>
           </TitleContainer>
 
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            ballots
-              .filter(
-                (ballot) =>
-                  ballot.ballotType === BallotType.DEVCONNECT_ORGANIZER
-              )
-              .map((ballot) => (
-                <BallotListButton
-                  key={ballot.ballotId}
-                  onClick={() => router.push(`ballot?id=${ballot.ballotURL}`)}
-                >
-                  <div style={{ fontWeight: 600 }}>{ballot.ballotTitle}</div>
-                  <div style={{ fontStyle: "italic" }}>
-                    {new Date(ballot.expiry) < new Date()
-                      ? "Expired"
-                      : getTimeBeforeExpiry(ballot.expiry)}
-                  </div>
-                </BallotListButton>
-              ))
+            <BallotList
+              ballots={ballots}
+              filter={BallotType.DEVCONNECT_STRAW}
+            />
           )}
         </BallotListContainer>
       )}
@@ -337,29 +238,4 @@ const TitleContainer = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 0.5rem;
-`;
-
-const BallotListButton = styled.div`
-  display: flex;
-  justify-content: space-between;
-
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid #888;
-  opacity: 1;
-  margin-bottom: 1rem;
-  gap: 0.5rem;
-
-  font-family: OpenSans;
-  font-weight: 400;
-  background-color: #fff;
-
-  cursor: pointer;
-  &:hover {
-    background-color: #d8d8d8;
-  }
-  &:active {
-    background-color: #c3c3c3;
-  }
 `;

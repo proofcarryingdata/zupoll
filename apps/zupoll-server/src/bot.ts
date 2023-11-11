@@ -6,6 +6,7 @@ import {
   cleanString,
   formatPollCreated,
   sendMessage,
+  sendMessageV2,
 } from "./util/bot";
 import { sleep } from "@pcd/util";
 import { prisma } from "./util/prisma";
@@ -118,37 +119,113 @@ export async function startBot(context: ApplicationContext): Promise<void> {
     });
   });
 
-  context.bot.command("latest", async () => {
-    const ballots = await prisma.ballot.findMany({
-      select: {
-        ballotTitle: true,
-        ballotURL: true,
-        expiry: true,
-        expiryNotif: true,
-        ballotDescription: true,
-        polls: true,
-      },
-      orderBy: { expiry: "desc" },
-      where: {
-        NOT: {
-          ballotType: {
-            in: [BallotType.PCDPASSUSER, BallotType.ORGANIZERONLY],
-          },
+  context.bot.command("latest", async (ctx) => {
+    try {
+      const ballots = await prisma.ballot.findMany({
+        select: {
+          ballotTitle: true,
+          ballotURL: true,
+          expiry: true,
+          expiryNotif: true,
+          ballotDescription: true,
+          polls: true,
+          ballotType: true,
         },
-      },
-    });
-    console.log(`[BALLOTS]`, ballots);
-    for (const ballot of ballots.slice(0, 1)) {
-      // @ts-expect-error prisma
-      const post = formatPollCreated(ballot, ballot.polls);
-      await sendMessage(post, context.bot);
+      });
+      for (const ballot of ballots) {
+        // @ts-expect-error prisma
+        const post = formatPollCreated(ballot, ballot.polls);
+        await sendMessageV2(post, ballot.ballotType, context.bot, {
+          userId: ctx.from?.id,
+        });
+      }
+    } catch (error) {
+      //
     }
-    // await ctx.reply(`Check console for ballots`, {
-    //   message_thread_id: ctx.message?.message_thread_id,
-    // });
-    // List most recent ballots
   });
 
+  context.bot.command("listen", async (ctx) => {
+    const message_thread_id = ctx.message?.message_thread_id;
+    const chatId = ctx.chat.id;
+    const topicId = ctx.update.message?.message_thread_id || 0;
+    const tgTopicId = `${chatId}_${topicId}`;
+    try {
+      if (!ctx.match) throw new Error(`No polls to listen to found`);
+      const ballotTypes = ctx.match.split(",") as BallotType[];
+      ballotTypes.forEach((p) => {
+        if (!Object.values(BallotType).includes(p))
+          throw new Error(`POLL TYPE INVALID`);
+      });
+      const topicExists = await prisma.tGTopic.findFirst({
+        where: { id: tgTopicId },
+      });
+      if (!topicExists)
+        throw new Error(`Topic not found in DB. Edit it and try again`);
+      // Upsert in DB
+      await prisma.pollReceiver.upsert({
+        where: {
+          tgTopicId,
+        },
+        update: {
+          ballotTypes,
+        },
+        create: {
+          tgTopicId,
+          ballotTypes,
+        },
+      });
+      ctx.reply(`Listening to ${ballotTypes}`, {
+        message_thread_id,
+      });
+    } catch (error) {
+      ctx.reply(`${error}`, {
+        message_thread_id,
+      });
+    }
+  });
+
+  context.bot.command("stoplisten", async (ctx) => {
+    const message_thread_id = ctx.message?.message_thread_id;
+    const chatId = ctx.chat.id;
+    const topicId = ctx.update.message?.message_thread_id || 0;
+    const tgTopicId = `${chatId}_${topicId}`;
+    try {
+      await prisma.pollReceiver.delete({ where: { tgTopicId } });
+
+      ctx.reply(`No longer listening to polls`, { message_thread_id });
+    } catch (error) {
+      ctx.reply(`${error}`, {
+        message_thread_id,
+      });
+    }
+  });
+
+  context.bot.on(":forum_topic_edited", async (ctx) => {
+    try {
+      const topicName = ctx.update?.message?.forum_topic_edited.name;
+      const chatId = ctx.chat.id;
+      const topicId = ctx.update.message?.message_thread_id || 0;
+      if (!topicName) throw new Error(`No topic name found`);
+      console.log(`EDITED`, topicName);
+      const id = `${chatId}_${topicId}`;
+      await prisma.tGTopic.upsert({
+        where: {
+          id,
+        },
+        update: {
+          topicName,
+        },
+        create: {
+          id,
+          topicId,
+          chatId,
+          topicName,
+        },
+      });
+    } catch (error) {
+      console.log(`[TOPIC EDITED ERROR]`, error);
+    }
+  });
   await sleep(5000);
 
   context.bot.start({

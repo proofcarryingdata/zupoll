@@ -1,5 +1,8 @@
 import { Ballot, BallotType, Poll, Vote } from "@prisma/client";
 import { Bot } from "grammy";
+import { prisma } from "./prisma";
+import { BallotTypeNames } from "./types";
+import { InlineKeyboardMarkup, ReplyKeyboardMarkup } from "grammy/types";
 
 export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
 
@@ -29,7 +32,50 @@ export async function sendMessage(message: string, bot?: Bot) {
   }
 }
 
+export async function sendMessageV2(
+  message: string,
+  ballotType: BallotType,
+  bot?: Bot,
+  opts?: {
+    reply_markup?: ReplyKeyboardMarkup | InlineKeyboardMarkup;
+    userId?: number;
+  }
+) {
+  if (!bot) throw new Error(`Bot not found`);
+  if (!ballotType) throw new Error(`No ballot type found`);
+  if (opts?.userId) {
+    return [
+      await bot.api.sendMessage(opts.userId, message, {
+        parse_mode: "HTML",
+        ...opts,
+      }),
+    ];
+  }
+  // Look up recipients based on ballot
+
+  async function findPollReceiversByBallotType(ballotType: BallotType) {
+    const pollReceivers = await prisma.pollReceiver.findMany();
+    return pollReceivers.filter((receiver) =>
+      receiver.ballotTypes.includes(ballotType)
+    );
+  }
+
+  const recipients = await findPollReceiversByBallotType(ballotType);
+  const res = recipients.map((r) => {
+    const [chatId, topicId] = r.tgTopicId.split("_");
+    return bot.api.sendMessage(chatId, message, {
+      message_thread_id: parseInt(topicId) || undefined,
+      parse_mode: "HTML",
+    });
+  });
+
+  const finished = await Promise.all(res);
+  console.log(`Sent poll created msg to ${res.length} chats`);
+  return finished;
+}
+
 export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
+  if (!polls) throw new Error(`No polls found`);
   const formatPolls = (polls: Poll[]) => {
     let pollStr = "";
     for (const poll of polls) {
@@ -37,11 +83,7 @@ export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
     }
     return pollStr;
   };
-  console.log(`polls`, polls);
-  let ballotPost =
-    ballot.ballotType === BallotType.STRAWPOLL
-      ? "New straw poll posted!"
-      : "New advisory vote posted!";
+  let ballotPost = `A ${BallotTypeNames[ballot.ballotType]} was created!`;
   ballotPost =
     ballotPost +
     `\n\nTitle: <b>${cleanString(ballot.ballotTitle)}</b>` +
@@ -57,7 +99,6 @@ export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
 
   ballotPost += `\n\n<a href="${SITE_URL}ballot?id=${ballot.ballotURL}">(Vote via browser)</a>`;
 
-  console.log(`Post`, ballotPost);
   return ballotPost;
 };
 
@@ -67,16 +108,19 @@ export type PollWithVotes =
     })
   | null;
 
-export function generatePollHTML(pollsWithVotes?: PollWithVotes[]) {
-  let html = "";
+export function generatePollHTML(
+  ballot: Ballot,
+  pollsWithVotes?: PollWithVotes[]
+) {
+  let html = `🦉 <b>${ballot.ballotTitle}</b>\n\n`;
 
   if (pollsWithVotes) {
-    for (const pollWithVotes of pollsWithVotes) {
-      if (pollWithVotes) {
-        const question = pollWithVotes.body;
-        const options = pollWithVotes.options.slice(0, -1);
-        console.log(`poll options`, options);
-        const votes = pollWithVotes.votes;
+    const pollsLite = pollsWithVotes.slice(0, 2);
+    pollsLite.map((poll, idx) => {
+      if (poll) {
+        const question = poll.body;
+        const options = poll.options.slice(0, -1);
+        const votes = poll.votes;
         const votesPerQuestion: number[] = [];
         for (const v of votes) {
           const currVotes = votesPerQuestion[v.voteIdx];
@@ -88,26 +132,23 @@ export function generatePollHTML(pollsWithVotes?: PollWithVotes[]) {
         }
         const totalVotes = votesPerQuestion.reduce((a, b) => a + b, 0);
 
-        console.log(`totalVotes`, totalVotes);
-        console.log(`votes`, votes);
-        console.log(`votes per question`, votesPerQuestion);
+        html += `❔ ${question} - <i>${totalVotes} votes </i>\n\n`;
 
-        html += `<b>${question}</b> - <i>${totalVotes} votes </i>\n\n`;
+        if (idx < 1) {
+          for (let i = 0; i < options.length; i++) {
+            const percentage = votesPerQuestion?.[i]
+              ? (votesPerQuestion[i] / totalVotes) * 100
+              : 0;
+            const rounded = Math.round(percentage / 10);
+            const numWhite = 10 - rounded;
 
-        for (let i = 0; i < options.length; i++) {
-          const percentage = votesPerQuestion?.[i]
-            ? (votesPerQuestion[i] / totalVotes) * 100
-            : 0;
-          const rounded = Math.round(percentage / 10);
-          const numWhite = 10 - rounded;
-
-          html += `<i>${options[i]}:</i>\n\n`;
-          html += `${`🟦`.repeat(rounded) + `⬜️`.repeat(numWhite)}`;
-          html += ` (${percentage.toFixed(2)}%)\n\n`;
-        }
+            html += `<i>${options[i]}:</i>\n\n`;
+            html += `${`🟦`.repeat(rounded) + `⬜️`.repeat(numWhite)}`;
+            html += ` (${percentage.toFixed(2)}%)\n\n`;
+          }
+        } else if (idx == 1) html += `⬇`;
       }
-      //
-    }
+    });
   }
   return html;
 }

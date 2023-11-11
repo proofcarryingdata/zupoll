@@ -48,7 +48,7 @@ export function openGroupMembershipPopup(
       },
     },
     {
-      title: "Zuzalu Anon Auth",
+      title: "Anon Voting Auth",
       description: originalSiteName,
     }
   );

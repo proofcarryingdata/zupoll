@@ -88,6 +88,7 @@ export function initAuthedRoutes(
         ballotURL: true,
         expiry: true,
         ballotType: true,
+        createdAt: true,
       },
       orderBy: { expiry: "desc" },
       where: {
@@ -127,11 +128,18 @@ export function initAuthedRoutes(
         const ballot = await prisma.ballot.findFirst({
           where: {
             ballotURL: ballotURL,
-            ballotType: {
-              in: getVisibleBallotTypesForUser(req.authUserType),
-            },
           },
         });
+        if (
+          ballot &&
+          !getVisibleBallotTypesForUser(req.authUserType).includes(
+            ballot.ballotType
+          )
+        ) {
+          throw new Error(
+            `Your role of ${req.authUserType} is not authorized to view ${ballot.ballotType}. Click close to logout and try again!`
+          );
+        }
         if (ballot === null) {
           throw new Error("Ballot not found.");
         }

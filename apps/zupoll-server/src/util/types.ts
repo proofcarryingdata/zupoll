@@ -15,3 +15,12 @@ declare global {
     }
   }
 }
+
+export const BallotTypeNames = {
+  ADVISORYVOTE: "Advisory Vote",
+  STRAWPOLL: "Straw Poll",
+  PCDPASSUSER: "PCD Pass User",
+  ORGANIZERONLY: "Organizer Only",
+  DEVCONNECT_STRAWPOLL: "Community Poll",
+  DEVCONNECT_FEEDBACK: "Organizer Poll",
+};
