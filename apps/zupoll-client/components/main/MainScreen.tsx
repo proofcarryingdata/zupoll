@@ -90,9 +90,10 @@ export function MainScreen({
         createBallot={() => router.push("/create-ballot")}
       />
       <GuarenteeContainer>
-        <Guarentee>🕵️‍♂️🛡️ The server never learns your identity.</Guarentee>
-        <Guarentee>🗳️👤 One vote per Zuzalu participant.</Guarentee>
-        <Guarentee>🚫🔗 Unlinkable votes across ballots/devices. </Guarentee>
+        <Guarentee>✅ Login Status: {loginState.config.name}</Guarentee>
+        <Guarentee>️‍️🛡️ The server never learns your identity.</Guarentee>
+        <Guarentee>🗳️ One vote per participant.</Guarentee>
+        <Guarentee>❌ Unlinkable votes across ballots/devices. </Guarentee>
       </GuarenteeContainer>
 
       {loginState.config.name === LoginConfigurationName.ZUZALU_ORGANIZER && (
@@ -131,8 +132,8 @@ export function MainScreen({
           LoginConfigurationName.ZUZALU_PARTICIPANT) && (
         <BallotListContainer>
           <TitleContainer>
-            <H1>Advisory Votes</H1>
-            <p>Official advisory ballots from the Zuzalu organizers</p>
+            <H1>Organizer Polls</H1>
+            <p>Official ballots from Zuconnect organizers</p>
           </TitleContainer>
 
           {loadingBallots || ballots === undefined ? (
@@ -162,7 +163,7 @@ export function MainScreen({
         <BallotListContainer>
           <TitleContainer>
             <H1>Straw Polls</H1>
-            <p>Unofficial ballots from all Zuzalu residents</p>
+            <p>Unofficial ballots from event participants</p>
           </TitleContainer>
 
           {loadingBallots || ballots === undefined ? (
@@ -219,12 +220,14 @@ export function MainScreen({
         </BallotListContainer>
       )}
 
-      {loginState.config.name ===
-        LoginConfigurationName.DEVCONNECT_PARTICIPANT && (
+      {(loginState.config.name ===
+        LoginConfigurationName.DEVCONNECT_PARTICIPANT ||
+        loginState.config.name ===
+          LoginConfigurationName.DEVCONNECT_ORGANIZER) && (
         <BallotListContainer>
           <TitleContainer>
             <H1>Community Polls</H1>
-            <p>Ballots created by Devconnect Users.</p>
+            <p>Ballots created by Devconnect attendees.</p>
           </TitleContainer>
 
           {loadingBallots || ballots === undefined ? (
@@ -234,6 +237,7 @@ export function MainScreen({
               .filter(
                 (ballot) => ballot.ballotType === BallotType.DEVCONNECT_STRAW
               )
+              .reverse()
               .map((ballot) => (
                 <Fragment key={ballot.ballotURL}>
                   <BallotListButton
@@ -253,12 +257,14 @@ export function MainScreen({
         </BallotListContainer>
       )}
 
-      {loginState.config.name ===
-        LoginConfigurationName.DEVCONNECT_ORGANIZER && (
+      {(loginState.config.name ===
+        LoginConfigurationName.DEVCONNECT_PARTICIPANT ||
+        loginState.config.name ===
+          LoginConfigurationName.DEVCONNECT_ORGANIZER) && (
         <BallotListContainer>
           <TitleContainer>
-            <H1>Community Polls</H1>
-            <p>Ballots created by Devconnect Users.</p>
+            <H1>Organizer Polls</H1>
+            <p>Ballots created by Devconnect organizers.</p>
           </TitleContainer>
 
           {loadingBallots || ballots === undefined ? (
@@ -269,6 +275,7 @@ export function MainScreen({
                 (ballot) =>
                   ballot.ballotType === BallotType.DEVCONNECT_ORGANIZER
               )
+              .reverse()
               .map((ballot) => (
                 <BallotListButton
                   key={ballot.ballotId}

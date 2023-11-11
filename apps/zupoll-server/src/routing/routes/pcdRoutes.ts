@@ -174,7 +174,7 @@ export function initPCDRoutes(
             request.ballot.ballotType !== BallotType.ORGANIZERONLY
           ) {
             // send message on TG channel, if bot is setup
-            const post = formatPollCreated(request.ballot, request.polls);
+            const post = formatPollCreated(newBallot, request.polls);
             const msgs = await sendMessageV2(
               post,
               request.ballot.ballotType,
