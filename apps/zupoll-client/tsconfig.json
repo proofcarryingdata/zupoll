@@ -3,7 +3,8 @@
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"],
   "compilerOptions": {
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "target": "es6"
   },
 
   "ts-node": {

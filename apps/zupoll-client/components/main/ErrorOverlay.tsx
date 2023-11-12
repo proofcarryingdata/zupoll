@@ -11,7 +11,6 @@ export function ErrorOverlay({
   onClose: () => void;
   onLogout?: () => void;
 }) {
-  console.log(error);
   return (
     <Overlay onClose={onClose}>
       <br />

@@ -2,23 +2,15 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { listBallotPolls, voteBallot } from "../../src/api";
+import { listBallotPolls } from "../../src/api";
 import {
   getBallotVotes,
-  setBallotVotes,
-  setVoted,
   useBallotVoting,
   votedOn,
 } from "../../src/ballotVoting";
-import { Ballot, UserType, Vote } from "../../src/prismaTypes";
-import {
-  BallotPollResponse,
-  MultiVoteRequest,
-  MultiVoteResponse,
-  PollWithCounts,
-} from "../../src/requestTypes";
+import { Ballot } from "../../src/prismaTypes";
+import { BallotPollResponse, PollWithCounts } from "../../src/requestTypes";
 import { LoginState, ZupollError } from "../../src/types";
-import { removeQueryParameters } from "../../src/util";
 import { Center } from "../core";
 import { ReturnHeader } from "../core/Headers";
 import {
@@ -52,8 +44,8 @@ export function BallotScreen({
     useState<string>("");
   const [expired, setExpired] = useState<boolean>(false);
   const [refresh, setRefresh] = useState<string>("");
-  const [parsedPcd, setMyparsedPcd] = useState<any>();
-  const [myVote, setMyVote] = useState<{
+  const [pcdFromUrl, setPcdFromUrl] = useState<any>();
+  const [voteFromUrl, setVoteFromUrl] = useState<{
     polls: PollWithCounts[];
     pollToVote: Map<string, number | undefined>;
   }>();
@@ -155,7 +147,7 @@ export function BallotScreen({
     if (proofString && voteString) {
       const voteStr = JSON.parse(voteString) as {
         polls: PollWithCounts[];
-        pollToVoteJSON: any; // TODO: actually type this
+        pollToVoteJSON: [string, number | undefined][];
       };
       const vote = {
         polls: voteStr.polls,
@@ -164,72 +156,10 @@ export function BallotScreen({
 
       const decodedProofString = decodeURIComponent(proofString);
       // Parse the decoded string into an object
-      const proofObject = JSON.parse(decodedProofString);
-      // @ts-expect-error map type
-      setMyVote(vote);
-      setMyparsedPcd(proofObject);
+      setVoteFromUrl(vote);
+      setPcdFromUrl(decodedProofString);
     }
-    // uwu
   }, []);
-
-  useEffect(() => {
-    console.log(`parsedPCd`, parsedPcd);
-    if (!parsedPcd || !myVote || !ballotVoterSemaphoreGroupUrl) return;
-    console.log(`Got pcd str and vote, submitting...`);
-
-    const doRequest = async () => {
-      const request: MultiVoteRequest = {
-        votes: [],
-        ballotURL: ballotURL,
-        voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
-        proof: parsedPcd.pcd,
-      };
-      myVote.polls.forEach((poll: PollWithCounts) => {
-        const voteIdx = myVote.pollToVote.get(poll.id);
-        if (voteIdx !== undefined) {
-          const vote: Vote = {
-            id: "",
-            pollId: poll.id,
-            voterType: UserType.ANON,
-            voterNullifier: "",
-            voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
-            voterName: null,
-            voterUuid: null,
-            voterCommitment: null,
-            voteIdx: voteIdx,
-            proof: parsedPcd.pcd,
-          };
-          request.votes.push(vote);
-        }
-      });
-
-      setServerLoading(true);
-      console.log(`submitting req`, request);
-      const res = await voteBallot(request, loginState.token);
-      if (res && res.status === 200) {
-        const multiVotesResponse: MultiVoteResponse = await res.json();
-
-        setVoted(ballotId);
-        setBallotVotes(ballotId, multiVotesResponse.userVotes);
-        setRefresh(ballotId);
-        setPollToVote(new Map());
-        setMyVote(undefined);
-        setMyparsedPcd(undefined);
-        console.log(`[RES]`, res);
-        setServerLoading(false);
-        removeQueryParameters(["vote", "proof", "finished"]);
-      }
-    };
-    doRequest();
-  }, [
-    parsedPcd,
-    loginState,
-    myVote,
-    ballotURL,
-    ballotVoterSemaphoreGroupUrl,
-    ballotId,
-    refresh,
-  ]);
 
   const [canVote, setCanVote] = useState<boolean>(true);
   const [pollToVote, setPollToVote] = useState(
@@ -259,6 +189,8 @@ export function BallotScreen({
     ballotVoterSemaphoreGroupUrl,
     polls,
     pollToVote,
+    voteFromUrl,
+    pcdFromUrl,
     onError: (err: ZupollError) => {
       setError(err);
       setServerLoading(false);
@@ -270,6 +202,8 @@ export function BallotScreen({
     },
     loginState,
     returnUrl: window.location.href, // If exists, will use returnUrl instead of pop up to get PCD.
+    setPcdFromUrl,
+    setVoteFromUrl,
   });
 
   return (
