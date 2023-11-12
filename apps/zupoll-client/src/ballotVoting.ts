@@ -13,7 +13,7 @@ import {
   VoteSignal,
 } from "./requestTypes";
 import { LoginState, PCDState, ZupollError } from "./types";
-import { openGroupMembershipPopup } from "./util";
+import { openGroupMembershipPopup, removeQueryParameters } from "./util";
 
 /**
  * Hook that handles requesting a PCD for voting on a set of polls on a ballot.
@@ -36,6 +36,10 @@ export function useBallotVoting({
   refresh,
   loginState,
   returnUrl,
+  voteFromUrl,
+  pcdFromUrl,
+  setVoteFromUrl,
+  setPcdFromUrl,
 }: {
   ballotId: string;
   ballotURL: string;
@@ -46,7 +50,14 @@ export function useBallotVoting({
   setServerLoading: (loading: boolean) => void;
   refresh: (id: string) => void;
   loginState: LoginState;
+  pcdFromUrl?: string;
+  voteFromUrl?: {
+    polls: PollWithCounts[];
+    pollToVote: Map<string, number | undefined>;
+  };
   returnUrl?: string;
+  setVoteFromUrl?: (a: any) => void;
+  setPcdFromUrl?: (a: any) => void;
 }) {
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
   const [pcdStr, _passportPendingPCDStr] = useZupassPopupMessages();
@@ -58,39 +69,8 @@ export function useBallotVoting({
     }
   }, [pcdStr]);
 
-  // process pcdStr and send request
-  useEffect(() => {
-    if (pcdState.current !== PCDState.RECEIVED_PCDSTR) return;
-    pcdState.current = PCDState.DEFAULT;
-
-    // Format MultiVoteRequest properly
-    const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
-    const request: MultiVoteRequest = {
-      votes: [],
-      ballotURL: ballotURL,
-      voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
-      proof: parsedPcd.pcd,
-    };
-    polls.forEach((poll: PollWithCounts) => {
-      const voteIdx = pollToVote.get(poll.id);
-      if (voteIdx !== undefined) {
-        const vote: Vote = {
-          id: "",
-          pollId: poll.id,
-          voterType: UserType.ANON,
-          voterNullifier: "",
-          voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
-          voterName: null,
-          voterUuid: null,
-          voterCommitment: null,
-          voteIdx: voteIdx,
-          proof: parsedPcd.pcd,
-        };
-        request.votes.push(vote);
-      }
-    });
-
-    async function doRequest() {
+  const submitVote = useCallback(
+    async (request: MultiVoteRequest) => {
       setServerLoading(true);
       const res = await voteBallot(request, loginState.token);
       setServerLoading(false);
@@ -125,20 +105,93 @@ export function useBallotVoting({
       setVoted(ballotId);
       setBallotVotes(ballotId, multiVotesResponse.userVotes);
       refresh(ballotId);
-    }
+    },
+    [ballotId, loginState.token, onError, refresh, setServerLoading]
+  );
 
-    doRequest();
+  // process pcdStr and send request
+  useEffect(() => {
+    if (
+      voteFromUrl &&
+      pcdFromUrl &&
+      setVoteFromUrl &&
+      setPcdFromUrl &&
+      ballotVoterSemaphoreGroupUrl
+    ) {
+      const parsedPcd = JSON.parse(pcdFromUrl);
+      const request: MultiVoteRequest = {
+        votes: [],
+        ballotURL: ballotURL,
+        voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
+        proof: parsedPcd.pcd,
+      };
+      voteFromUrl.polls.forEach((poll: PollWithCounts) => {
+        const voteIdx = voteFromUrl.pollToVote.get(poll.id);
+        if (voteIdx !== undefined) {
+          const vote: Vote = {
+            id: "",
+            pollId: poll.id,
+            voterType: UserType.ANON,
+            voterNullifier: "",
+            voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
+            voterName: null,
+            voterUuid: null,
+            voterCommitment: null,
+            voteIdx: voteIdx,
+            proof: parsedPcd.pcd,
+          };
+          request.votes.push(vote);
+        }
+      });
+      submitVote(request);
+      setVoteFromUrl(undefined);
+      setPcdFromUrl("");
+      removeQueryParameters(["vote", "proof", "finished"]);
+    } else {
+      if (pcdState.current !== PCDState.RECEIVED_PCDSTR) return;
+      pcdState.current = PCDState.DEFAULT;
+
+      // Format MultiVoteRequest properly
+      const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
+      const request: MultiVoteRequest = {
+        votes: [],
+        ballotURL: ballotURL,
+        voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
+        proof: parsedPcd.pcd,
+      };
+      polls.forEach((poll: PollWithCounts) => {
+        const voteIdx = pollToVote.get(poll.id);
+        if (voteIdx !== undefined) {
+          const vote: Vote = {
+            id: "",
+            pollId: poll.id,
+            voterType: UserType.ANON,
+            voterNullifier: "",
+            voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
+            voterName: null,
+            voterUuid: null,
+            voterCommitment: null,
+            voteIdx: voteIdx,
+            proof: parsedPcd.pcd,
+          };
+          request.votes.push(vote);
+        }
+      });
+      submitVote(request);
+    }
   }, [
     pcdStr,
     ballotId,
     ballotURL,
     ballotVoterSemaphoreGroupUrl,
-    onError,
     pollToVote,
     polls,
-    setServerLoading,
-    refresh,
     loginState,
+    voteFromUrl,
+    pcdFromUrl,
+    submitVote,
+    setVoteFromUrl,
+    setPcdFromUrl,
   ]);
 
   const createBallotVotePCD = useCallback(async () => {
@@ -170,7 +223,6 @@ export function useBallotVoting({
     const sigHashEnc = generateSnarkMessageHash(signalHash).toString();
     const externalNullifier = generateSnarkMessageHash(ballotId).toString();
 
-    // @ts-expect-error poll to vote
     const polltoVoteList = [...pollToVote];
 
     openGroupMembershipPopup(
