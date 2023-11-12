@@ -5,7 +5,6 @@ import {
   SITE_URL,
   cleanString,
   formatPollCreated,
-  sendMessage,
   sendMessageV2,
 } from "./util/bot";
 import { sleep } from "@pcd/util";
@@ -20,6 +19,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
       ballotURL: true,
       expiry: true,
       expiryNotif: true,
+      ballotType: true,
     },
     orderBy: { expiry: "desc" },
     where: {
@@ -58,7 +58,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
       )}</b> will expire in less than 1 week. Vote at ${
         tgPollUrl + " or " || ""
       }${pollUrl}`;
-      await sendMessage(expiryMessage, bot);
+      await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     } else if (
       hours === 24 &&
       (ballot.expiryNotif === "WEEK" || ballot.expiryNotif === "NONE")
@@ -77,7 +77,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
       )}</b> will expire in less than 24 hours. Vote at ${
         tgPollUrl + " or " || ""
       }${pollUrl}`;
-      await sendMessage(expiryMessage, bot);
+      await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     } else if (
       hours === 1 &&
       (ballot.expiryNotif === "DAY" || ballot.expiryNotif === "NONE")
@@ -96,7 +96,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
       )}</b> will expire in less than 1 hour! Get your votes in at ${
         tgPollUrl + " or " || ""
       }${pollUrl}`;
-      await sendMessage(expiryMessage, bot);
+      await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     }
   }
 };
