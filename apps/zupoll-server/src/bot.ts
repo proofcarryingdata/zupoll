@@ -55,9 +55,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
 
       const expiryMessage = `<b>${cleanString(
         ballot.ballotTitle
-      )}</b> will expire in less than 1 week. Vote at ${
-        tgPollUrl + " or " || ""
-      }${pollUrl}`;
+      )}</b> will expire in less than 1 week.\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;
       await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     } else if (
       hours === 24 &&
@@ -74,9 +72,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
 
       const expiryMessage = `<b>${cleanString(
         ballot.ballotTitle
-      )}</b> will expire in less than 24 hours. Vote at ${
-        tgPollUrl + " or " || ""
-      }${pollUrl}`;
+      )}</b> will expire in less than 24 hours.\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;
       await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     } else if (
       hours === 1 &&
@@ -93,9 +89,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
 
       const expiryMessage = `<b>${cleanString(
         ballot.ballotTitle
-      )}</b> will expire in less than 1 hour! Get your votes in at ${
-        tgPollUrl + " or " || ""
-      }${pollUrl}`;
+      )}</b> will expire in less than 1 hour!\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;
       await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     }
   }
@@ -239,6 +233,7 @@ export async function startBot(context: ApplicationContext): Promise<void> {
 
   // start up cron jobs
   const cronJob = new CronJob(
+    // "* * * * *",
     "0,15,30,45 * * * *", // every 15 minutes, check if any ballots are expiring soon
     async () => {
       if (context.bot) {
