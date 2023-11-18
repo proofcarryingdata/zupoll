@@ -41,6 +41,7 @@ export async function sendMessageV2(
     userId?: number;
   }
 ) {
+  console.log(`[MESSAGE]`, message);
   if (!bot) throw new Error(`Bot not found`);
   if (!ballotType) throw new Error(`No ballot type found`);
   if (opts?.userId) {
