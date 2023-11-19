@@ -108,9 +108,14 @@ export async function startBot(context: ApplicationContext): Promise<void> {
   context.bot = new Bot(botToken);
 
   context.bot.command("start", async (ctx) => {
-    ctx.reply(`Zupoll`, {
-      reply_markup: new InlineKeyboard().webApp(`Zupoll`, `https://zupoll.org`),
-    });
+    if (ctx.chat.type === "private") {
+      ctx.reply(`Zupoll`, {
+        reply_markup: new InlineKeyboard().webApp(
+          `Zupoll`,
+          `https://zupoll.org`
+        ),
+      });
+    }
   });
 
   context.bot.command("latest", async (ctx) => {
