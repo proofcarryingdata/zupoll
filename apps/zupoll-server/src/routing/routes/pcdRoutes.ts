@@ -394,11 +394,10 @@ export function initPCDRoutes(
               console.log(`Updated DB with RESULTS`);
             }
           }
-          //
         }
         res.json(multiVoteResponse);
       } catch (e) {
-        console.error(e);
+        console.error(`[ERROR]`, e);
         next(e);
       }
     }
