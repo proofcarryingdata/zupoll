@@ -1,6 +1,6 @@
 module.exports = {
   reactStrictMode: false,
-  transpilePackages: ["@pcd/passport-interface"],
+  transpilePackages: [],
   compiler: {
     styledComponents: true,
   },

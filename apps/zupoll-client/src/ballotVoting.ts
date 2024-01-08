@@ -1,4 +1,4 @@
-import { useZupassPopupMessages } from "@pcd/passport-interface/src/PassportPopup";
+import { useZupassPopupMessages } from "@pcd/passport-interface";
 import { generateSnarkMessageHash } from "@pcd/util";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
@@ -106,7 +106,7 @@ export function useBallotVoting({
       setBallotVotes(ballotId, multiVotesResponse.userVotes);
       refresh(ballotId);
     },
-    [ballotId, loginState.token, onError, refresh, setServerLoading]
+    [ballotId, loginState.token, onError, refresh, setServerLoading],
   );
 
   // process pcdStr and send request
@@ -239,7 +239,7 @@ export function useBallotVoting({
               pollToVoteJSON: polltoVoteList,
               polls,
             })}`
-        : undefined
+        : undefined,
     );
   }, [
     loginState,
@@ -260,7 +260,7 @@ export function votedOn(ballotId: string): boolean {
 
 function getVoted(): Array<string> {
   const voted: Array<string> = JSON.parse(
-    window.localStorage.getItem("voted") || "[]"
+    window.localStorage.getItem("voted") || "[]",
   );
   return voted;
 }
