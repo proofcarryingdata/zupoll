@@ -1,4 +1,4 @@
-import { useZupassPopupMessages } from "@pcd/passport-interface/src/PassportPopup";
+import { useZupassPopupMessages } from "@pcd/passport-interface";
 import { useEffect, useState } from "react";
 import { login } from "../../src/api";
 import { LoginConfig, LoginState, ZupollError } from "../../src/types";
@@ -109,7 +109,7 @@ export function Login({
             undefined,
             undefined,
             window.location.origin +
-              `?config=${encodeURIComponent(stableStringify(config))}`
+            `?config=${encodeURIComponent(stableStringify(config))}`
           );
         }}
         disabled={loggingIn}

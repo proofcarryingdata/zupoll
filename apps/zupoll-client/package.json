@@ -12,11 +12,11 @@
     "staging-env-local": "./staging-env-local.sh"
   },
   "dependencies": {
-    "@pcd/email-pcd": "^0.3.0",
-    "@pcd/passport-interface": "^0.8.0",
-    "@pcd/pcd-types": "^0.8.0",
-    "@pcd/semaphore-group-pcd": "^0.8.0",
-    "@pcd/semaphore-identity-pcd": "^0.8.0",
+    "@pcd/email-pcd": "^0.5.0",
+    "@pcd/passport-interface": "^0.10.0",
+    "@pcd/pcd-types": "^0.10.0",
+    "@pcd/semaphore-group-pcd": "^0.10.0",
+    "@pcd/semaphore-identity-pcd": "^0.10.0",
     "@pcd/util": "^0.2.0",
     "@semaphore-protocol/group": "^3.11.0",
     "@semaphore-protocol/identity": "^3.11.0",
@@ -46,7 +46,7 @@
     "@types/styled-components": "^5.1.26",
     "@types/url-join": "^4.0.2",
     "eslint": "7.32.0",
-    "typescript": "5.1.6",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "typescript": "5.1.6"
   }
 }

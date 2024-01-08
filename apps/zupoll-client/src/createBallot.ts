@@ -1,4 +1,4 @@
-import { useZupassPopupMessages } from "@pcd/passport-interface/src/PassportPopup";
+import { useZupassPopupMessages } from "@pcd/passport-interface";
 import { generateSnarkMessageHash } from "@pcd/util";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
@@ -47,7 +47,7 @@ interface GenerateBallotArgs {
   creatorGroupUrl: string;
 }
 const generateBallotRequest = (
-  args: GenerateBallotArgs
+  args: GenerateBallotArgs,
 ): CreateBallotRequest => {
   const finalRequest: CreateBallotRequest = {
     ballot: {
@@ -116,7 +116,7 @@ export function useCreateBallot({
   } = useHistoricSemaphoreUrl(
     ballotConfig.passportServerUrl,
     ballotConfig.voterGroupId,
-    onError
+    onError,
   );
 
   const submitBallot = useCallback(
@@ -159,7 +159,7 @@ export function useCreateBallot({
       setServerLoading,
       setBallotFromUrl,
       setPcdFromUrl,
-    ]
+    ],
   );
 
   // only accept pcdStr if we were expecting one
@@ -272,7 +272,7 @@ export function useCreateBallot({
         ballotConfig,
         ballotSignal,
         polls,
-      })
+      }),
     )}`;
     console.log({ ballotUrl });
 
@@ -283,7 +283,7 @@ export function useCreateBallot({
       "zupoll",
       sigHashEnc,
       sigHashEnc,
-      USE_CREATE_BALLOT_REDIRECT ? url + ballotUrl : undefined
+      USE_CREATE_BALLOT_REDIRECT ? url + ballotUrl : undefined,
     );
   }, [
     voterGroupUrl,
