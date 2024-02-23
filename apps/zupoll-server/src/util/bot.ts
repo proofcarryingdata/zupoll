@@ -1,6 +1,5 @@
 import { Ballot, BallotType, Poll, Vote } from "@prisma/client";
 import { Bot } from "grammy";
-import { prisma } from "./prisma";
 import { BallotTypeNames } from "./types";
 import { InlineKeyboardMarkup, ReplyKeyboardMarkup } from "grammy/types";
 
@@ -33,10 +32,10 @@ export async function sendMessage(message: string, bot?: Bot) {
 }
 
 export async function sendMessageV2(
-  message: string,
-  ballotType: BallotType,
-  bot?: Bot,
-  opts?: {
+  _message: string,
+  _ballotType: BallotType,
+  _bot?: Bot,
+  _opts?: {
     reply_markup?: ReplyKeyboardMarkup | InlineKeyboardMarkup;
     userId?: number;
   },

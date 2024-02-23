@@ -21,12 +21,7 @@ import {
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../../util/auth";
-import {
-  formatPollCreated,
-  generatePollHTML,
-  PollWithVotes,
-  sendMessageV2,
-} from "../../util/bot";
+import { generatePollHTML, PollWithVotes } from "../../util/bot";
 import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
