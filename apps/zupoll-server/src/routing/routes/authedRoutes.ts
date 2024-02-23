@@ -13,7 +13,7 @@ import { verifyGroupProof } from "../../util/verify";
 
 export function initAuthedRoutes(
   app: express.Application,
-  context: ApplicationContext
+  context: ApplicationContext,
 ): void {
   app.post(
     "/login",
@@ -27,13 +27,13 @@ export function initAuthedRoutes(
         console.log(
           `[POST LOGIN] url ${request.semaphoreGroupUrl}`,
           `proof:\n`,
-          request.proof
+          request.proof,
         );
         await verifyGroupProof(request.semaphoreGroupUrl, request.proof, {});
 
         const accessToken = sign(
           { groupUrl: request.semaphoreGroupUrl },
-          ACCESS_TOKEN_SECRET!
+          ACCESS_TOKEN_SECRET!,
         );
 
         res.status(200).json({ accessToken });
@@ -41,7 +41,7 @@ export function initAuthedRoutes(
         console.error(e);
         next(e);
       }
-    }
+    },
   );
 
   app.post(
@@ -63,7 +63,7 @@ export function initAuthedRoutes(
       }
 
       res.status(200);
-    }
+    },
   );
 
   app.get("/ballots", authenticateJWT, async (req: Request, res: Response) => {
@@ -74,13 +74,19 @@ export function initAuthedRoutes(
         AuthType.PCDPASS,
         AuthType.DEVCONNECT_ORGANIZER,
         AuthType.DEVCONNECT_PARTICIPANT,
+        AuthType.EDGE_CITY_RESIDENT,
+        AuthType.EDGE_CITY_ORGANIZER,
       ].includes(req.authUserType as any)
     ) {
       res.sendStatus(403);
       return;
     }
 
-    console.log(`BALLOTS`, req.authUserType);
+    console.log(
+      `BALLOTS`,
+      req.authUserType,
+      getVisibleBallotTypesForUser(req.authUserType),
+    );
 
     const ballots = await prisma.ballot.findMany({
       select: {
@@ -112,6 +118,8 @@ export function initAuthedRoutes(
           AuthType.PCDPASS,
           AuthType.DEVCONNECT_ORGANIZER,
           AuthType.DEVCONNECT_PARTICIPANT,
+          AuthType.EDGE_CITY_RESIDENT,
+          AuthType.EDGE_CITY_ORGANIZER,
         ].includes(req.authUserType as any)
       ) {
         res.sendStatus(403);
@@ -133,11 +141,11 @@ export function initAuthedRoutes(
         if (
           ballot &&
           !getVisibleBallotTypesForUser(req.authUserType).includes(
-            ballot.ballotType
+            ballot.ballotType,
           )
         ) {
           throw new Error(
-            `Your role of ${req.authUserType} is not authorized to view ${ballot.ballotType}. Logout and try again!`
+            `Your role of ${req.authUserType} is not authorized to view ${ballot.ballotType}. Logout and try again!`,
           );
         }
         if (ballot === null) {
@@ -174,7 +182,7 @@ export function initAuthedRoutes(
         console.error(e);
         next(e);
       }
-    }
+    },
   );
 }
 

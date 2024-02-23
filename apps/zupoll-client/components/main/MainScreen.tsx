@@ -96,36 +96,36 @@ export function MainScreen({
 
       {(loginState.config.name === LoginConfigurationName.ZUZALU_ORGANIZER ||
         loginState.config.name ===
-          LoginConfigurationName.ZUZALU_PARTICIPANT) && (
-        <BallotListContainer>
-          <TitleContainer>
-            <H1>Organizer Polls</H1>
-            <p>Official ballots from Zuconnect organizers</p>
-          </TitleContainer>
+        LoginConfigurationName.ZUZALU_PARTICIPANT) && (
+          <BallotListContainer>
+            <TitleContainer>
+              <H1>Organizer Polls</H1>
+              <p>Official ballots from Zuconnect organizers</p>
+            </TitleContainer>
 
-          {loadingBallots || ballots === undefined ? (
-            <RippleLoader />
-          ) : (
-            <BallotList ballots={ballots} filter={BallotType.ADVISORYVOTE} />
-          )}
-        </BallotListContainer>
-      )}
+            {loadingBallots || ballots === undefined ? (
+              <RippleLoader />
+            ) : (
+              <BallotList ballots={ballots} filter={BallotType.ADVISORYVOTE} />
+            )}
+          </BallotListContainer>
+        )}
       {(loginState.config.name === LoginConfigurationName.ZUZALU_ORGANIZER ||
         loginState.config.name ===
-          LoginConfigurationName.ZUZALU_PARTICIPANT) && (
-        <BallotListContainer>
-          <TitleContainer>
-            <H1>Straw Polls</H1>
-            <p>Unofficial ballots from event participants</p>
-          </TitleContainer>
+        LoginConfigurationName.ZUZALU_PARTICIPANT) && (
+          <BallotListContainer>
+            <TitleContainer>
+              <H1>Straw Polls</H1>
+              <p>Unofficial ballots from event participants</p>
+            </TitleContainer>
 
-          {loadingBallots || ballots === undefined ? (
-            <RippleLoader />
-          ) : (
-            <BallotList ballots={ballots} filter={BallotType.STRAWPOLL} />
-          )}
-        </BallotListContainer>
-      )}
+            {loadingBallots || ballots === undefined ? (
+              <RippleLoader />
+            ) : (
+              <BallotList ballots={ballots} filter={BallotType.STRAWPOLL} />
+            )}
+          </BallotListContainer>
+        )}
 
       {loginState.config.name === LoginConfigurationName.PCDPASS_USER && (
         <BallotListContainer>
@@ -148,44 +148,86 @@ export function MainScreen({
       {(loginState.config.name ===
         LoginConfigurationName.DEVCONNECT_PARTICIPANT ||
         loginState.config.name ===
-          LoginConfigurationName.DEVCONNECT_ORGANIZER) && (
-        <BallotListContainer>
-          <TitleContainer>
-            <H1>Organizer Polls</H1>
-            <p>Ballots created by Devconnect organizers.</p>
-          </TitleContainer>
+        LoginConfigurationName.DEVCONNECT_ORGANIZER) && (
+          <BallotListContainer>
+            <TitleContainer>
+              <H1>Organizer Polls</H1>
+              <p>Ballots created by Devconnect organizers.</p>
+            </TitleContainer>
 
-          {loadingBallots || ballots === undefined ? (
-            <RippleLoader />
-          ) : (
-            <BallotList
-              ballots={ballots}
-              filter={BallotType.DEVCONNECT_ORGANIZER}
-            />
-          )}
-        </BallotListContainer>
-      )}
+            {loadingBallots || ballots === undefined ? (
+              <RippleLoader />
+            ) : (
+              <BallotList
+                ballots={ballots}
+                filter={BallotType.DEVCONNECT_ORGANIZER}
+              />
+            )}
+          </BallotListContainer>
+        )}
 
       {(loginState.config.name ===
         LoginConfigurationName.DEVCONNECT_PARTICIPANT ||
         loginState.config.name ===
-          LoginConfigurationName.DEVCONNECT_ORGANIZER) && (
-        <BallotListContainer>
-          <TitleContainer>
-            <H1>Community Polls</H1>
-            <p>Ballots created by Devconnect attendees.</p>
-          </TitleContainer>
+        LoginConfigurationName.DEVCONNECT_ORGANIZER) && (
+          <BallotListContainer>
+            <TitleContainer>
+              <H1>Community Polls</H1>
+              <p>Ballots created by Devconnect attendees.</p>
+            </TitleContainer>
 
-          {loadingBallots || ballots === undefined ? (
-            <RippleLoader />
-          ) : (
-            <BallotList
-              ballots={ballots}
-              filter={BallotType.DEVCONNECT_STRAW}
-            />
-          )}
-        </BallotListContainer>
-      )}
+            {loadingBallots || ballots === undefined ? (
+              <RippleLoader />
+            ) : (
+              <BallotList
+                ballots={ballots}
+                filter={BallotType.DEVCONNECT_STRAW}
+              />
+            )}
+          </BallotListContainer>
+        )}
+
+      {(loginState.config.name ===
+        LoginConfigurationName.EDGE_CITY_ORGANIZER ||
+        loginState.config.name ===
+        LoginConfigurationName.EDGE_CITY_RESIDENT) && (
+          <BallotListContainer>
+            <TitleContainer>
+              <H1>Community Polls</H1>
+              <p>Ballots created by Edge City attendees.</p>
+            </TitleContainer>
+
+            {loadingBallots || ballots === undefined ? (
+              <RippleLoader />
+            ) : (
+              <BallotList
+                ballots={ballots}
+                filter={BallotType.EDGE_CITY_RESIDENT}
+              />
+            )}
+          </BallotListContainer>
+        )}
+
+      {(loginState.config.name ===
+        LoginConfigurationName.EDGE_CITY_ORGANIZER ||
+        loginState.config.name ===
+        LoginConfigurationName.EDGE_CITY_RESIDENT) && (
+          <BallotListContainer>
+            <TitleContainer>
+              <H1>Organizer Feedback</H1>
+              <p>Ballots created by Edge City organizers.</p>
+            </TitleContainer>
+
+            {loadingBallots || ballots === undefined ? (
+              <RippleLoader />
+            ) : (
+              <BallotList
+                ballots={ballots}
+                filter={BallotType.EDGE_CITY_ORGANIZER}
+              />
+            )}
+          </BallotListContainer>
+        )}
 
       {error && (
         <ErrorOverlay

@@ -73,6 +73,8 @@ export const BALLOT_TYPE_FROM_LOGIN_CONFIG: Record<
   [LoginConfigurationName.DEVCONNECT_ORGANIZER]:
     BallotType.DEVCONNECT_ORGANIZER,
   [LoginConfigurationName.DEVCONNECT_PARTICIPANT]: BallotType.DEVCONNECT_STRAW,
+  [LoginConfigurationName.EDGE_CITY_RESIDENT]: BallotType.EDGE_CITY_RESIDENT,
+  [LoginConfigurationName.EDGE_CITY_ORGANIZER]: BallotType.EDGE_CITY_ORGANIZER,
 };
 
 export const ZUPASS_URL = zupassUrl[DEPLOYMENT];
@@ -87,3 +89,9 @@ export const ZUZALU_ADMINS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${Semaphor
 export const DEVCONNECT_ADMINS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${SemaphoreGroups.DevconnectOrganizers}`;
 export const DEVCONNECT_ATTENDEES_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${SemaphoreGroups.DevconnectAttendees}`;
 export const PCDPASS_USERS_GROUP_URL = `${PCDPASS_SERVER_URL}semaphore/${SemaphoreGroups.Everyone}`;
+
+export const EDGE_CITY_PIPELINE_URL = `${process.env.NEXT_PUBLIC_EDGE_CITY_PIPELINE_URL}`;
+export const EDGE_CITY_RESIDENTS_GROUP_ID = `${process.env.NEXT_PUBLIC_EDGE_CITY_RESIDENTS_GROUP_ID}`;
+export const EDGE_CITY_RESIDENTS_GROUP_URL = `${EDGE_CITY_PIPELINE_URL}/${EDGE_CITY_RESIDENTS_GROUP_ID}`;
+export const EDGE_CITY_ORGANIZERS_GROUP_ID = `${process.env.NEXT_PUBLIC_EDGE_CITY_ORGANIZERS_GROUP_ID}`;
+export const EDGE_CITY_ORGANIZERS_GROUP_URL = `${EDGE_CITY_PIPELINE_URL}/${EDGE_CITY_ORGANIZERS_GROUP_ID}`;

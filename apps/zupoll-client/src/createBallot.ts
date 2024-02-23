@@ -47,7 +47,7 @@ interface GenerateBallotArgs {
   creatorGroupUrl: string;
 }
 const generateBallotRequest = (
-  args: GenerateBallotArgs
+  args: GenerateBallotArgs,
 ): CreateBallotRequest => {
   const finalRequest: CreateBallotRequest = {
     ballot: {
@@ -108,16 +108,12 @@ export function useCreateBallot({
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
   const [pcdStr, _passportPendingPCDStr] = useZupassPopupMessages();
   const ballotConfig = BALLOT_CONFIGS[ballotType];
-
+  console.log({ ballotConfig, ballotType });
   const {
     loading: loadingVoterGroupUrl,
     rootHash: voterGroupRootHash,
     groupUrl: voterGroupUrl,
-  } = useHistoricSemaphoreUrl(
-    ballotConfig.passportServerUrl,
-    ballotConfig.voterGroupId,
-    onError
-  );
+  } = useHistoricSemaphoreUrl(ballotConfig, onError);
 
   const submitBallot = useCallback(
     async (finalRequest: CreateBallotRequest) => {
@@ -159,7 +155,7 @@ export function useCreateBallot({
       setServerLoading,
       setBallotFromUrl,
       setPcdFromUrl,
-    ]
+    ],
   );
 
   // only accept pcdStr if we were expecting one
@@ -272,7 +268,7 @@ export function useCreateBallot({
         ballotConfig,
         ballotSignal,
         polls,
-      })
+      }),
     )}`;
     console.log({ ballotUrl });
 
@@ -283,7 +279,7 @@ export function useCreateBallot({
       "zupoll",
       sigHashEnc,
       sigHashEnc,
-      USE_CREATE_BALLOT_REDIRECT ? url + ballotUrl : undefined
+      USE_CREATE_BALLOT_REDIRECT ? url + ballotUrl : undefined,
     );
   }, [
     voterGroupUrl,

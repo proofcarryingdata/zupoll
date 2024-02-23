@@ -57,13 +57,16 @@ export const PCDPASS_HISTORIC_API_URL = IS_DEPLOYED
   ? process.env.PCDPASS_HISTORIC_API_URL
   : `${BASE_URL}/semaphore/valid-historic/`;
 
+export const EDGE_CITY_RESIDENTS_GROUP_URL = `${process.env.EDGE_CITY_PIPELINE_URL}/${process.env.EDGE_CITY_RESIDENTS_GROUP_ID}`;
+export const EDGE_CITY_ORGANIZERS_GROUP_URL = `${process.env.EDGE_CITY_PIPELINE_URL}/${process.env.EDGE_CITY_ORGANIZERS_GROUP_ID}`;
+
 export interface GroupJwtPayload extends JwtPayload {
   groupUrl: string;
 }
 export const authenticateJWT = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const authHeader = req.headers.authorization;
 
@@ -76,6 +79,9 @@ export const authenticateJWT = (
       }
 
       const payload = group as GroupJwtPayload;
+      console.log(payload);
+      console.log(EDGE_CITY_ORGANIZERS_GROUP_URL);
+      console.log(payload.groupUrl.includes(EDGE_CITY_ORGANIZERS_GROUP_URL));
 
       if (
         ZUZALU_PARTICIPANTS_GROUP_URL &&
@@ -112,6 +118,20 @@ export const authenticateJWT = (
         req.authUserType = AuthType.DEVCONNECT_PARTICIPANT;
         next();
         return;
+      } else if (
+        EDGE_CITY_RESIDENTS_GROUP_URL &&
+        payload.groupUrl.includes(EDGE_CITY_RESIDENTS_GROUP_URL)
+      ) {
+        req.authUserType = AuthType.EDGE_CITY_RESIDENT;
+        next();
+        return;
+      } else if (
+        EDGE_CITY_ORGANIZERS_GROUP_URL &&
+        payload.groupUrl.includes(EDGE_CITY_ORGANIZERS_GROUP_URL)
+      ) {
+        req.authUserType = AuthType.EDGE_CITY_ORGANIZER;
+        next();
+        return;
       }
 
       return res.sendStatus(403);
@@ -122,7 +142,7 @@ export const authenticateJWT = (
 };
 
 export function getVisibleBallotTypesForUser(
-  userAuth: AuthType | undefined
+  userAuth: AuthType | undefined,
 ): BallotType[] {
   let relevantBallots: BallotType[] = [];
 
@@ -145,6 +165,13 @@ export function getVisibleBallotTypesForUser(
     relevantBallots = [
       BallotType.DEVCONNECT_STRAWPOLL,
       BallotType.DEVCONNECT_FEEDBACK,
+    ];
+  } else if (userAuth === AuthType.EDGE_CITY_RESIDENT) {
+    relevantBallots = [BallotType.EDGE_CITY_STRAWPOLL];
+  } else if (userAuth === AuthType.EDGE_CITY_ORGANIZER) {
+    relevantBallots = [
+      BallotType.EDGE_CITY_STRAWPOLL,
+      BallotType.EDGE_CITY_FEEDBACK,
     ];
   }
 

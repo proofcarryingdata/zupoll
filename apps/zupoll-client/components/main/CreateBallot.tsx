@@ -200,38 +200,55 @@ export function CreateBallot({
             >
               {loginState.config.name ===
                 LoginConfigurationName.ZUZALU_PARTICIPANT && (
-                <>
-                  <option value={BallotType.STRAWPOLL}>Straw Poll</option>
-                </>
-              )}
+                  <>
+                    <option value={BallotType.STRAWPOLL}>Straw Poll</option>
+                  </>
+                )}
               {loginState.config.name ===
                 LoginConfigurationName.ZUZALU_ORGANIZER && (
+                  <>
+                    <option value={BallotType.STRAWPOLL}>Straw Poll</option>
+                    <option value={BallotType.ADVISORYVOTE}>Advisory Vote</option>
+                    <option value={BallotType.ORGANIZERONLY}>
+                      Organizer Only
+                    </option>
+                  </>
+                )}
+              {loginState.config.name ===
+                LoginConfigurationName.PCDPASS_USER && (
+                  <option value={BallotType.PCDPASSUSER}>PCDPass Poll</option>
+                )}
+              {loginState.config.name ===
+                LoginConfigurationName.DEVCONNECT_PARTICIPANT && (
+                  <option value={BallotType.DEVCONNECT_STRAW}>
+                    Devconnect Community Poll
+                  </option>
+                )}
+              {loginState.config.name ===
+                LoginConfigurationName.DEVCONNECT_ORGANIZER && (
+                  <>
+                    <option value={BallotType.DEVCONNECT_STRAW}>
+                      Community Poll
+                    </option>
+                    <option value={BallotType.DEVCONNECT_ORGANIZER}>
+                      Organizer Feedback
+                    </option>
+                  </>
+                )}
+              {loginState.config.name === LoginConfigurationName.EDGE_CITY_RESIDENT && (
                 <>
-                  <option value={BallotType.STRAWPOLL}>Straw Poll</option>
-                  <option value={BallotType.ADVISORYVOTE}>Advisory Vote</option>
-                  <option value={BallotType.ORGANIZERONLY}>
-                    Organizer Only
+                  <option value={BallotType.EDGE_CITY_RESIDENT}>
+                    Edge City Community Poll
                   </option>
                 </>
               )}
-              {loginState.config.name ===
-                LoginConfigurationName.PCDPASS_USER && (
-                <option value={BallotType.PCDPASSUSER}>PCDPass Poll</option>
-              )}
-              {loginState.config.name ===
-                LoginConfigurationName.DEVCONNECT_PARTICIPANT && (
-                <option value={BallotType.DEVCONNECT_STRAW}>
-                  Devconnect Community Poll
-                </option>
-              )}
-              {loginState.config.name ===
-                LoginConfigurationName.DEVCONNECT_ORGANIZER && (
+              {loginState.config.name === LoginConfigurationName.EDGE_CITY_ORGANIZER && (
                 <>
-                  <option value={BallotType.DEVCONNECT_STRAW}>
-                    Community Poll
+                  <option value={BallotType.EDGE_CITY_RESIDENT}>
+                    Edge City Community Poll
                   </option>
-                  <option value={BallotType.DEVCONNECT_ORGANIZER}>
-                    Organizer Feedback
+                  <option value={BallotType.EDGE_CITY_ORGANIZER}>
+                    Edge City Organizer Feedback
                   </option>
                 </>
               )}

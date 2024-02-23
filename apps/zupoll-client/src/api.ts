@@ -8,7 +8,7 @@ import { LoginConfig } from "./types";
 
 export async function createBallot(
   request: CreateBallotRequest,
-  accessToken: string
+  accessToken: string,
 ): Promise<Response | undefined> {
   if (!accessToken) return undefined;
 
@@ -33,7 +33,7 @@ export async function createBallot(
 
 export async function voteBallot(
   request: MultiVoteRequest,
-  accessToken: string
+  accessToken: string,
 ): Promise<Response | undefined> {
   if (!accessToken) return undefined;
 
@@ -58,7 +58,7 @@ export async function voteBallot(
 
 export async function login(
   config: LoginConfig,
-  pcdStr: string
+  pcdStr: string,
 ): Promise<Response | undefined> {
   const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
   const request = {
@@ -85,7 +85,7 @@ export async function login(
 
 export async function botPost(
   request: BotPostRequest,
-  accessToken: string | null
+  accessToken: string | null,
 ): Promise<Response | undefined> {
   if (!accessToken) return undefined;
 
@@ -109,7 +109,7 @@ export async function botPost(
 }
 
 export async function listBallots(
-  accessToken: string | null
+  accessToken: string | null,
 ): Promise<Response | undefined> {
   if (!accessToken) return undefined;
 
@@ -128,7 +128,7 @@ export async function listBallots(
 
 export async function listBallotPolls(
   accessToken: string | null,
-  ballotURL: string
+  ballotURL: string,
 ): Promise<Response | undefined> {
   if (!accessToken) return undefined;
 
@@ -148,12 +148,8 @@ export async function listBallotPolls(
 }
 
 export async function getLatestSemaphoreGroupHash(
-  groupId: string,
-  serverUrl: string
+  url: string,
 ): Promise<string | null> {
-  const url = `${serverUrl}semaphore/latest-root/${encodeURIComponent(
-    groupId
-  )}`;
   const res = await fetch(url);
 
   if (!res.ok) {
@@ -167,7 +163,7 @@ export async function getLatestSemaphoreGroupHash(
 export function getHistoricGroupUrl(
   groupId: string,
   rootHash: string,
-  serverUrl: string
+  serverUrl: string,
 ): string {
   return `${serverUrl}semaphore/historic/${groupId}/${rootHash}`;
 }

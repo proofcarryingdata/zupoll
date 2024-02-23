@@ -1,21 +1,29 @@
 import { useEffect, useState } from "react";
 import { getHistoricGroupUrl, getLatestSemaphoreGroupHash } from "./api";
-import { ZupollError } from "./types";
+import { BallotConfig, ZupollError } from "./types";
 
 export function useHistoricSemaphoreUrl(
-  semaphoreGroupServer: string | undefined,
-  semaphoreGroupId: string | undefined,
-  onError: (error: ZupollError) => void
+  ballotConfig: BallotConfig,
+  onError: (error: ZupollError) => void,
 ) {
   const [loading, setLoading] = useState(true);
   const [rootHash, setRootHash] = useState<string | null>(null);
-
+  const semaphoreGroupId = ballotConfig.voterGroupId;
+  const semaphoreGroupServer = ballotConfig.passportServerUrl;
+  console.log("ballot config", ballotConfig);
   useEffect(() => {
-    if (!semaphoreGroupServer || !semaphoreGroupId) {
+    if (!ballotConfig.passportServerUrl || !ballotConfig.voterGroupId) {
       setLoading(true);
       return;
     }
-    getLatestSemaphoreGroupHash(semaphoreGroupId, semaphoreGroupServer)
+    const semaphoreGroupId = ballotConfig.voterGroupId;
+    const semaphoreGroupServer = ballotConfig.passportServerUrl;
+    const groupHashUrl = ballotConfig.latestGroupHashUrl
+      ? ballotConfig.latestGroupHashUrl
+      : `${semaphoreGroupServer}semaphore/latest-root/${encodeURIComponent(
+          semaphoreGroupId,
+        )}`;
+    getLatestSemaphoreGroupHash(groupHashUrl)
       .then((hash) => setRootHash(hash))
       .catch((e: Error) => {
         console.log(e);
@@ -27,15 +35,21 @@ export function useHistoricSemaphoreUrl(
       .finally(() => {
         setLoading(false);
       });
-  }, [onError, semaphoreGroupId, semaphoreGroupServer]);
-
+  }, [onError, ballotConfig]);
+  console.log({ loading, rootHash });
   return {
     loading,
     rootHash,
     groupUrl:
-      semaphoreGroupId && semaphoreGroupServer
+      ballotConfig.passportServerUrl && ballotConfig.voterGroupId
         ? rootHash &&
-          getHistoricGroupUrl(semaphoreGroupId, rootHash, semaphoreGroupServer)
+          (ballotConfig.makeHistoricalGroupUrl
+            ? ballotConfig.makeHistoricalGroupUrl(rootHash)
+            : getHistoricGroupUrl(
+                semaphoreGroupId,
+                rootHash,
+                semaphoreGroupServer,
+              ))
         : undefined,
   };
 }

@@ -14,6 +14,8 @@ import {
   authenticateJWT,
   DEVCONNECT_ORGANIZERS_GROUP_URL,
   DEVCONNECT_PARTICIPANTS_GROUP_URL,
+  EDGE_CITY_ORGANIZERS_GROUP_URL,
+  EDGE_CITY_RESIDENTS_GROUP_URL,
   getVisibleBallotTypesForUser,
   PCDPASS_USERS_GROUP_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
@@ -37,7 +39,7 @@ import { InlineKeyboard } from "grammy";
  */
 export function initPCDRoutes(
   app: express.Application,
-  context: ApplicationContext
+  context: ApplicationContext,
 ): void {
   app.post(
     "/create-ballot",
@@ -58,7 +60,7 @@ export function initPCDRoutes(
       if (req.authUserType === AuthType.PCDPASS) {
         if (request.ballot.ballotType !== BallotType.PCDPASSUSER) {
           throw new Error(
-            `${req.authUserType} user can't create this ballot type`
+            `${req.authUserType} user can't create this ballot type`,
           );
         }
       } else if (req.authUserType === AuthType.ZUZALU_PARTICIPANT) {
@@ -68,13 +70,13 @@ export function initPCDRoutes(
           request.ballot.ballotType === BallotType.ORGANIZERONLY
         ) {
           throw new Error(
-            `${req.authUserType} user can't create this ballot type`
+            `${req.authUserType} user can't create this ballot type`,
           );
         }
       } else if (req.authUserType === AuthType.ZUZALU_ORGANIZER) {
         if (request.ballot.ballotType === BallotType.PCDPASSUSER) {
           throw new Error(
-            `${req.authUserType} user can't create this ballot type`
+            `${req.authUserType} user can't create this ballot type`,
           );
         }
       }
@@ -103,22 +105,35 @@ export function initPCDRoutes(
       try {
         if (request.ballot.pollsterType == UserType.ANON) {
           let groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
-          if (request.ballot.ballotType === BallotType.ADVISORYVOTE) {
-            groupUrl = ZUZALU_ORGANIZERS_GROUP_URL;
-          } else if (request.ballot.ballotType === BallotType.ORGANIZERONLY) {
-            groupUrl = ZUZALU_ORGANIZERS_GROUP_URL;
-          } else if (request.ballot.ballotType === BallotType.STRAWPOLL) {
-            groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
-          } else if (request.ballot.ballotType === BallotType.PCDPASSUSER) {
-            groupUrl = PCDPASS_USERS_GROUP_URL;
-          } else if (
-            request.ballot.ballotType === BallotType.DEVCONNECT_STRAWPOLL
-          ) {
-            groupUrl = DEVCONNECT_PARTICIPANTS_GROUP_URL;
-          } else if (
-            request.ballot.ballotType === BallotType.DEVCONNECT_FEEDBACK
-          ) {
-            groupUrl = DEVCONNECT_ORGANIZERS_GROUP_URL;
+          console.log(request.ballot.ballotType);
+          console.log(BallotType.EDGE_CITY_STRAWPOLL);
+          console.log(
+            request.ballot.ballotType === BallotType.EDGE_CITY_STRAWPOLL,
+          );
+
+          switch (request.ballot.ballotType) {
+            case BallotType.ADVISORYVOTE:
+            case BallotType.ORGANIZERONLY:
+              groupUrl = ZUZALU_ORGANIZERS_GROUP_URL;
+              break;
+            case BallotType.STRAWPOLL:
+              groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
+              break;
+            case BallotType.PCDPASSUSER:
+              groupUrl = PCDPASS_USERS_GROUP_URL;
+              break;
+            case BallotType.DEVCONNECT_STRAWPOLL:
+              groupUrl = DEVCONNECT_PARTICIPANTS_GROUP_URL;
+              break;
+            case BallotType.DEVCONNECT_FEEDBACK:
+              groupUrl = DEVCONNECT_ORGANIZERS_GROUP_URL;
+              break;
+            case BallotType.EDGE_CITY_STRAWPOLL:
+              groupUrl = EDGE_CITY_RESIDENTS_GROUP_URL;
+              break;
+            case BallotType.EDGE_CITY_FEEDBACK:
+              groupUrl = EDGE_CITY_ORGANIZERS_GROUP_URL;
+              break;
           }
 
           // pollsterSemaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
@@ -130,7 +145,7 @@ export function initPCDRoutes(
               signal: signalHash,
               allowedGroups: [groupUrl!],
               claimedExtNullifier: signalHash,
-            }
+            },
           );
 
           console.log("Valid proof with nullifier", nullifier);
@@ -165,35 +180,35 @@ export function initPCDRoutes(
                   expiry: request.ballot.expiry,
                 },
               });
-            })
+            }),
           );
 
           // Send MSG first, so if it fails, we don't add poll to DB.
-          if (
-            request.ballot.ballotType !== BallotType.PCDPASSUSER &&
-            request.ballot.ballotType !== BallotType.ORGANIZERONLY
-          ) {
-            // send message on TG channel, if bot is setup
-            const post = formatPollCreated(newBallot, request.polls);
-            const msgs = await sendMessageV2(
-              post,
-              request.ballot.ballotType,
-              context.bot
-            );
-            if (msgs) {
-              for (const msg of msgs) {
-                await prisma.tGMessage.create({
-                  data: {
-                    messageId: msg.message_id,
-                    chatId: msg.chat.id,
-                    topicId: msg.message_thread_id,
-                    ballotId: newBallot.ballotId,
-                    messageType: MessageType.CREATE,
-                  },
-                });
-              }
-            }
-          }
+          // if (
+          //   request.ballot.ballotType !== BallotType.PCDPASSUSER &&
+          //   request.ballot.ballotType !== BallotType.ORGANIZERONLY
+          // ) {
+          //   // send message on TG channel, if bot is setup
+          //   const post = formatPollCreated(newBallot, request.polls);
+          //   const msgs = await sendMessageV2(
+          //     post,
+          //     request.ballot.ballotType,
+          //     context.bot,
+          //   );
+          //   if (msgs) {
+          //     for (const msg of msgs) {
+          //       await prisma.tGMessage.create({
+          //         data: {
+          //           messageId: msg.message_id,
+          //           chatId: msg.chat.id,
+          //           topicId: msg.message_thread_id,
+          //           ballotId: newBallot.ballotId,
+          //           messageType: MessageType.CREATE,
+          //         },
+          //       });
+          //     }
+          //   }
+          // }
 
           res.json({
             url: newBallot.ballotURL,
@@ -205,7 +220,7 @@ export function initPCDRoutes(
         console.error(e);
         next(e);
       }
-    }
+    },
   );
 
   app.post(
@@ -289,7 +304,7 @@ export function initPCDRoutes(
             allowedGroups: ballot.voterSemaphoreGroupUrls,
             allowedRoots: ballot.voterSemaphoreGroupRoots,
             claimedExtNullifier: ballot.ballotId.toString(),
-          }
+          },
         );
 
         const previousBallotVote = await prisma.vote.findFirst({
@@ -354,9 +369,9 @@ export function initPCDRoutes(
                   disable_web_page_preview: true,
                   reply_markup: new InlineKeyboard().url(
                     `See more / Vote`,
-                    `${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}`
+                    `${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}`,
                   ),
-                }
+                },
               );
               if (msg) console.log(`Edited vote msg`);
             } catch (error) {
@@ -377,9 +392,9 @@ export function initPCDRoutes(
                 disable_web_page_preview: true,
                 reply_markup: new InlineKeyboard().url(
                   `See more / Vote`,
-                  `${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}`
+                  `${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}`,
                 ),
-              }
+              },
             );
             if (msg) {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -400,7 +415,7 @@ export function initPCDRoutes(
         console.error(`[ERROR]`, e);
         next(e);
       }
-    }
+    },
   );
 }
 

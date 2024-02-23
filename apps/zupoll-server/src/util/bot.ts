@@ -39,40 +39,41 @@ export async function sendMessageV2(
   opts?: {
     reply_markup?: ReplyKeyboardMarkup | InlineKeyboardMarkup;
     userId?: number;
-  }
+  },
 ) {
-  console.log(`[MESSAGE]`, message);
-  if (!bot) throw new Error(`Bot not found`);
-  if (!ballotType) throw new Error(`No ballot type found`);
-  if (opts?.userId) {
-    return [
-      await bot.api.sendMessage(opts.userId, message, {
-        parse_mode: "HTML",
-        ...opts,
-      }),
-    ];
-  }
-  // Look up recipients based on ballot
+  return;
+  // console.log(`[MESSAGE]`, message);
+  // if (!bot) throw new Error(`Bot not found`);
+  // if (!ballotType) throw new Error(`No ballot type found`);
+  // if (opts?.userId) {
+  //   return [
+  //     await bot.api.sendMessage(opts.userId, message, {
+  //       parse_mode: "HTML",
+  //       ...opts,
+  //     }),
+  //   ];
+  // }
+  // // Look up recipients based on ballot
 
-  async function findPollReceiversByBallotType(ballotType: BallotType) {
-    const pollReceivers = await prisma.pollReceiver.findMany();
-    return pollReceivers.filter((receiver) =>
-      receiver.ballotTypes.includes(ballotType)
-    );
-  }
+  // async function findPollReceiversByBallotType(ballotType: BallotType) {
+  //   const pollReceivers = await prisma.pollReceiver.findMany();
+  //   return pollReceivers.filter((receiver) =>
+  //     receiver.ballotTypes.includes(ballotType)
+  //   );
+  // }
 
-  const recipients = await findPollReceiversByBallotType(ballotType);
-  const res = recipients.map((r) => {
-    const [chatId, topicId] = r.tgTopicId.split("_");
-    return bot.api.sendMessage(chatId, message, {
-      message_thread_id: parseInt(topicId) || undefined,
-      parse_mode: "HTML",
-    });
-  });
+  // const recipients = await findPollReceiversByBallotType(ballotType);
+  // const res = recipients.map((r) => {
+  //   const [chatId, topicId] = r.tgTopicId.split("_");
+  //   return bot.api.sendMessage(chatId, message, {
+  //     message_thread_id: parseInt(topicId) || undefined,
+  //     parse_mode: "HTML",
+  //   });
+  // });
 
-  const finished = await Promise.all(res);
-  console.log(`Sent poll created msg to ${res.length} chats`);
-  return finished;
+  // const finished = await Promise.all(res);
+  // console.log(`Sent poll created msg to ${res.length} chats`);
+  // return finished;
 }
 
 export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
@@ -111,7 +112,7 @@ export type PollWithVotes =
 
 export function generatePollHTML(
   ballot: Ballot,
-  pollsWithVotes?: PollWithVotes[]
+  pollsWithVotes?: PollWithVotes[],
 ) {
   let html = `🦉 <b>${ballot.ballotTitle}</b>\n\n`;
 

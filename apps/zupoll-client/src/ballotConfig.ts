@@ -10,6 +10,10 @@ import {
   ZUZALU_ADMINS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "./env";
+import {
+  EDGE_CITY_ORGANIZER_CONFIG,
+  EDGE_CITY_RESIDENT_CONFIG,
+} from "./loginConfig";
 import { BallotType } from "./prismaTypes";
 import { BallotConfig } from "./types";
 
@@ -73,6 +77,32 @@ export const DEVCONNECT_ORGANIZER_BALLOT_CONFIG: BallotConfig = {
   ballotType: BallotType.DEVCONNECT_ORGANIZER,
 };
 
+export const EDGE_CITY_RESIDENT_BALLOT_CONFIG: BallotConfig = {
+  voterGroupId: EDGE_CITY_RESIDENT_CONFIG.groupId,
+  voterGroupUrl: EDGE_CITY_RESIDENT_CONFIG.groupUrl,
+  creatorGroupId: EDGE_CITY_RESIDENT_CONFIG.groupId,
+  creatorGroupUrl: EDGE_CITY_RESIDENT_CONFIG.groupUrl,
+  passportServerUrl: ZUPASS_SERVER_URL,
+  passportAppUrl: ZUPASS_URL,
+  ballotType: BallotType.EDGE_CITY_RESIDENT,
+  latestGroupHashUrl: EDGE_CITY_RESIDENT_CONFIG.groupUrl + "/latest-root",
+  makeHistoricalGroupUrl: (hash) =>
+    EDGE_CITY_RESIDENT_CONFIG.groupUrl + "/" + hash,
+};
+
+export const EDGE_CITY_ORGANIZER_BALLOT_CONFIG: BallotConfig = {
+  voterGroupId: EDGE_CITY_ORGANIZER_CONFIG.groupId,
+  voterGroupUrl: EDGE_CITY_ORGANIZER_CONFIG.groupUrl,
+  creatorGroupId: EDGE_CITY_ORGANIZER_CONFIG.groupId,
+  creatorGroupUrl: EDGE_CITY_ORGANIZER_CONFIG.groupUrl,
+  passportServerUrl: ZUPASS_SERVER_URL,
+  passportAppUrl: ZUPASS_URL,
+  ballotType: BallotType.EDGE_CITY_ORGANIZER,
+  latestGroupHashUrl: EDGE_CITY_ORGANIZER_CONFIG.groupUrl + "/latest-root",
+  makeHistoricalGroupUrl: (hash) =>
+    EDGE_CITY_ORGANIZER_CONFIG.groupUrl + "/" + hash,
+};
+
 export const BALLOT_CONFIGS = {
   [BallotType.ADVISORYVOTE]: ADVISORY_VOTE_BALLOT_CONFIG,
   [BallotType.ORGANIZERONLY]: ORGANIZER_ONLY_BALLOT_CONFIG,
@@ -80,4 +110,6 @@ export const BALLOT_CONFIGS = {
   [BallotType.STRAWPOLL]: STRAWPOLL_BALLOT_CONFIG,
   [BallotType.DEVCONNECT_STRAW]: DEVCONNECT_ATTENDEE_BALLOT_CONFIG,
   [BallotType.DEVCONNECT_ORGANIZER]: DEVCONNECT_ORGANIZER_BALLOT_CONFIG,
+  [BallotType.EDGE_CITY_RESIDENT]: EDGE_CITY_RESIDENT_BALLOT_CONFIG,
+  [BallotType.EDGE_CITY_ORGANIZER]: EDGE_CITY_ORGANIZER_BALLOT_CONFIG,
 };
