@@ -77,12 +77,16 @@ export const BALLOT_TYPE_FROM_LOGIN_CONFIG: Record<
   [LoginConfigurationName.EDGE_CITY_ORGANIZER]: BallotType.EDGE_CITY_ORGANIZER,
 };
 
-export const ZUPASS_URL = zupassUrl[DEPLOYMENT];
+export const ZUPASS_URL =
+  process.env.NEXT_PUBLIC_ZUPASS_URL ?? zupassUrl[DEPLOYMENT];
 export const PCDPASS_URL = pcdpassUrl[DEPLOYMENT];
 
-export const ZUPASS_SERVER_URL = zuzaluPassportServerURL[DEPLOYMENT];
+export const ZUPASS_SERVER_URL =
+  process.env.NEXT_PUBLIC_ZUPASS_SERVER_URL ??
+  zuzaluPassportServerURL[DEPLOYMENT];
 export const PCDPASS_SERVER_URL = pcdpassServerUrl[DEPLOYMENT];
-export const ZUPOLL_SERVER_URL = zupollServerURL[DEPLOYMENT];
+export const ZUPOLL_SERVER_URL =
+  process.env.NEXT_PUBLIC_ZUPOLL_SERVER_URL ?? zupollServerURL[DEPLOYMENT];
 
 export const ZUZALU_PARTICIPANTS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${SemaphoreGroups.ZuzaluParticipants}`;
 export const ZUZALU_ADMINS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${SemaphoreGroups.ZuzaluOrganizers}`;
