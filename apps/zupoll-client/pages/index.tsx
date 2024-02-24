@@ -39,7 +39,7 @@ export default function Index() {
     content = (
       <LoginScreen
         title="This app lets Zupass users vote anonymously."
-        loginConfigs={[]}
+        visibleLoginOptions={[]}
         onLogin={(state: LoginState) => {
           replaceLoginState(state);
           removeQueryParameters();

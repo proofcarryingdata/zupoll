@@ -39,7 +39,7 @@ export default function Denver() {
     content = (
       <LoginScreen
         title="Edge City Denver"
-        loginConfigs={[LoginConfigurationName.EDGE_CITY_RESIDENT, LoginConfigurationName.EDGE_CITY_ORGANIZER]}
+        visibleLoginOptions={[LoginConfigurationName.EDGE_CITY_RESIDENT, LoginConfigurationName.EDGE_CITY_ORGANIZER]}
         onLogin={(state: LoginState) => {
           replaceLoginState(state);
           removeQueryParameters();

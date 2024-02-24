@@ -2201,16 +2201,6 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.5.1.tgz#5f1b518ec5fa54437c0b7c4a821546c64fed6922"
   integrity sha512-6i/8UoL0P5y4leBIGzvkZdS85RDMG9y1ihZzmTZQ5LdHUYmZ7pKFoj8X0236s3lusPs1Fa5HTQUpwI+UfTcmeA==
 
-"@semaphore-protocol/group@^3.11.0":
-  version "3.15.2"
-  resolved "https://registry.yarnpkg.com/@semaphore-protocol/group/-/group-3.15.2.tgz#31d24b302982fd51760548cdfc0a7df6e3523a75"
-  integrity sha512-amDjSRattdViYUOZs40+4quKm+C1/F1fvyOvng9QGW2kkc138vombltyL4ix0mGSSPuqy/7ToH6wrfGivIfJFw==
-  dependencies:
-    "@ethersproject/bignumber" "^5.7.0"
-    "@ethersproject/bytes" "^5.7.0"
-    "@ethersproject/keccak256" "^5.7.0"
-    "@zk-kit/incremental-merkle-tree" "1.1.0"
-
 "@semaphore-protocol/group@^3.14.0":
   version "3.15.0"
   resolved "https://registry.yarnpkg.com/@semaphore-protocol/group/-/group-3.15.0.tgz#82da17b1ad2870574633bb330cb9e212053dd9fb"
@@ -2220,17 +2210,6 @@
     "@ethersproject/bytes" "^5.7.0"
     "@ethersproject/keccak256" "^5.7.0"
     "@zk-kit/incremental-merkle-tree" "1.1.0"
-
-"@semaphore-protocol/identity@^3.11.0":
-  version "3.15.2"
-  resolved "https://registry.yarnpkg.com/@semaphore-protocol/identity/-/identity-3.15.2.tgz#8c5e75c01c25d1dcabfefe89fbe8aefe5dd21922"
-  integrity sha512-MJ1MO5QL+oX+OFK2rHAPjQ6+kKgGxCsVJLNdn1soRawxbrxH9A6tV9AsVHV0DN4saegQ4qaOOy1XO1PAN6PiQA==
-  dependencies:
-    "@ethersproject/bignumber" "^5.5.0"
-    "@ethersproject/keccak256" "^5.7.0"
-    "@ethersproject/random" "^5.5.1"
-    "@ethersproject/strings" "^5.6.1"
-    js-sha512 "^0.8.0"
 
 "@semaphore-protocol/identity@^3.14.0":
   version "3.15.0"

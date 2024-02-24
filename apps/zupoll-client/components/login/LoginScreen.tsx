@@ -28,15 +28,25 @@ const allLoginConfigs = [
 export function LoginScreen({
   onLogin,
   title = "This app lets Zupass users vote anonymously.",
-  loginConfigs
+  // visibleLoginOptions is a set of login config names to show here
+  // this supports creating login pages for specific events which only show
+  // some login options.
+  // if the array is empty, all options are shown.
+  visibleLoginOptions
 }: {
   onLogin: (loginState: LoginState) => void;
   title: string;
-  loginConfigs: string[]
+  visibleLoginOptions: string[]
 }) {
   const [serverLoading, setServerLoading] = useState<boolean>(false);
   const [error, setError] = useState<ZupollError>();
-  const loginConfigSet = new Set(loginConfigs);
+  const loginConfigSet = new Set(visibleLoginOptions);
+  // Chunk the login options into rows of two options
+  const loginRows = _.chunk(allLoginConfigs.filter(
+    // If loginConfigSet is zero include everything, otherwise check for
+    // inclusion
+    config => loginConfigSet.size === 0 || loginConfigSet.has(config.name)
+  ), 2);
   return (
     <Center>
       <LoggedOutHeader />
@@ -55,7 +65,7 @@ export function LoginScreen({
           </p>
         </Description>
         <>
-          {_.chunk(allLoginConfigs.filter(config => loginConfigSet.size === 0 || loginConfigSet.has(config.name)), 2).map(([a, b], idx) => {
+          {loginRows.map(([a, b], idx) => {
             return (
               <div key={idx}>
                 <LoginRow>
