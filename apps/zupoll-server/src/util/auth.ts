@@ -79,9 +79,6 @@ export const authenticateJWT = (
       }
 
       const payload = group as GroupJwtPayload;
-      console.log(payload);
-      console.log(EDGE_CITY_ORGANIZERS_GROUP_URL);
-      console.log(payload.groupUrl.includes(EDGE_CITY_ORGANIZERS_GROUP_URL));
 
       if (
         ZUZALU_PARTICIPANTS_GROUP_URL &&

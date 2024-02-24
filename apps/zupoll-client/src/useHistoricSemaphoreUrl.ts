@@ -10,7 +10,6 @@ export function useHistoricSemaphoreUrl(
   const [rootHash, setRootHash] = useState<string | null>(null);
   const semaphoreGroupId = ballotConfig.voterGroupId;
   const semaphoreGroupServer = ballotConfig.passportServerUrl;
-  console.log("ballot config", ballotConfig);
   useEffect(() => {
     if (!ballotConfig.passportServerUrl || !ballotConfig.voterGroupId) {
       setLoading(true);
@@ -36,7 +35,6 @@ export function useHistoricSemaphoreUrl(
         setLoading(false);
       });
   }, [onError, ballotConfig]);
-  console.log({ loading, rootHash });
   return {
     loading,
     rootHash,

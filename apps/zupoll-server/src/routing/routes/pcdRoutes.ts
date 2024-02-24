@@ -100,11 +100,6 @@ export function initPCDRoutes(
       try {
         if (request.ballot.pollsterType == UserType.ANON) {
           let groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
-          console.log(request.ballot.ballotType);
-          console.log(BallotType.EDGE_CITY_STRAWPOLL);
-          console.log(
-            request.ballot.ballotType === BallotType.EDGE_CITY_STRAWPOLL,
-          );
 
           switch (request.ballot.ballotType) {
             case BallotType.ADVISORYVOTE:

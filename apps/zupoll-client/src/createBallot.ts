@@ -249,8 +249,6 @@ export function useCreateBallot({
       ballotSignal.pollSignals.push(pollSignal);
     });
     const signalHash = sha256(stableStringify(ballotSignal));
-    console.log(stableStringify(ballotSignal));
-    console.log(signalHash);
     const sigHashEnc = generateSnarkMessageHash(signalHash).toString();
     console.log(`[CREATED BALLOT]`, {
       ballotSignal,
@@ -270,7 +268,6 @@ export function useCreateBallot({
         polls,
       }),
     )}`;
-    console.log({ ballotUrl });
 
     openGroupMembershipPopup(
       ballotConfig.passportAppUrl,
