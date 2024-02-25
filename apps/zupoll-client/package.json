@@ -12,7 +12,6 @@
     "staging-env-local": "./staging-env-local.sh"
   },
   "dependencies": {
-    "@pcd/email-pcd": "^0.5.0",
     "@pcd/passport-interface": "^0.10.0",
     "@pcd/pcd-types": "^0.10.0",
     "@pcd/semaphore-group-pcd": "^0.10.0",
@@ -37,8 +36,6 @@
     "@types/expect": "^24.3.0",
     "@types/json-stable-stringify": "^1.0.34",
     "@types/libsodium-wrappers-sumo": "^0.7.7",
-    "@types/pako": "^2.0.2",
-    "@types/qr-image": "^3.2.8",
     "@types/react": "^18.0.22",
     "@types/react-dom": "^18.0.7",
     "@types/styled-components": "^5.1.26",
