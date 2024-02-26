@@ -33,7 +33,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
 
   for (const ballot of ballots) {
     const minutes = Math.ceil(
-      (new Date(ballot.expiry).getTime() - Date.now()) / 60000
+      (new Date(ballot.expiry).getTime() - Date.now()) / 60000,
     );
     const hours = Math.ceil(minutes / 60);
     const days = Math.ceil(minutes / (24 * 60));
@@ -54,7 +54,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
       });
 
       const expiryMessage = `<b>${cleanString(
-        ballot.ballotTitle
+        ballot.ballotTitle,
       )}</b> will expire in less than 1 week.\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;
       await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     } else if (
@@ -71,7 +71,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
       });
 
       const expiryMessage = `<b>${cleanString(
-        ballot.ballotTitle
+        ballot.ballotTitle,
       )}</b> will expire in less than 24 hours.\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;
       await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     } else if (
@@ -88,7 +88,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
       });
 
       const expiryMessage = `<b>${cleanString(
-        ballot.ballotTitle
+        ballot.ballotTitle,
       )}</b> will expire in less than 1 hour!\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;
       await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     }
@@ -109,10 +109,11 @@ export async function startBot(context: ApplicationContext): Promise<void> {
 
   context.bot.command("start", async (ctx) => {
     if (ctx.chat.type === "private") {
+      console.log(process.env.BOT_ZUPOLL_LINK);
       ctx.reply(`Zupoll`, {
         reply_markup: new InlineKeyboard().url(
           `Zupoll`,
-          `https://t.me/zupoll_prod_bot/poll`
+          process.env.BOT_ZUPOLL_LINK ?? `https://t.me/zupoll_prod_bot/poll`,
         ),
       });
     }
@@ -244,7 +245,7 @@ export async function startBot(context: ApplicationContext): Promise<void> {
       if (context.bot) {
         await findBallots(context.bot);
       }
-    }
+    },
   );
 
   cronJob.start();

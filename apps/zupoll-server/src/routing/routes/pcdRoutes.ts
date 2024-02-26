@@ -21,7 +21,12 @@ import {
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL,
 } from "../../util/auth";
-import { generatePollHTML, PollWithVotes } from "../../util/bot";
+import {
+  formatPollCreated,
+  generatePollHTML,
+  PollWithVotes,
+  sendMessageV2,
+} from "../../util/bot";
 import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
@@ -174,31 +179,31 @@ export function initPCDRoutes(
           );
 
           // Send MSG first, so if it fails, we don't add poll to DB.
-          // if (
-          //   request.ballot.ballotType !== BallotType.PCDPASSUSER &&
-          //   request.ballot.ballotType !== BallotType.ORGANIZERONLY
-          // ) {
-          //   // send message on TG channel, if bot is setup
-          //   const post = formatPollCreated(newBallot, request.polls);
-          //   const msgs = await sendMessageV2(
-          //     post,
-          //     request.ballot.ballotType,
-          //     context.bot,
-          //   );
-          //   if (msgs) {
-          //     for (const msg of msgs) {
-          //       await prisma.tGMessage.create({
-          //         data: {
-          //           messageId: msg.message_id,
-          //           chatId: msg.chat.id,
-          //           topicId: msg.message_thread_id,
-          //           ballotId: newBallot.ballotId,
-          //           messageType: MessageType.CREATE,
-          //         },
-          //       });
-          //     }
-          //   }
-          // }
+          if (
+            request.ballot.ballotType !== BallotType.PCDPASSUSER &&
+            request.ballot.ballotType !== BallotType.ORGANIZERONLY
+          ) {
+            // send message on TG channel, if bot is setup
+            const post = formatPollCreated(newBallot, request.polls);
+            const msgs = await sendMessageV2(
+              post,
+              request.ballot.ballotType,
+              context.bot,
+            );
+            if (msgs) {
+              for (const msg of msgs) {
+                await prisma.tGMessage.create({
+                  data: {
+                    messageId: msg.message_id,
+                    chatId: msg.chat.id,
+                    topicId: msg.message_thread_id,
+                    ballotId: newBallot.ballotId,
+                    messageType: MessageType.CREATE,
+                  },
+                });
+              }
+            }
+          }
 
           res.json({
             url: newBallot.ballotURL,
