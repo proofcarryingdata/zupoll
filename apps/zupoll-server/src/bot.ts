@@ -109,7 +109,6 @@ export async function startBot(context: ApplicationContext): Promise<void> {
 
   context.bot.command("start", async (ctx) => {
     if (ctx.chat.type === "private") {
-      console.log(process.env.BOT_ZUPOLL_LINK);
       ctx.reply(`Zupoll`, {
         reply_markup: new InlineKeyboard().url(
           `Zupoll`,

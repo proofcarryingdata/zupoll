@@ -108,7 +108,7 @@ export function useCreateBallot({
   const pcdState = useRef<PCDState>(PCDState.DEFAULT);
   const [pcdStr, _passportPendingPCDStr] = useZupassPopupMessages();
   const ballotConfig = BALLOT_CONFIGS[ballotType];
-  console.log({ ballotConfig, ballotType });
+
   const {
     loading: loadingVoterGroupUrl,
     rootHash: voterGroupRootHash,

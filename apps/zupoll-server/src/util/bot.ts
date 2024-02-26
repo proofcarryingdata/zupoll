@@ -56,14 +56,12 @@ export async function sendMessageV2(
 
   async function findPollReceiversByBallotType(ballotType: BallotType) {
     const pollReceivers = await prisma.pollReceiver.findMany();
-    console.log(pollReceivers);
     return pollReceivers.filter((receiver) =>
       receiver.ballotTypes.includes(ballotType),
     );
   }
 
   const recipients = await findPollReceiversByBallotType(ballotType);
-  console.log(recipients);
   const res = recipients.map((r) => {
     const [chatId, topicId] = r.tgTopicId.split("_");
     return bot.api.sendMessage(chatId, message, {
