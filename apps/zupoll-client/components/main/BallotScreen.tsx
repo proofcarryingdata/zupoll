@@ -6,7 +6,7 @@ import { listBallotPolls } from "../../src/api";
 import {
   getBallotVotes,
   useBallotVoting,
-  votedOn,
+  votedOn
 } from "../../src/ballotVoting";
 import { Ballot } from "../../src/prismaTypes";
 import { BallotPollResponse, PollWithCounts } from "../../src/requestTypes";
@@ -15,7 +15,7 @@ import { Center } from "../core";
 import { ReturnHeader } from "../core/Headers";
 import {
   RippleLoaderLight,
-  RippleLoaderLightMargin,
+  RippleLoaderLightMargin
 } from "../core/RippleLoader";
 import { BallotPoll } from "./BallotPoll";
 import { ErrorOverlay } from "./ErrorOverlay";
@@ -23,7 +23,7 @@ import { ErrorOverlay } from "./ErrorOverlay";
 export function BallotScreen({
   ballotURL,
   loginState,
-  logout,
+  logout
 }: {
   ballotURL: string;
   loginState: LoginState;
@@ -60,7 +60,7 @@ export function BallotScreen({
       if (res === undefined) {
         const serverDownError: ZupollError = {
           title: "Retrieving polls failed",
-          message: "Server is down. Contact passport@0xparc.org.",
+          message: "Server is down. Contact passport@0xparc.org."
         };
         setError(serverDownError);
         return;
@@ -76,7 +76,7 @@ export function BallotScreen({
         console.error("error posting vote to the server: ", resErr);
         const err: ZupollError = {
           title: "Retreiving polls failed",
-          message: `Server Error: ${resErr}`,
+          message: `Server Error: ${resErr}`
         };
         setError(err);
         return;
@@ -119,7 +119,7 @@ export function BallotScreen({
         console.error("No polls found in ballot");
         const err: ZupollError = {
           title: "Retreiving polls failed",
-          message: `No polls found in ballot`,
+          message: `No polls found in ballot`
         };
         setError(err);
         return;
@@ -151,7 +151,7 @@ export function BallotScreen({
       };
       const vote = {
         polls: voteStr.polls,
-        pollToVote: new Map(voteStr.pollToVoteJSON),
+        pollToVote: new Map(voteStr.pollToVoteJSON)
       };
 
       const decodedProofString = decodeURIComponent(proofString);
@@ -203,7 +203,7 @@ export function BallotScreen({
     loginState,
     returnUrl: window.location.href, // If exists, will use returnUrl instead of pop up to get PCD.
     setPcdFromUrl,
-    setVoteFromUrl,
+    setVoteFromUrl
   });
 
   return (

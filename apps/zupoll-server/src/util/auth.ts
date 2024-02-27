@@ -11,7 +11,7 @@ export const enum SemaphoreGroups {
   ZuzaluOrganizers = "4",
   Everyone = "5",
   DevconnectAttendees = "6",
-  DevconnectOrganizers = "7",
+  DevconnectOrganizers = "7"
 }
 
 export const ACCESS_TOKEN_SECRET = IS_DEPLOYED
@@ -66,7 +66,7 @@ export interface GroupJwtPayload extends JwtPayload {
 export const authenticateJWT = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const authHeader = req.headers.authorization;
 
@@ -139,7 +139,7 @@ export const authenticateJWT = (
 };
 
 export function getVisibleBallotTypesForUser(
-  userAuth: AuthType | undefined,
+  userAuth: AuthType | undefined
 ): BallotType[] {
   let relevantBallots: BallotType[] = [];
 
@@ -149,26 +149,26 @@ export function getVisibleBallotTypesForUser(
     relevantBallots = [
       BallotType.ADVISORYVOTE,
       BallotType.STRAWPOLL,
-      BallotType.ORGANIZERONLY,
+      BallotType.ORGANIZERONLY
     ];
   } else if (userAuth === AuthType.ZUZALU_PARTICIPANT) {
     relevantBallots = [BallotType.ADVISORYVOTE, BallotType.STRAWPOLL];
   } else if (userAuth === AuthType.DEVCONNECT_PARTICIPANT) {
     relevantBallots = [
       BallotType.DEVCONNECT_STRAWPOLL,
-      BallotType.DEVCONNECT_FEEDBACK,
+      BallotType.DEVCONNECT_FEEDBACK
     ];
   } else if (userAuth === AuthType.DEVCONNECT_ORGANIZER) {
     relevantBallots = [
       BallotType.DEVCONNECT_STRAWPOLL,
-      BallotType.DEVCONNECT_FEEDBACK,
+      BallotType.DEVCONNECT_FEEDBACK
     ];
   } else if (userAuth === AuthType.EDGE_CITY_RESIDENT) {
     relevantBallots = [BallotType.EDGE_CITY_STRAWPOLL];
   } else if (userAuth === AuthType.EDGE_CITY_ORGANIZER) {
     relevantBallots = [
       BallotType.EDGE_CITY_STRAWPOLL,
-      BallotType.EDGE_CITY_FEEDBACK,
+      BallotType.EDGE_CITY_FEEDBACK
     ];
   }
 

@@ -4,7 +4,7 @@ import { BallotConfig, ZupollError } from "./types";
 
 export function useHistoricSemaphoreUrl(
   ballotConfig: BallotConfig,
-  onError: (error: ZupollError) => void,
+  onError: (error: ZupollError) => void
 ) {
   const [loading, setLoading] = useState(true);
   const [rootHash, setRootHash] = useState<string | null>(null);
@@ -20,7 +20,7 @@ export function useHistoricSemaphoreUrl(
     const groupHashUrl = ballotConfig.latestGroupHashUrl
       ? ballotConfig.latestGroupHashUrl
       : `${semaphoreGroupServer}semaphore/latest-root/${encodeURIComponent(
-          semaphoreGroupId,
+          semaphoreGroupId
         )}`;
     getLatestSemaphoreGroupHash(groupHashUrl)
       .then((hash) => setRootHash(hash))
@@ -28,7 +28,7 @@ export function useHistoricSemaphoreUrl(
         console.log(e);
         onError({
           message: "Failed to load historic Semaphore Group",
-          title: "Loading Error",
+          title: "Loading Error"
         });
       })
       .finally(() => {
@@ -46,8 +46,8 @@ export function useHistoricSemaphoreUrl(
             : getHistoricGroupUrl(
                 semaphoreGroupId,
                 rootHash,
-                semaphoreGroupServer,
+                semaphoreGroupServer
               ))
-        : undefined,
+        : undefined
   };
 }

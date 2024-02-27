@@ -1,22 +1,22 @@
 import {
   SemaphoreGroupPCDPackage,
-  SerializedSemaphoreGroup,
+  SerializedSemaphoreGroup
 } from "@pcd/semaphore-group-pcd";
 import { SemaphoreSignaturePCDPackage } from "@pcd/semaphore-signature-pcd";
+import { generateSnarkMessageHash } from "@pcd/util";
 import {
   ADMIN_GROUP_ID,
+  DEVCONNECT_ORGANIZERS_GROUP_URL,
+  DEVCONNECT_PARTICIPANTS_GROUP_URL,
   PARTICIPANTS_GROUP_ID,
   PCDPASS_GROUP_ID,
   PCDPASS_HISTORIC_API_URL,
   PCDPASS_USERS_GROUP_URL,
+  SemaphoreGroups,
   ZUZALU_HISTORIC_API_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
-  ZUZALU_PARTICIPANTS_GROUP_URL,
-  DEVCONNECT_ORGANIZERS_GROUP_URL,
-  DEVCONNECT_PARTICIPANTS_GROUP_URL,
-  SemaphoreGroups,
+  ZUZALU_PARTICIPANTS_GROUP_URL
 } from "./auth";
-import { generateSnarkMessageHash } from "@pcd/util";
 
 const residentRootCache = new Set<string>();
 const organizerRootCache = new Set<string>();
@@ -32,7 +32,7 @@ export async function verifyGroupProof(
     allowedGroups?: string[];
     allowedRoots?: string[];
     claimedExtNullifier?: string;
-  },
+  }
 ): Promise<string> {
   console.log(`VERIFY`, semaphoreGroupUrl, options);
   if (
@@ -86,7 +86,7 @@ export async function verifyGroupProof(
       const validResidentRoot = await verifyRootValidity(
         PARTICIPANTS_GROUP_ID,
         pcd.claim.merkleRoot,
-        ZUZALU_HISTORIC_API_URL!,
+        ZUZALU_HISTORIC_API_URL!
       );
       if (validResidentRoot) {
         residentRootCache.add(pcd.claim.merkleRoot);
@@ -99,7 +99,7 @@ export async function verifyGroupProof(
       const validOrganizerRoot = await verifyRootValidity(
         ADMIN_GROUP_ID,
         pcd.claim.merkleRoot,
-        ZUZALU_HISTORIC_API_URL!,
+        ZUZALU_HISTORIC_API_URL!
       );
       if (validOrganizerRoot) {
         organizerRootCache.add(pcd.claim.merkleRoot);
@@ -112,7 +112,7 @@ export async function verifyGroupProof(
       const validResidentRoot = await verifyRootValidity(
         SemaphoreGroups.DevconnectAttendees,
         pcd.claim.merkleRoot,
-        ZUZALU_HISTORIC_API_URL!,
+        ZUZALU_HISTORIC_API_URL!
       );
       if (validResidentRoot) {
         residentRootCache.add(pcd.claim.merkleRoot);
@@ -125,7 +125,7 @@ export async function verifyGroupProof(
       const validOrganizerRoot = await verifyRootValidity(
         SemaphoreGroups.DevconnectOrganizers,
         pcd.claim.merkleRoot,
-        ZUZALU_HISTORIC_API_URL!,
+        ZUZALU_HISTORIC_API_URL!
       );
       if (validOrganizerRoot) {
         organizerRootCache.add(pcd.claim.merkleRoot);
@@ -138,7 +138,7 @@ export async function verifyGroupProof(
       const validPcdpassRoot = await verifyRootValidity(
         PCDPASS_GROUP_ID,
         pcd.claim.merkleRoot,
-        PCDPASS_HISTORIC_API_URL!,
+        PCDPASS_HISTORIC_API_URL!
       );
       if (validPcdpassRoot) {
         pcdpassUserRootCache.add(pcd.claim.merkleRoot);
@@ -150,14 +150,14 @@ export async function verifyGroupProof(
     if (!genericIssuanceRootCache.has(pcd.claim.merkleRoot)) {
       const validRoot = await verifyGenericIssuanceRootValidity(
         semaphoreGroupUrl,
-        pcd.claim.merkleRoot,
+        pcd.claim.merkleRoot
       );
 
       if (validRoot) {
         genericIssuanceRootCache.add(pcd.claim.merkleRoot);
       } else {
         throw new Error(
-          "No allowed roots specified and group is neither the organizer or resident group.",
+          "No allowed roots specified and group is neither the organizer or resident group."
         );
       }
     }
@@ -170,7 +170,7 @@ export async function verifySignatureProof(
   commitment: string,
   proof: string,
   signal: string,
-  allowedGroups: string[],
+  allowedGroups: string[]
 ): Promise<string> {
   let found = false;
   for (const group of allowedGroups) {
@@ -208,7 +208,7 @@ export async function verifySignatureProof(
 async function verifyRootValidity(
   groupId: string,
   root: string,
-  historicAPI: string,
+  historicAPI: string
 ): Promise<boolean> {
   const url = historicAPI + groupId + "/" + root;
   const response = await fetch(url);
@@ -218,7 +218,7 @@ async function verifyRootValidity(
 
 async function verifyGenericIssuanceRootValidity(
   baseUrl: string,
-  root: string,
+  root: string
 ): Promise<boolean> {
   const url = baseUrl + "/valid/" + root;
   const response = await fetch(url);

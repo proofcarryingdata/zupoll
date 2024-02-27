@@ -24,7 +24,7 @@ export default function Index() {
     replaceLoginState,
     isLoading,
     logout,
-    definitelyNotLoggedIn,
+    definitelyNotLoggedIn
   } = useSavedLoginState(router);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function Index() {
     content = (
       <LoginScreen
         title="This app lets Zupass users vote anonymously."
-        visibleLoginOptions={[]}
+        visibleLoginOptions={undefined}
         onLogin={(state: LoginState) => {
           replaceLoginState(state);
           removeQueryParameters();

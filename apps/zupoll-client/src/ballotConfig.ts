@@ -8,11 +8,11 @@ import {
   ZUPASS_SERVER_URL,
   ZUPASS_URL,
   ZUZALU_ADMINS_GROUP_URL,
-  ZUZALU_PARTICIPANTS_GROUP_URL,
+  ZUZALU_PARTICIPANTS_GROUP_URL
 } from "./env";
 import {
   EDGE_CITY_ORGANIZER_CONFIG,
-  EDGE_CITY_RESIDENT_CONFIG,
+  EDGE_CITY_RESIDENT_CONFIG
 } from "./loginConfig";
 import { BallotType } from "./prismaTypes";
 import { BallotConfig } from "./types";
@@ -24,7 +24,7 @@ export const STRAWPOLL_BALLOT_CONFIG: BallotConfig = {
   creatorGroupUrl: ZUZALU_PARTICIPANTS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
-  ballotType: BallotType.STRAWPOLL,
+  ballotType: BallotType.STRAWPOLL
 };
 
 export const ADVISORY_VOTE_BALLOT_CONFIG: BallotConfig = {
@@ -34,7 +34,7 @@ export const ADVISORY_VOTE_BALLOT_CONFIG: BallotConfig = {
   creatorGroupUrl: ZUZALU_ADMINS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
-  ballotType: BallotType.ADVISORYVOTE,
+  ballotType: BallotType.ADVISORYVOTE
 };
 
 export const ORGANIZER_ONLY_BALLOT_CONFIG: BallotConfig = {
@@ -44,7 +44,7 @@ export const ORGANIZER_ONLY_BALLOT_CONFIG: BallotConfig = {
   creatorGroupUrl: ZUZALU_ADMINS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
-  ballotType: BallotType.ORGANIZERONLY,
+  ballotType: BallotType.ORGANIZERONLY
 };
 
 export const PCDPASS_BALLOT_CONFIG: BallotConfig = {
@@ -54,7 +54,7 @@ export const PCDPASS_BALLOT_CONFIG: BallotConfig = {
   creatorGroupUrl: PCDPASS_USERS_GROUP_URL,
   passportServerUrl: PCDPASS_SERVER_URL,
   passportAppUrl: PCDPASS_URL,
-  ballotType: BallotType.PCDPASSUSER,
+  ballotType: BallotType.PCDPASSUSER
 };
 
 export const DEVCONNECT_ATTENDEE_BALLOT_CONFIG: BallotConfig = {
@@ -64,7 +64,7 @@ export const DEVCONNECT_ATTENDEE_BALLOT_CONFIG: BallotConfig = {
   creatorGroupUrl: DEVCONNECT_ATTENDEES_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
-  ballotType: BallotType.DEVCONNECT_STRAW,
+  ballotType: BallotType.DEVCONNECT_STRAW
 };
 
 export const DEVCONNECT_ORGANIZER_BALLOT_CONFIG: BallotConfig = {
@@ -74,7 +74,7 @@ export const DEVCONNECT_ORGANIZER_BALLOT_CONFIG: BallotConfig = {
   creatorGroupUrl: DEVCONNECT_ADMINS_GROUP_URL,
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
-  ballotType: BallotType.DEVCONNECT_ORGANIZER,
+  ballotType: BallotType.DEVCONNECT_ORGANIZER
 };
 
 export const EDGE_CITY_RESIDENT_BALLOT_CONFIG: BallotConfig = {
@@ -87,7 +87,7 @@ export const EDGE_CITY_RESIDENT_BALLOT_CONFIG: BallotConfig = {
   ballotType: BallotType.EDGE_CITY_RESIDENT,
   latestGroupHashUrl: EDGE_CITY_RESIDENT_CONFIG.groupUrl + "/latest-root",
   makeHistoricalGroupUrl: (hash) =>
-    EDGE_CITY_RESIDENT_CONFIG.groupUrl + "/" + hash,
+    EDGE_CITY_RESIDENT_CONFIG.groupUrl + "/" + hash
 };
 
 export const EDGE_CITY_ORGANIZER_BALLOT_CONFIG: BallotConfig = {
@@ -100,7 +100,7 @@ export const EDGE_CITY_ORGANIZER_BALLOT_CONFIG: BallotConfig = {
   ballotType: BallotType.EDGE_CITY_ORGANIZER,
   latestGroupHashUrl: EDGE_CITY_ORGANIZER_CONFIG.groupUrl + "/latest-root",
   makeHistoricalGroupUrl: (hash) =>
-    EDGE_CITY_ORGANIZER_CONFIG.groupUrl + "/" + hash,
+    EDGE_CITY_ORGANIZER_CONFIG.groupUrl + "/" + hash
 };
 
 export const BALLOT_CONFIGS = {
@@ -111,5 +111,5 @@ export const BALLOT_CONFIGS = {
   [BallotType.DEVCONNECT_STRAW]: DEVCONNECT_ATTENDEE_BALLOT_CONFIG,
   [BallotType.DEVCONNECT_ORGANIZER]: DEVCONNECT_ORGANIZER_BALLOT_CONFIG,
   [BallotType.EDGE_CITY_RESIDENT]: EDGE_CITY_RESIDENT_BALLOT_CONFIG,
-  [BallotType.EDGE_CITY_ORGANIZER]: EDGE_CITY_ORGANIZER_BALLOT_CONFIG,
+  [BallotType.EDGE_CITY_ORGANIZER]: EDGE_CITY_ORGANIZER_BALLOT_CONFIG
 };

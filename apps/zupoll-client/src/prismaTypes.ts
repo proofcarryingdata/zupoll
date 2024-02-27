@@ -67,14 +67,14 @@ export const BallotType = {
   DEVCONNECT_STRAW: "DEVCONNECT_STRAWPOLL",
   DEVCONNECT_ORGANIZER: "DEVCONNECT_FEEDBACK",
   EDGE_CITY_RESIDENT: "EDGE_CITY_STRAWPOLL",
-  EDGE_CITY_ORGANIZER: "EDGE_CITY_FEEDBACK",
+  EDGE_CITY_ORGANIZER: "EDGE_CITY_FEEDBACK"
 };
 
 export type BallotType = (typeof BallotType)[keyof typeof BallotType];
 
 export const UserType = {
   ANON: "ANON",
-  NONANON: "NONANON",
+  NONANON: "NONANON"
 };
 
 export type UserType = (typeof UserType)[keyof typeof UserType];
@@ -83,7 +83,7 @@ export const ExpiryNotifStatus = {
   NONE: "NONE",
   WEEK: "WEEK",
   DAY: "DAY",
-  HOUR: "HOUR",
+  HOUR: "HOUR"
 };
 
 export type ExpiryNotifStatus =

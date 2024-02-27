@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { useState } from "react";
 import styled from "styled-components";
 import {
@@ -6,15 +7,18 @@ import {
   EDGE_CITY_ORGANIZER_CONFIG,
   EDGE_CITY_RESIDENT_CONFIG,
   ZUZALU_ORGANIZER_LOGIN_CONFIG,
-  ZUZALU_PARTICIPANT_LOGIN_CONFIG,
+  ZUZALU_PARTICIPANT_LOGIN_CONFIG
 } from "../../src/loginConfig";
-import { LoginState, ZupollError } from "../../src/types";
+import {
+  LoginConfigurationName,
+  LoginState,
+  ZupollError
+} from "../../src/types";
 import { Center } from "../core";
 import { LoggedOutHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "../main/ErrorOverlay";
 import { Login } from "./Login";
-import _ from "lodash";
 
 const allLoginConfigs = [
   EDGE_CITY_RESIDENT_CONFIG,
@@ -36,17 +40,22 @@ export function LoginScreen({
 }: {
   onLogin: (loginState: LoginState) => void;
   title: string;
-  visibleLoginOptions: string[]
+  visibleLoginOptions: LoginConfigurationName[] | undefined;
 }) {
   const [serverLoading, setServerLoading] = useState<boolean>(false);
   const [error, setError] = useState<ZupollError>();
   const loginConfigSet = new Set(visibleLoginOptions);
+  const visibleLoginRows =
+    visibleLoginOptions === undefined
+      ? allLoginConfigs
+      : allLoginConfigs.filter(
+          // If loginConfigSet is zero include everything, otherwise check for
+          // inclusion
+          (config) =>
+            loginConfigSet.size === 0 || loginConfigSet.has(config.name)
+        );
   // Chunk the login options into rows of two options
-  const loginRows = _.chunk(allLoginConfigs.filter(
-    // If loginConfigSet is zero include everything, otherwise check for
-    // inclusion
-    config => loginConfigSet.size === 0 || loginConfigSet.has(config.name)
-  ), 2);
+  const loginRows = _.chunk(visibleLoginRows, 2);
   return (
     <Center>
       <LoggedOutHeader />
@@ -80,17 +89,18 @@ export function LoginScreen({
                       prompt={a.prompt}
                     />
                   )}
-                  {b && (serverLoading ? (
-                    <RippleLoader />
-                  ) : (
-                    <Login
-                      onLogin={onLogin}
-                      onError={setError}
-                      setServerLoading={setServerLoading}
-                      config={b}
-                      prompt={b.prompt}
-                    />
-                  ))}
+                  {b &&
+                    (serverLoading ? (
+                      <RippleLoader />
+                    ) : (
+                      <Login
+                        onLogin={onLogin}
+                        onError={setError}
+                        setServerLoading={setServerLoading}
+                        config={b}
+                        prompt={b.prompt}
+                      />
+                    ))}
                 </LoginRow>
                 <br />
               </div>

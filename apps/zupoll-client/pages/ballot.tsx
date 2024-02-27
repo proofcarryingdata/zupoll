@@ -34,7 +34,7 @@ export default function BallotPage() {
     router.query.id,
     router.asPath,
     loginState,
-    definitelyNotLoggedIn,
+    definitelyNotLoggedIn
   ]);
 
   return (

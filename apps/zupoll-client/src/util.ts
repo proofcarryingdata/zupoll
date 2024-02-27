@@ -1,6 +1,6 @@
 import {
   constructZupassPcdGetRequestUrl,
-  openZupassPopup,
+  openZupassPopup
 } from "@pcd/passport-interface";
 import { ArgumentTypeName } from "@pcd/pcd-types";
 import { SemaphoreGroupPCDPackage } from "@pcd/semaphore-group-pcd";
@@ -16,7 +16,7 @@ export function openGroupMembershipPopup(
   originalSiteName: string,
   signal?: string,
   externalNullifier?: string,
-  returnUrl?: string,
+  returnUrl?: string
 ) {
   const proofUrl = constructZupassPcdGetRequestUrl<
     typeof SemaphoreGroupPCDPackage
@@ -30,29 +30,29 @@ export function openGroupMembershipPopup(
         userProvided: false,
         value:
           externalNullifier ??
-          generateSnarkMessageHash(originalSiteName).toString(),
+          generateSnarkMessageHash(originalSiteName).toString()
       },
       group: {
         argumentType: ArgumentTypeName.Object,
         userProvided: false,
-        remoteUrl: urlToSemaphoreGroup,
+        remoteUrl: urlToSemaphoreGroup
       },
       identity: {
         argumentType: ArgumentTypeName.PCD,
         pcdType: SemaphoreIdentityPCDPackage.name,
         value: undefined,
-        userProvided: true,
+        userProvided: true
       },
       signal: {
         argumentType: ArgumentTypeName.BigInt,
         userProvided: false,
-        value: signal ?? "1",
-      },
+        value: signal ?? "1"
+      }
     },
     {
       title: "Anon Voting Auth",
-      description: originalSiteName,
-    },
+      description: originalSiteName
+    }
   );
 
   if (returnUrl) {

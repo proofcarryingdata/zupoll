@@ -4,7 +4,7 @@ import { ApplicationContext } from "../../types";
 import {
   ACCESS_TOKEN_SECRET,
   authenticateJWT,
-  getVisibleBallotTypesForUser,
+  getVisibleBallotTypesForUser
 } from "../../util/auth";
 import { sendMessage } from "../../util/bot";
 import { prisma } from "../../util/prisma";
@@ -13,7 +13,7 @@ import { verifyGroupProof } from "../../util/verify";
 
 export function initAuthedRoutes(
   app: express.Application,
-  context: ApplicationContext,
+  context: ApplicationContext
 ): void {
   app.post(
     "/login",
@@ -27,13 +27,13 @@ export function initAuthedRoutes(
         console.log(
           `[POST LOGIN] url ${request.semaphoreGroupUrl}`,
           `proof:\n`,
-          request.proof,
+          request.proof
         );
         await verifyGroupProof(request.semaphoreGroupUrl, request.proof, {});
 
         const accessToken = sign(
           { groupUrl: request.semaphoreGroupUrl },
-          ACCESS_TOKEN_SECRET!,
+          ACCESS_TOKEN_SECRET!
         );
 
         res.status(200).json({ accessToken });
@@ -41,7 +41,7 @@ export function initAuthedRoutes(
         console.error(e);
         next(e);
       }
-    },
+    }
   );
 
   app.post(
@@ -63,7 +63,7 @@ export function initAuthedRoutes(
       }
 
       res.status(200);
-    },
+    }
   );
 
   app.get("/ballots", authenticateJWT, async (req: Request, res: Response) => {
@@ -75,18 +75,12 @@ export function initAuthedRoutes(
         AuthType.DEVCONNECT_ORGANIZER,
         AuthType.DEVCONNECT_PARTICIPANT,
         AuthType.EDGE_CITY_RESIDENT,
-        AuthType.EDGE_CITY_ORGANIZER,
+        AuthType.EDGE_CITY_ORGANIZER
       ].includes(req.authUserType as any)
     ) {
       res.sendStatus(403);
       return;
     }
-
-    console.log(
-      `BALLOTS`,
-      req.authUserType,
-      getVisibleBallotTypesForUser(req.authUserType),
-    );
 
     const ballots = await prisma.ballot.findMany({
       select: {
@@ -94,14 +88,14 @@ export function initAuthedRoutes(
         ballotURL: true,
         expiry: true,
         ballotType: true,
-        createdAt: true,
+        createdAt: true
       },
       orderBy: { expiry: "desc" },
       where: {
         ballotType: {
-          in: getVisibleBallotTypesForUser(req.authUserType),
-        },
-      },
+          in: getVisibleBallotTypesForUser(req.authUserType)
+        }
+      }
     });
 
     res.status(200).json({ ballots });
@@ -119,7 +113,7 @@ export function initAuthedRoutes(
           AuthType.DEVCONNECT_ORGANIZER,
           AuthType.DEVCONNECT_PARTICIPANT,
           AuthType.EDGE_CITY_RESIDENT,
-          AuthType.EDGE_CITY_ORGANIZER,
+          AuthType.EDGE_CITY_ORGANIZER
         ].includes(req.authUserType as any)
       ) {
         res.sendStatus(403);
@@ -135,17 +129,17 @@ export function initAuthedRoutes(
 
         const ballot = await prisma.ballot.findFirst({
           where: {
-            ballotURL: ballotURL,
-          },
+            ballotURL: ballotURL
+          }
         });
         if (
           ballot &&
           !getVisibleBallotTypesForUser(req.authUserType).includes(
-            ballot.ballotType,
+            ballot.ballotType
           )
         ) {
           throw new Error(
-            `Your role of ${req.authUserType} is not authorized to view ${ballot.ballotType}. Logout and try again!`,
+            `Your role of ${req.authUserType} is not authorized to view ${ballot.ballotType}. Logout and try again!`
           );
         }
         if (ballot === null) {
@@ -154,16 +148,16 @@ export function initAuthedRoutes(
 
         const polls = await prisma.poll.findMany({
           where: {
-            ballotURL: ballotURL,
+            ballotURL: ballotURL
           },
           include: {
             votes: {
               select: {
-                voteIdx: true,
-              },
-            },
+                voteIdx: true
+              }
+            }
           },
-          orderBy: { expiry: "asc" },
+          orderBy: { expiry: "asc" }
         });
         if (polls === null) {
           throw new Error("Ballot has no polls.");
@@ -182,7 +176,7 @@ export function initAuthedRoutes(
         console.error(e);
         next(e);
       }
-    },
+    }
   );
 }
 

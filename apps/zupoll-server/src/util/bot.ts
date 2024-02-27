@@ -1,8 +1,8 @@
 import { Ballot, BallotType, Poll, Vote } from "@prisma/client";
 import { Bot } from "grammy";
-import { BallotTypeNames } from "./types";
 import { InlineKeyboardMarkup, ReplyKeyboardMarkup } from "grammy/types";
 import { prisma } from "./prisma";
+import { BallotTypeNames } from "./types";
 
 export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
 
@@ -25,7 +25,7 @@ export async function sendMessage(message: string, bot?: Bot) {
       if (!isNaN(message_thread_id) && !isNaN(chat_id)) {
         return await bot.api.sendMessage(chat_id, message, {
           message_thread_id,
-          parse_mode: "HTML",
+          parse_mode: "HTML"
         });
       }
     }
@@ -39,7 +39,7 @@ export async function sendMessageV2(
   opts?: {
     reply_markup?: ReplyKeyboardMarkup | InlineKeyboardMarkup;
     userId?: number;
-  },
+  }
 ) {
   console.log(`[MESSAGE]`, message);
   if (!bot) throw new Error(`Bot not found`);
@@ -48,8 +48,8 @@ export async function sendMessageV2(
     return [
       await bot.api.sendMessage(opts.userId, message, {
         parse_mode: "HTML",
-        ...opts,
-      }),
+        ...opts
+      })
     ];
   }
   // Look up recipients based on ballot
@@ -57,7 +57,7 @@ export async function sendMessageV2(
   async function findPollReceiversByBallotType(ballotType: BallotType) {
     const pollReceivers = await prisma.pollReceiver.findMany();
     return pollReceivers.filter((receiver) =>
-      receiver.ballotTypes.includes(ballotType),
+      receiver.ballotTypes.includes(ballotType)
     );
   }
 
@@ -66,7 +66,7 @@ export async function sendMessageV2(
     const [chatId, topicId] = r.tgTopicId.split("_");
     return bot.api.sendMessage(chatId, message, {
       message_thread_id: parseInt(topicId) || undefined,
-      parse_mode: "HTML",
+      parse_mode: "HTML"
     });
   });
 
@@ -91,7 +91,7 @@ export const formatPollCreated = (ballot: Ballot, polls: Poll[]) => {
     `\nDescription: <i>${cleanString(ballot.ballotDescription)}</i>` +
     `\nQuestions:\n${formatPolls(polls)}` +
     `\nExpiry: <i>${new Date(ballot.expiry).toLocaleString("en-US", {
-      timeZone: "America/Denver",
+      timeZone: "America/Denver"
     })}</i>`;
 
   if (process.env.BOT_ZUPOLL_LINK) {
@@ -111,7 +111,7 @@ export type PollWithVotes =
 
 export function generatePollHTML(
   ballot: Ballot,
-  pollsWithVotes?: PollWithVotes[],
+  pollsWithVotes?: PollWithVotes[]
 ) {
   let html = `🦉 <b>${ballot.ballotTitle}</b>\n\n`;
 

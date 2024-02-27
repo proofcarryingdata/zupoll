@@ -1,15 +1,15 @@
+import { sleep } from "@pcd/util";
 import { BallotType } from "@prisma/client";
+import { CronJob } from "cron";
 import { Api, Bot, Context, InlineKeyboard, RawApi } from "grammy";
 import { ApplicationContext } from "./types";
 import {
-  SITE_URL,
   cleanString,
   formatPollCreated,
   sendMessageV2,
+  SITE_URL
 } from "./util/bot";
-import { sleep } from "@pcd/util";
 import { prisma } from "./util/prisma";
-import { CronJob } from "cron";
 
 const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
   console.log(`Running find ballots: ${Date.now()}`);
@@ -19,21 +19,21 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
       ballotURL: true,
       expiry: true,
       expiryNotif: true,
-      ballotType: true,
+      ballotType: true
     },
     orderBy: { expiry: "desc" },
     where: {
       NOT: {
         ballotType: {
-          in: [BallotType.PCDPASSUSER, BallotType.ORGANIZERONLY],
-        },
-      },
-    },
+          in: [BallotType.PCDPASSUSER, BallotType.ORGANIZERONLY]
+        }
+      }
+    }
   });
 
   for (const ballot of ballots) {
     const minutes = Math.ceil(
-      (new Date(ballot.expiry).getTime() - Date.now()) / 60000,
+      (new Date(ballot.expiry).getTime() - Date.now()) / 60000
     );
     const hours = Math.ceil(minutes / 60);
     const days = Math.ceil(minutes / (24 * 60));
@@ -46,15 +46,15 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
     if (days === 7 && ballot.expiryNotif === "NONE") {
       await prisma.ballot.update({
         where: {
-          ballotURL: ballot.ballotURL,
+          ballotURL: ballot.ballotURL
         },
         data: {
-          expiryNotif: "WEEK",
-        },
+          expiryNotif: "WEEK"
+        }
       });
 
       const expiryMessage = `<b>${cleanString(
-        ballot.ballotTitle,
+        ballot.ballotTitle
       )}</b> will expire in less than 1 week.\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;
       await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     } else if (
@@ -63,15 +63,15 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
     ) {
       await prisma.ballot.update({
         where: {
-          ballotURL: ballot.ballotURL,
+          ballotURL: ballot.ballotURL
         },
         data: {
-          expiryNotif: "DAY",
-        },
+          expiryNotif: "DAY"
+        }
       });
 
       const expiryMessage = `<b>${cleanString(
-        ballot.ballotTitle,
+        ballot.ballotTitle
       )}</b> will expire in less than 24 hours.\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;
       await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     } else if (
@@ -80,15 +80,15 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
     ) {
       await prisma.ballot.update({
         where: {
-          ballotURL: ballot.ballotURL,
+          ballotURL: ballot.ballotURL
         },
         data: {
-          expiryNotif: "HOUR",
-        },
+          expiryNotif: "HOUR"
+        }
       });
 
       const expiryMessage = `<b>${cleanString(
-        ballot.ballotTitle,
+        ballot.ballotTitle
       )}</b> will expire in less than 1 hour!\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;
       await sendMessageV2(expiryMessage, ballot.ballotType, bot);
     }
@@ -112,8 +112,8 @@ export async function startBot(context: ApplicationContext): Promise<void> {
       ctx.reply(`Zupoll`, {
         reply_markup: new InlineKeyboard().url(
           `Zupoll`,
-          process.env.BOT_ZUPOLL_LINK ?? `https://t.me/zupoll_prod_bot/poll`,
-        ),
+          process.env.BOT_ZUPOLL_LINK ?? `https://t.me/zupoll_prod_bot/poll`
+        )
       });
     }
   });
@@ -128,14 +128,14 @@ export async function startBot(context: ApplicationContext): Promise<void> {
           expiryNotif: true,
           ballotDescription: true,
           polls: true,
-          ballotType: true,
-        },
+          ballotType: true
+        }
       });
       for (const ballot of ballots) {
         // @ts-expect-error prisma
         const post = formatPollCreated(ballot, ballot.polls);
         await sendMessageV2(post, ballot.ballotType, context.bot, {
-          userId: ctx.from?.id,
+          userId: ctx.from?.id
         });
       }
     } catch (error) {
@@ -156,29 +156,29 @@ export async function startBot(context: ApplicationContext): Promise<void> {
           throw new Error(`POLL TYPE INVALID`);
       });
       const topicExists = await prisma.tGTopic.findFirst({
-        where: { id: tgTopicId },
+        where: { id: tgTopicId }
       });
       if (!topicExists)
         throw new Error(`Topic not found in DB. Edit it and try again`);
       // Upsert in DB
       await prisma.pollReceiver.upsert({
         where: {
-          tgTopicId,
+          tgTopicId
         },
         update: {
-          ballotTypes,
+          ballotTypes
         },
         create: {
           tgTopicId,
-          ballotTypes,
-        },
+          ballotTypes
+        }
       });
       ctx.reply(`Listening to ${ballotTypes}`, {
-        message_thread_id,
+        message_thread_id
       });
     } catch (error) {
       ctx.reply(`${error}`, {
-        message_thread_id,
+        message_thread_id
       });
     }
   });
@@ -194,7 +194,7 @@ export async function startBot(context: ApplicationContext): Promise<void> {
       ctx.reply(`No longer listening to polls`, { message_thread_id });
     } catch (error) {
       ctx.reply(`${error}`, {
-        message_thread_id,
+        message_thread_id
       });
     }
   });
@@ -209,17 +209,17 @@ export async function startBot(context: ApplicationContext): Promise<void> {
       const id = `${chatId}_${topicId}`;
       await prisma.tGTopic.upsert({
         where: {
-          id,
+          id
         },
         update: {
-          topicName,
+          topicName
         },
         create: {
           id,
           topicId,
           chatId,
-          topicName,
-        },
+          topicName
+        }
       });
     } catch (error) {
       console.log(`[TOPIC EDITED ERROR]`, error);
@@ -231,7 +231,7 @@ export async function startBot(context: ApplicationContext): Promise<void> {
     allowed_updates: ["message"],
     onStart(info) {
       console.log(`[TELEGRAM] Started bot '${info.username}' successfully!`);
-    },
+    }
   });
 
   context.bot.catch((error) => console.log(`[TELEGRAM] Bot error`, error));
@@ -244,7 +244,7 @@ export async function startBot(context: ApplicationContext): Promise<void> {
       if (context.bot) {
         await findBallots(context.bot);
       }
-    },
+    }
   );
 
   cronJob.start();

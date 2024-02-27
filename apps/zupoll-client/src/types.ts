@@ -12,7 +12,7 @@ export type ZupollError = {
 export enum PCDState {
   DEFAULT,
   AWAITING_PCDSTR,
-  RECEIVED_PCDSTR,
+  RECEIVED_PCDSTR
 }
 
 export enum LoginConfigurationName {
@@ -22,7 +22,7 @@ export enum LoginConfigurationName {
   DEVCONNECT_PARTICIPANT = "DEVCONNECT_PARTICIPANT",
   DEVCONNECT_ORGANIZER = "DEVCONNECT_ORGANIZER",
   EDGE_CITY_RESIDENT = "EDGE_CITY_RESIDENT",
-  EDGE_CITY_ORGANIZER = "EDGE_CITY_ORGANIZER",
+  EDGE_CITY_ORGANIZER = "EDGE_CITY_ORGANIZER"
 }
 
 export interface BallotConfig {

@@ -14,7 +14,6 @@ export default function Denver() {
   useEffect(() => {
     // Check if the query parameter exists
     if (router.query.tgWebAppStartParam) {
-      console.log(`got start param`, router.query.tgWebAppStartParam);
       router.push(`/ballot?id=${router.query.tgWebAppStartParam}`);
     }
   }, [router.query.tgWebAppStartParam, router]);
@@ -24,7 +23,7 @@ export default function Denver() {
     replaceLoginState,
     isLoading,
     logout,
-    definitelyNotLoggedIn,
+    definitelyNotLoggedIn
   } = useSavedLoginState(router);
 
   useEffect(() => {
@@ -39,7 +38,10 @@ export default function Denver() {
     content = (
       <LoginScreen
         title="Edge City Denver"
-        visibleLoginOptions={[LoginConfigurationName.EDGE_CITY_RESIDENT, LoginConfigurationName.EDGE_CITY_ORGANIZER]}
+        visibleLoginOptions={[
+          LoginConfigurationName.EDGE_CITY_RESIDENT,
+          LoginConfigurationName.EDGE_CITY_ORGANIZER
+        ]}
         onLogin={(state: LoginState) => {
           replaceLoginState(state);
           removeQueryParameters();

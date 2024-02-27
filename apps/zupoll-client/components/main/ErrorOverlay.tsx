@@ -5,7 +5,7 @@ import { Overlay } from "./Overlay";
 export function ErrorOverlay({
   error,
   onClose,
-  onLogout,
+  onLogout
 }: {
   error: ZupollError;
   onClose: () => void;

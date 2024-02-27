@@ -6,7 +6,7 @@ export function BallotPoll({
   poll,
   voteIdx,
   finalVoteIdx,
-  onVoted,
+  onVoted
 }: {
   canVote: boolean;
   poll: PollWithCounts;

@@ -11,9 +11,9 @@ import { BallotSignal, CreateBallotRequest, PollSignal } from "./requestTypes";
 import { BallotConfig, LoginState, PCDState, ZupollError } from "./types";
 import { useHistoricSemaphoreUrl } from "./useHistoricSemaphoreUrl";
 import {
-  USE_CREATE_BALLOT_REDIRECT,
   openGroupMembershipPopup,
   removeQueryParameters,
+  USE_CREATE_BALLOT_REDIRECT
 } from "./util";
 
 /**
@@ -47,7 +47,7 @@ interface GenerateBallotArgs {
   creatorGroupUrl: string;
 }
 const generateBallotRequest = (
-  args: GenerateBallotArgs,
+  args: GenerateBallotArgs
 ): CreateBallotRequest => {
   const finalRequest: CreateBallotRequest = {
     ballot: {
@@ -67,10 +67,10 @@ const generateBallotRequest = (
       pollsterSemaphoreGroupUrl: args.creatorGroupUrl,
       voterSemaphoreGroupUrls: args.voterGroupUrls,
       voterSemaphoreGroupRoots: args.voterGroupRoots,
-      ballotType: args.ballotType,
+      ballotType: args.ballotType
     },
     polls: args.polls,
-    proof: args.proof,
+    proof: args.proof
   };
   return finalRequest;
 };
@@ -88,7 +88,7 @@ export function useCreateBallot({
   pcdFromUrl,
   setBallotFromUrl,
   setPcdFromUrl,
-  url,
+  url
 }: {
   ballotTitle: string;
   ballotDescription: string;
@@ -112,7 +112,7 @@ export function useCreateBallot({
   const {
     loading: loadingVoterGroupUrl,
     rootHash: voterGroupRootHash,
-    groupUrl: voterGroupUrl,
+    groupUrl: voterGroupUrl
   } = useHistoricSemaphoreUrl(ballotConfig, onError);
 
   const submitBallot = useCallback(
@@ -125,7 +125,7 @@ export function useCreateBallot({
       if (res === undefined) {
         const serverDownError: ZupollError = {
           title: "Creating ballot failed",
-          message: "Server is down. Contact passport@0xparc.org.",
+          message: "Server is down. Contact passport@0xparc.org."
         };
         onError(serverDownError);
         removeQueryParameters(["ballot", "proof", "finished"]);
@@ -137,7 +137,7 @@ export function useCreateBallot({
         console.error("error posting vote to the server: ", resErr);
         const err: ZupollError = {
           title: "Creating ballot failed",
-          message: `Server Error: ${resErr}`,
+          message: `Server Error: ${resErr}`
         };
         onError(err);
         removeQueryParameters(["ballot", "proof", "finished"]);
@@ -154,8 +154,8 @@ export function useCreateBallot({
       router,
       setServerLoading,
       setBallotFromUrl,
-      setPcdFromUrl,
-    ],
+      setPcdFromUrl
+    ]
   );
 
   // only accept pcdStr if we were expecting one
@@ -177,7 +177,7 @@ export function useCreateBallot({
         voterGroupRoots: ballotSignal.voterSemaphoreGroupRoots,
         voterGroupUrls: ballotSignal.voterSemaphoreGroupUrls,
         proof: parsedPcd.pcd,
-        creatorGroupUrl: ballotConfig.creatorGroupUrl,
+        creatorGroupUrl: ballotConfig.creatorGroupUrl
       });
       // Do request
       submitBallot(request);
@@ -198,7 +198,7 @@ export function useCreateBallot({
         voterGroupRoots: [voterGroupRootHash],
         voterGroupUrls: [voterGroupUrl],
         expiry,
-        creatorGroupUrl: ballotConfig.creatorGroupUrl,
+        creatorGroupUrl: ballotConfig.creatorGroupUrl
       });
 
       submitBallot(finalRequest);
@@ -218,7 +218,7 @@ export function useCreateBallot({
     ballotFromUrl,
     setBallotFromUrl,
     setPcdFromUrl,
-    submitBallot,
+    submitBallot
   ]);
 
   // ran after ballot is submitted by user
@@ -226,7 +226,7 @@ export function useCreateBallot({
     if (voterGroupUrl == null || voterGroupRootHash == null) {
       return onError({
         title: "Error Creating Poll",
-        message: "Voter group not loaded yet.",
+        message: "Voter group not loaded yet."
       });
     }
 
@@ -239,12 +239,12 @@ export function useCreateBallot({
       ballotType: ballotType,
       expiry: expiry,
       voterSemaphoreGroupUrls: [voterGroupUrl],
-      voterSemaphoreGroupRoots: [voterGroupRootHash],
+      voterSemaphoreGroupRoots: [voterGroupRootHash]
     };
     polls.forEach((poll: Poll) => {
       const pollSignal: PollSignal = {
         body: poll.body,
-        options: poll.options,
+        options: poll.options
       };
       ballotSignal.pollSignals.push(pollSignal);
     });
@@ -254,7 +254,7 @@ export function useCreateBallot({
       ballotSignal,
       signalHash,
       sigHashEnc,
-      ballotConfig,
+      ballotConfig
     });
     localStorage.setItem("lastBallotSignal", stableStringify(ballotSignal));
     localStorage.setItem("lastBallotSignalHash", signalHash);
@@ -265,8 +265,8 @@ export function useCreateBallot({
       stableStringify({
         ballotConfig,
         ballotSignal,
-        polls,
-      }),
+        polls
+      })
     )}`;
 
     openGroupMembershipPopup(
@@ -276,7 +276,7 @@ export function useCreateBallot({
       "zupoll",
       sigHashEnc,
       sigHashEnc,
-      USE_CREATE_BALLOT_REDIRECT ? url + ballotUrl : undefined,
+      USE_CREATE_BALLOT_REDIRECT ? url + ballotUrl : undefined
     );
   }, [
     voterGroupUrl,
@@ -288,7 +288,7 @@ export function useCreateBallot({
     polls,
     onError,
     url,
-    ballotConfig,
+    ballotConfig
   ]);
 
   return { loadingVoterGroupUrl, createBallotPCD };

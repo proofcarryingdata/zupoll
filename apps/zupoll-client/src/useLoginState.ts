@@ -22,7 +22,7 @@ export function loadLoginStateFromLocalStorage(): LoginState | undefined {
 
   return {
     token: savedToken,
-    config: parsedLoginConfig,
+    config: parsedLoginConfig
   };
 }
 
@@ -78,7 +78,7 @@ export function useSavedLoginState(router: NextRouter): SavedLoginState {
     replaceLoginState,
     isLoading,
     logout,
-    definitelyNotLoggedIn,
+    definitelyNotLoggedIn
   };
 }
 

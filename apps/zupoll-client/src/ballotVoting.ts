@@ -10,7 +10,7 @@ import {
   MultiVoteResponse,
   MultiVoteSignal,
   PollWithCounts,
-  VoteSignal,
+  VoteSignal
 } from "./requestTypes";
 import { LoginState, PCDState, ZupollError } from "./types";
 import { openGroupMembershipPopup, removeQueryParameters } from "./util";
@@ -39,7 +39,7 @@ export function useBallotVoting({
   voteFromUrl,
   pcdFromUrl,
   setVoteFromUrl,
-  setPcdFromUrl,
+  setPcdFromUrl
 }: {
   ballotId: string;
   ballotURL: string;
@@ -78,7 +78,7 @@ export function useBallotVoting({
       if (res === undefined) {
         const serverDownError: ZupollError = {
           title: "Voting failed",
-          message: "Server is down. Contact passport@0xparc.org.",
+          message: "Server is down. Contact passport@0xparc.org."
         };
         onError(serverDownError);
         return;
@@ -88,7 +88,7 @@ export function useBallotVoting({
         const resErr = await res.text();
         const err: ZupollError = {
           title: "Voting failed",
-          message: `Server Error: ${resErr}`,
+          message: `Server Error: ${resErr}`
         };
         if (resErr === "User has already voted on this ballot.") {
           err.message = "You have already voted on this ballot!";
@@ -106,7 +106,7 @@ export function useBallotVoting({
       setBallotVotes(ballotId, multiVotesResponse.userVotes);
       refresh(ballotId);
     },
-    [ballotId, loginState.token, onError, refresh, setServerLoading],
+    [ballotId, loginState.token, onError, refresh, setServerLoading]
   );
 
   // process pcdStr and send request
@@ -123,7 +123,7 @@ export function useBallotVoting({
         votes: [],
         ballotURL: ballotURL,
         voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
-        proof: parsedPcd.pcd,
+        proof: parsedPcd.pcd
       };
       voteFromUrl.polls.forEach((poll: PollWithCounts) => {
         const voteIdx = voteFromUrl.pollToVote.get(poll.id);
@@ -138,7 +138,7 @@ export function useBallotVoting({
             voterUuid: null,
             voterCommitment: null,
             voteIdx: voteIdx,
-            proof: parsedPcd.pcd,
+            proof: parsedPcd.pcd
           };
           request.votes.push(vote);
         }
@@ -157,7 +157,7 @@ export function useBallotVoting({
         votes: [],
         ballotURL: ballotURL,
         voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
-        proof: parsedPcd.pcd,
+        proof: parsedPcd.pcd
       };
       polls.forEach((poll: PollWithCounts) => {
         const voteIdx = pollToVote.get(poll.id);
@@ -172,7 +172,7 @@ export function useBallotVoting({
             voterUuid: null,
             voterCommitment: null,
             voteIdx: voteIdx,
-            proof: parsedPcd.pcd,
+            proof: parsedPcd.pcd
           };
           request.votes.push(vote);
         }
@@ -191,14 +191,14 @@ export function useBallotVoting({
     pcdFromUrl,
     submitVote,
     setVoteFromUrl,
-    setPcdFromUrl,
+    setPcdFromUrl
   ]);
 
   const createBallotVotePCD = useCallback(async () => {
     if (pollToVote.size === 0) {
       const emptyBallotError: ZupollError = {
         title: "Empty Ballot",
-        message: "Answer at least one question",
+        message: "Answer at least one question"
       };
       onError(emptyBallotError);
       return;
@@ -206,7 +206,7 @@ export function useBallotVoting({
     pcdState.current = PCDState.AWAITING_PCDSTR;
 
     const multiVoteSignal: MultiVoteSignal = {
-      voteSignals: [],
+      voteSignals: []
     };
 
     polls.forEach((poll: PollWithCounts) => {
@@ -214,7 +214,7 @@ export function useBallotVoting({
       if (voteIdx !== undefined) {
         const voteSignal: VoteSignal = {
           pollId: poll.id,
-          voteIdx: voteIdx,
+          voteIdx: voteIdx
         };
         multiVoteSignal.voteSignals.push(voteSignal);
       }
@@ -237,9 +237,9 @@ export function useBallotVoting({
         ? returnUrl +
             `&vote=${stableStringify({
               pollToVoteJSON: polltoVoteList,
-              polls,
+              polls
             })}`
-        : undefined,
+        : undefined
     );
   }, [
     loginState,
@@ -248,7 +248,7 @@ export function useBallotVoting({
     ballotVoterSemaphoreGroupUrl,
     pollToVote,
     returnUrl,
-    onError,
+    onError
   ]);
 
   return createBallotVotePCD;
@@ -260,7 +260,7 @@ export function votedOn(ballotId: string): boolean {
 
 function getVoted(): Array<string> {
   const voted: Array<string> = JSON.parse(
-    window.localStorage.getItem("voted") || "[]",
+    window.localStorage.getItem("voted") || "[]"
   );
   return voted;
 }

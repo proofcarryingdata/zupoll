@@ -1,1 +1,1 @@
-export const IS_DEPLOYED = process.env.NODE_ENV === "production"
+export const IS_DEPLOYED = process.env.NODE_ENV === "production";
