@@ -164,7 +164,10 @@ export function getVisibleBallotTypesForUser(
       BallotType.DEVCONNECT_FEEDBACK
     ];
   } else if (userAuth === AuthType.EDGE_CITY_RESIDENT) {
-    relevantBallots = [BallotType.EDGE_CITY_STRAWPOLL];
+    relevantBallots = [
+      BallotType.EDGE_CITY_STRAWPOLL,
+      BallotType.EDGE_CITY_FEEDBACK
+    ];
   } else if (userAuth === AuthType.EDGE_CITY_ORGANIZER) {
     relevantBallots = [
       BallotType.EDGE_CITY_STRAWPOLL,
