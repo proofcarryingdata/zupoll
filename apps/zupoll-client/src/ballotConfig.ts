@@ -91,8 +91,8 @@ export const EDGE_CITY_RESIDENT_BALLOT_CONFIG: BallotConfig = {
 };
 
 export const EDGE_CITY_ORGANIZER_BALLOT_CONFIG: BallotConfig = {
-  voterGroupId: EDGE_CITY_ORGANIZER_CONFIG.groupId,
-  voterGroupUrl: EDGE_CITY_ORGANIZER_CONFIG.groupUrl,
+  voterGroupId: EDGE_CITY_RESIDENT_CONFIG.groupId,
+  voterGroupUrl: EDGE_CITY_RESIDENT_CONFIG.groupUrl,
   creatorGroupId: EDGE_CITY_ORGANIZER_CONFIG.groupId,
   creatorGroupUrl: EDGE_CITY_ORGANIZER_CONFIG.groupUrl,
   passportServerUrl: ZUPASS_SERVER_URL,
