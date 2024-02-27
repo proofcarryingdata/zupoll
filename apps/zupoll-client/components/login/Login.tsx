@@ -1,13 +1,13 @@
-import { useZupassPopupMessages } from "@pcd/passport-interface/src/PassportPopup";
+import { useZupassPopupMessages } from "@pcd/passport-interface";
+import stableStringify from "json-stable-stringify";
 import { useEffect, useState } from "react";
 import { login } from "../../src/api";
 import { LoginConfig, LoginState, ZupollError } from "../../src/types";
 import {
   openGroupMembershipPopup,
-  removeQueryParameters,
+  removeQueryParameters
 } from "../../src/util";
 import { Button } from "../core/Button";
-import stableStringify from "json-stable-stringify";
 
 /**
  * Login for the user who belongs to the specified semaphore group.
@@ -22,7 +22,7 @@ export function Login({
   setServerLoading,
   prompt,
   deemphasized,
-  config,
+  config
 }: {
   onLogin: (loginState: LoginState) => void;
   onError: (error: ZupollError) => void;
@@ -71,12 +71,12 @@ export function Login({
         const token = await fetchLoginToken(config, pcdFromUrl || pcdStr);
         onLogin({
           token,
-          config,
+          config
         });
       } catch (err: any) {
         const loginError: ZupollError = {
           title: "Login failed",
-          message: err.message,
+          message: err.message
         };
         onError(loginError);
         removeQueryParameters();
@@ -92,7 +92,7 @@ export function Login({
     onError,
     setServerLoading,
     config,
-    configFromUrl,
+    configFromUrl
   ]);
 
   return (

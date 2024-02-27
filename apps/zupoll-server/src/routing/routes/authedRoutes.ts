@@ -4,7 +4,7 @@ import { ApplicationContext } from "../../types";
 import {
   ACCESS_TOKEN_SECRET,
   authenticateJWT,
-  getVisibleBallotTypesForUser,
+  getVisibleBallotTypesForUser
 } from "../../util/auth";
 import { sendMessage } from "../../util/bot";
 import { prisma } from "../../util/prisma";
@@ -74,13 +74,13 @@ export function initAuthedRoutes(
         AuthType.PCDPASS,
         AuthType.DEVCONNECT_ORGANIZER,
         AuthType.DEVCONNECT_PARTICIPANT,
+        AuthType.EDGE_CITY_RESIDENT,
+        AuthType.EDGE_CITY_ORGANIZER
       ].includes(req.authUserType as any)
     ) {
       res.sendStatus(403);
       return;
     }
-
-    console.log(`BALLOTS`, req.authUserType);
 
     const ballots = await prisma.ballot.findMany({
       select: {
@@ -88,14 +88,14 @@ export function initAuthedRoutes(
         ballotURL: true,
         expiry: true,
         ballotType: true,
-        createdAt: true,
+        createdAt: true
       },
       orderBy: { expiry: "desc" },
       where: {
         ballotType: {
-          in: getVisibleBallotTypesForUser(req.authUserType),
-        },
-      },
+          in: getVisibleBallotTypesForUser(req.authUserType)
+        }
+      }
     });
 
     res.status(200).json({ ballots });
@@ -112,6 +112,8 @@ export function initAuthedRoutes(
           AuthType.PCDPASS,
           AuthType.DEVCONNECT_ORGANIZER,
           AuthType.DEVCONNECT_PARTICIPANT,
+          AuthType.EDGE_CITY_RESIDENT,
+          AuthType.EDGE_CITY_ORGANIZER
         ].includes(req.authUserType as any)
       ) {
         res.sendStatus(403);
@@ -127,8 +129,8 @@ export function initAuthedRoutes(
 
         const ballot = await prisma.ballot.findFirst({
           where: {
-            ballotURL: ballotURL,
-          },
+            ballotURL: ballotURL
+          }
         });
         if (
           ballot &&
@@ -146,16 +148,16 @@ export function initAuthedRoutes(
 
         const polls = await prisma.poll.findMany({
           where: {
-            ballotURL: ballotURL,
+            ballotURL: ballotURL
           },
           include: {
             votes: {
               select: {
-                voteIdx: true,
-              },
-            },
+                voteIdx: true
+              }
+            }
           },
-          orderBy: { expiry: "asc" },
+          orderBy: { expiry: "asc" }
         });
         if (polls === null) {
           throw new Error("Ballot has no polls.");

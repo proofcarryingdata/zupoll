@@ -4,17 +4,16 @@ import { useEffect } from "react";
 import styled from "styled-components";
 import { LoginScreen } from "../components/login/LoginScreen";
 import { MainScreen } from "../components/main/MainScreen";
-import { LoginState } from "../src/types";
+import { LoginConfigurationName, LoginState } from "../src/types";
 import { useSavedLoginState } from "../src/useLoginState";
 import { removeQueryParameters } from "../src/util";
 
-export default function Index() {
+export default function Denver() {
   const router = useRouter();
 
   useEffect(() => {
     // Check if the query parameter exists
     if (router.query.tgWebAppStartParam) {
-      console.log(`got start param`, router.query.tgWebAppStartParam);
       router.push(`/ballot?id=${router.query.tgWebAppStartParam}`);
     }
   }, [router.query.tgWebAppStartParam, router]);
@@ -38,8 +37,11 @@ export default function Index() {
   if (!isLoading && !loginState) {
     content = (
       <LoginScreen
-        title="This app lets Zupass users vote anonymously."
-        visibleLoginOptions={undefined}
+        title="Edge City Denver"
+        visibleLoginOptions={[
+          LoginConfigurationName.EDGE_CITY_RESIDENT,
+          LoginConfigurationName.EDGE_CITY_ORGANIZER
+        ]}
         onLogin={(state: LoginState) => {
           replaceLoginState(state);
           removeQueryParameters();

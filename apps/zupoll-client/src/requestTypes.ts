@@ -41,7 +41,7 @@ export type BallotPollResponse = {
 
 export type BallotResponse = {
   ballots: Ballot[];
-}
+};
 
 export type PollWithCounts = Poll & {
   votes: any[];
@@ -65,4 +65,4 @@ export type VoteSignal = {
 
 export type MultiVoteResponse = {
   userVotes: VoteSignal[];
-}
+};

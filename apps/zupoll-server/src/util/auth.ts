@@ -11,7 +11,7 @@ export const enum SemaphoreGroups {
   ZuzaluOrganizers = "4",
   Everyone = "5",
   DevconnectAttendees = "6",
-  DevconnectOrganizers = "7",
+  DevconnectOrganizers = "7"
 }
 
 export const ACCESS_TOKEN_SECRET = IS_DEPLOYED
@@ -56,6 +56,9 @@ export const ZUZALU_HISTORIC_API_URL = IS_DEPLOYED
 export const PCDPASS_HISTORIC_API_URL = IS_DEPLOYED
   ? process.env.PCDPASS_HISTORIC_API_URL
   : `${BASE_URL}/semaphore/valid-historic/`;
+
+export const EDGE_CITY_RESIDENTS_GROUP_URL = `${process.env.EDGE_CITY_PIPELINE_URL}/${process.env.EDGE_CITY_RESIDENTS_GROUP_ID}`;
+export const EDGE_CITY_ORGANIZERS_GROUP_URL = `${process.env.EDGE_CITY_PIPELINE_URL}/${process.env.EDGE_CITY_ORGANIZERS_GROUP_ID}`;
 
 export interface GroupJwtPayload extends JwtPayload {
   groupUrl: string;
@@ -112,6 +115,20 @@ export const authenticateJWT = (
         req.authUserType = AuthType.DEVCONNECT_PARTICIPANT;
         next();
         return;
+      } else if (
+        EDGE_CITY_RESIDENTS_GROUP_URL &&
+        payload.groupUrl.includes(EDGE_CITY_RESIDENTS_GROUP_URL)
+      ) {
+        req.authUserType = AuthType.EDGE_CITY_RESIDENT;
+        next();
+        return;
+      } else if (
+        EDGE_CITY_ORGANIZERS_GROUP_URL &&
+        payload.groupUrl.includes(EDGE_CITY_ORGANIZERS_GROUP_URL)
+      ) {
+        req.authUserType = AuthType.EDGE_CITY_ORGANIZER;
+        next();
+        return;
       }
 
       return res.sendStatus(403);
@@ -132,19 +149,26 @@ export function getVisibleBallotTypesForUser(
     relevantBallots = [
       BallotType.ADVISORYVOTE,
       BallotType.STRAWPOLL,
-      BallotType.ORGANIZERONLY,
+      BallotType.ORGANIZERONLY
     ];
   } else if (userAuth === AuthType.ZUZALU_PARTICIPANT) {
     relevantBallots = [BallotType.ADVISORYVOTE, BallotType.STRAWPOLL];
   } else if (userAuth === AuthType.DEVCONNECT_PARTICIPANT) {
     relevantBallots = [
       BallotType.DEVCONNECT_STRAWPOLL,
-      BallotType.DEVCONNECT_FEEDBACK,
+      BallotType.DEVCONNECT_FEEDBACK
     ];
   } else if (userAuth === AuthType.DEVCONNECT_ORGANIZER) {
     relevantBallots = [
       BallotType.DEVCONNECT_STRAWPOLL,
-      BallotType.DEVCONNECT_FEEDBACK,
+      BallotType.DEVCONNECT_FEEDBACK
+    ];
+  } else if (userAuth === AuthType.EDGE_CITY_RESIDENT) {
+    relevantBallots = [BallotType.EDGE_CITY_STRAWPOLL];
+  } else if (userAuth === AuthType.EDGE_CITY_ORGANIZER) {
+    relevantBallots = [
+      BallotType.EDGE_CITY_STRAWPOLL,
+      BallotType.EDGE_CITY_FEEDBACK
     ];
   }
 

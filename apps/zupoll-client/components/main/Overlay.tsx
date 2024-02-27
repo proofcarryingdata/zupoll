@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 export function Overlay({
   children,
-  onClose,
+  onClose
 }: {
   children: React.ReactNode;
   onClose: () => void;

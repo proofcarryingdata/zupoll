@@ -1,6 +1,6 @@
+import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Ballot } from "../../src/prismaTypes";
-import { useRouter } from "next/router";
 
 export function BallotItem({ ballot }: { ballot: Ballot }) {
   const isExpired = new Date(ballot.expiry) < new Date();

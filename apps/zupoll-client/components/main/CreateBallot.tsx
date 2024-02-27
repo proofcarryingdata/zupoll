@@ -2,13 +2,16 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { BallotFromUrl, useCreateBallot } from "../../src/createBallot";
+import { BALLOT_TYPE_FROM_LOGIN_CONFIG } from "../../src/env";
 import { BallotType, Poll } from "../../src/prismaTypes";
 import { BallotSignal } from "../../src/requestTypes";
 import {
   LoginConfigurationName,
   LoginState,
-  ZupollError,
+  ZupollError
 } from "../../src/types";
+import { USE_CREATE_BALLOT_REDIRECT } from "../../src/util";
+import { Button } from "../core/Button";
 import {
   FormButtonContainer,
   FormContainer,
@@ -18,16 +21,13 @@ import {
   StyledForm,
   StyledInput,
   StyledLabel,
-  StyledSelect,
+  StyledSelect
 } from "../core/Form";
 import { RippleLoaderLight } from "../core/RippleLoader";
-import { USE_CREATE_BALLOT_REDIRECT } from "../../src/util";
-import { Button } from "../core/Button";
-import { BALLOT_TYPE_FROM_LOGIN_CONFIG } from "../../src/env";
 
 export function CreateBallot({
   onError,
-  loginState,
+  loginState
 }: {
   onError: (err: ZupollError) => void;
   loginState: LoginState;
@@ -39,8 +39,8 @@ export function CreateBallot({
       options: [""],
       ballotURL: 0,
       createdAt: new Date(),
-      expiry: new Date(),
-    },
+      expiry: new Date()
+    }
   ]);
   const router = useRouter();
   const [ballotTitle, setBallotTitle] = useState("");
@@ -122,7 +122,7 @@ export function CreateBallot({
     pcdFromUrl,
     setBallotFromUrl,
     setPcdFromUrl,
-    url: window.location.href, // If exists, will use redirect instead of pop up
+    url: window.location.href // If exists, will use redirect instead of pop up
   });
 
   useEffect(() => {
@@ -215,10 +215,6 @@ export function CreateBallot({
                 </>
               )}
               {loginState.config.name ===
-                LoginConfigurationName.PCDPASS_USER && (
-                <option value={BallotType.PCDPASSUSER}>PCDPass Poll</option>
-              )}
-              {loginState.config.name ===
                 LoginConfigurationName.DEVCONNECT_PARTICIPANT && (
                 <option value={BallotType.DEVCONNECT_STRAW}>
                   Devconnect Community Poll
@@ -232,6 +228,25 @@ export function CreateBallot({
                   </option>
                   <option value={BallotType.DEVCONNECT_ORGANIZER}>
                     Organizer Feedback
+                  </option>
+                </>
+              )}
+              {loginState.config.name ===
+                LoginConfigurationName.EDGE_CITY_RESIDENT && (
+                <>
+                  <option value={BallotType.EDGE_CITY_RESIDENT}>
+                    Edge City Community Poll
+                  </option>
+                </>
+              )}
+              {loginState.config.name ===
+                LoginConfigurationName.EDGE_CITY_ORGANIZER && (
+                <>
+                  <option value={BallotType.EDGE_CITY_RESIDENT}>
+                    Edge City Community Poll
+                  </option>
+                  <option value={BallotType.EDGE_CITY_ORGANIZER}>
+                    Edge City Organizer Feedback
                   </option>
                 </>
               )}
@@ -308,8 +323,8 @@ export function CreateBallot({
                 options: [""],
                 ballotURL: 0,
                 createdAt: new Date(),
-                expiry: new Date(),
-              },
+                expiry: new Date()
+              }
             ])
           }
         >

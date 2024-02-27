@@ -13,7 +13,7 @@ import { Button } from "../core/Button";
  */
 export function CreatePost({
   onError,
-  loginState,
+  loginState
 }: {
   onError: (err: ZupollError) => void;
   loginState: LoginState;
@@ -30,14 +30,14 @@ export function CreatePost({
     if (text === undefined) return;
 
     const request: BotPostRequest = {
-      message: text,
+      message: text
     };
     const res = await botPost(request, loginState.token);
 
     if (res === undefined) {
       const serverDownError: ZupollError = {
         title: "Post failed",
-        message: "Server is down. Contact passport@0xparc.org.",
+        message: "Server is down. Contact passport@0xparc.org."
       };
       onError(serverDownError);
       return;
@@ -48,7 +48,7 @@ export function CreatePost({
       console.error("error posting: ", resErr);
       const err: ZupollError = {
         title: "Posting failed",
-        message: `Server Error: ${resErr}`,
+        message: `Server Error: ${resErr}`
       };
       onError(err);
       return;

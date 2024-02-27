@@ -2,7 +2,7 @@ import { ZUPOLL_SERVER_URL } from "./env";
 import {
   BotPostRequest,
   CreateBallotRequest,
-  MultiVoteRequest,
+  MultiVoteRequest
 } from "./requestTypes";
 import { LoginConfig } from "./types";
 
@@ -21,8 +21,8 @@ export async function createBallot(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
     return await res;
   } catch (e) {
@@ -46,8 +46,8 @@ export async function voteBallot(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
     return await res;
   } catch (e) {
@@ -63,7 +63,7 @@ export async function login(
   const parsedPcd = JSON.parse(decodeURIComponent(pcdStr));
   const request = {
     semaphoreGroupUrl: config.groupUrl,
-    proof: parsedPcd.pcd,
+    proof: parsedPcd.pcd
   };
   const url = `${ZUPOLL_SERVER_URL}login`;
 
@@ -73,8 +73,8 @@ export async function login(
       body: JSON.stringify(request),
       headers: {
         "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+        Accept: "application/json"
+      }
     });
     return await res;
   } catch (e) {
@@ -98,8 +98,8 @@ export async function botPost(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
     return await res;
   } catch (e) {
@@ -117,7 +117,7 @@ export async function listBallots(
 
   try {
     const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: { Authorization: `Bearer ${accessToken}` }
     });
     return await res;
   } catch (e) {
@@ -137,8 +137,8 @@ export async function listBallotPolls(
   try {
     const res = await fetch(url, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
     return await res;
   } catch (e) {
@@ -148,12 +148,8 @@ export async function listBallotPolls(
 }
 
 export async function getLatestSemaphoreGroupHash(
-  groupId: string,
-  serverUrl: string
+  url: string
 ): Promise<string | null> {
-  const url = `${serverUrl}semaphore/latest-root/${encodeURIComponent(
-    groupId
-  )}`;
   const res = await fetch(url);
 
   if (!res.ok) {

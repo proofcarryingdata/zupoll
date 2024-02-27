@@ -12,7 +12,7 @@ import { RouteInitializer } from "./types";
 const routes: RouteInitializer[] = [
   initHealthcheckRoutes,
   initAuthedRoutes,
-  initPCDRoutes,
+  initPCDRoutes
 ];
 
 export async function startServer(
@@ -31,7 +31,7 @@ export async function startServer(
     app.use(
       cors({
         origin: "*",
-        methods: ["GET", "POST", "PUT", "DELETE"],
+        methods: ["GET", "POST", "PUT", "DELETE"]
       })
     );
 
@@ -51,7 +51,7 @@ export async function startServer(
       const localEndpoint = `https://dev.local:${port}`;
       const httpsOptions = {
         key: fs.readFileSync("../certificates/dev.local-key.pem"),
-        cert: fs.readFileSync("../certificates/dev.local.pem"),
+        cert: fs.readFileSync("../certificates/dev.local.pem")
       };
 
       const server = https.createServer(httpsOptions, app).listen(port, () => {

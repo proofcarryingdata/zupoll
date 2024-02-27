@@ -1,33 +1,68 @@
+import _ from "lodash";
 import { useState } from "react";
 import styled from "styled-components";
 import {
   DEVCONNECT_ORGANIZER_CONFIG,
   DEVCONNECT_USER_CONFIG,
+  EDGE_CITY_ORGANIZER_CONFIG,
+  EDGE_CITY_RESIDENT_CONFIG,
   ZUZALU_ORGANIZER_LOGIN_CONFIG,
-  ZUZALU_PARTICIPANT_LOGIN_CONFIG,
+  ZUZALU_PARTICIPANT_LOGIN_CONFIG
 } from "../../src/loginConfig";
-import { LoginState, ZupollError } from "../../src/types";
+import {
+  LoginConfigurationName,
+  LoginState,
+  ZupollError
+} from "../../src/types";
 import { Center } from "../core";
 import { LoggedOutHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "../main/ErrorOverlay";
 import { Login } from "./Login";
 
+const allLoginConfigs = [
+  EDGE_CITY_RESIDENT_CONFIG,
+  EDGE_CITY_ORGANIZER_CONFIG,
+  ZUZALU_PARTICIPANT_LOGIN_CONFIG,
+  ZUZALU_ORGANIZER_LOGIN_CONFIG,
+  DEVCONNECT_USER_CONFIG,
+  DEVCONNECT_ORGANIZER_CONFIG
+];
+
 export function LoginScreen({
   onLogin,
+  title = "This app lets Zupass users vote anonymously.",
+  // visibleLoginOptions is a set of login config names to show here
+  // this supports creating login pages for specific events which only show
+  // some login options.
+  // if the array is empty, all options are shown.
+  visibleLoginOptions
 }: {
   onLogin: (loginState: LoginState) => void;
+  title: string;
+  visibleLoginOptions: LoginConfigurationName[] | undefined;
 }) {
   const [serverLoading, setServerLoading] = useState<boolean>(false);
   const [error, setError] = useState<ZupollError>();
-
+  const loginConfigSet = new Set(visibleLoginOptions);
+  const visibleLoginRows =
+    visibleLoginOptions === undefined
+      ? allLoginConfigs
+      : allLoginConfigs.filter(
+          // If loginConfigSet is zero include everything, otherwise check for
+          // inclusion
+          (config) =>
+            loginConfigSet.size === 0 || loginConfigSet.has(config.name)
+        );
+  // Chunk the login options into rows of two options
+  const loginRows = _.chunk(visibleLoginRows, 2);
   return (
     <Center>
       <LoggedOutHeader />
       <Body>
         <Description>
           <p>
-            <strong>This app lets Zupass users vote anonymously.</strong>
+            <strong>{title}</strong>
           </p>
           <p>
             The server never learns who you are. From Zupass, you create a
@@ -38,51 +73,40 @@ export function LoginScreen({
             <strong>Choose a group to get started </strong>
           </p>
         </Description>
-        <LoginRow>
-          {serverLoading ? (
-            <RippleLoader />
-          ) : (
-            <>
-              <Login
-                onLogin={onLogin}
-                onError={setError}
-                setServerLoading={setServerLoading}
-                config={ZUZALU_PARTICIPANT_LOGIN_CONFIG}
-                prompt="ZuConnect Resident"
-              />
-              <Login
-                onLogin={onLogin}
-                onError={setError}
-                setServerLoading={setServerLoading}
-                config={ZUZALU_ORGANIZER_LOGIN_CONFIG}
-                prompt="ZuConnect Organizer"
-              />
-            </>
-          )}
-        </LoginRow>
-        <br></br>
-        <LoginRow>
-          {serverLoading ? (
-            <RippleLoader />
-          ) : (
-            <>
-              <Login
-                onLogin={onLogin}
-                onError={setError}
-                setServerLoading={setServerLoading}
-                config={DEVCONNECT_USER_CONFIG}
-                prompt="Devconnect Resident"
-              />
-              <Login
-                onLogin={onLogin}
-                onError={setError}
-                setServerLoading={setServerLoading}
-                config={DEVCONNECT_ORGANIZER_CONFIG}
-                prompt="Devconnect Organizer"
-              />
-            </>
-          )}
-        </LoginRow>
+        <>
+          {loginRows.map(([a, b], idx) => {
+            return (
+              <div key={idx}>
+                <LoginRow>
+                  {serverLoading ? (
+                    <RippleLoader />
+                  ) : (
+                    <Login
+                      onLogin={onLogin}
+                      onError={setError}
+                      setServerLoading={setServerLoading}
+                      config={a}
+                      prompt={a.prompt}
+                    />
+                  )}
+                  {b &&
+                    (serverLoading ? (
+                      <RippleLoader />
+                    ) : (
+                      <Login
+                        onLogin={onLogin}
+                        onError={setError}
+                        setServerLoading={setServerLoading}
+                        config={b}
+                        prompt={b.prompt}
+                      />
+                    ))}
+                </LoginRow>
+                <br />
+              </div>
+            );
+          })}
+        </>
       </Body>
 
       {error && (

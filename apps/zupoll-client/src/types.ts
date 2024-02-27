@@ -12,7 +12,7 @@ export type ZupollError = {
 export enum PCDState {
   DEFAULT,
   AWAITING_PCDSTR,
-  RECEIVED_PCDSTR,
+  RECEIVED_PCDSTR
 }
 
 export enum LoginConfigurationName {
@@ -21,6 +21,8 @@ export enum LoginConfigurationName {
   PCDPASS_USER = "PCDPASS_USER",
   DEVCONNECT_PARTICIPANT = "DEVCONNECT_PARTICIPANT",
   DEVCONNECT_ORGANIZER = "DEVCONNECT_ORGANIZER",
+  EDGE_CITY_RESIDENT = "EDGE_CITY_RESIDENT",
+  EDGE_CITY_ORGANIZER = "EDGE_CITY_ORGANIZER"
 }
 
 export interface BallotConfig {
@@ -31,6 +33,8 @@ export interface BallotConfig {
   passportServerUrl: string;
   passportAppUrl: string;
   ballotType: BallotType;
+  latestGroupHashUrl?: string;
+  makeHistoricalGroupUrl?: (hash: string) => string;
 }
 
 export interface LoginConfig {
@@ -39,6 +43,7 @@ export interface LoginConfig {
   passportServerUrl: string;
   passportAppUrl: string;
   name: LoginConfigurationName;
+  prompt: string;
 }
 
 export interface LoginState {

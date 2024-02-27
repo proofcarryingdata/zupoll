@@ -1,26 +1,27 @@
 import {
   SemaphoreGroupPCDPackage,
-  SerializedSemaphoreGroup,
+  SerializedSemaphoreGroup
 } from "@pcd/semaphore-group-pcd";
 import { SemaphoreSignaturePCDPackage } from "@pcd/semaphore-signature-pcd";
+import { generateSnarkMessageHash } from "@pcd/util";
 import {
   ADMIN_GROUP_ID,
+  DEVCONNECT_ORGANIZERS_GROUP_URL,
+  DEVCONNECT_PARTICIPANTS_GROUP_URL,
   PARTICIPANTS_GROUP_ID,
   PCDPASS_GROUP_ID,
   PCDPASS_HISTORIC_API_URL,
   PCDPASS_USERS_GROUP_URL,
+  SemaphoreGroups,
   ZUZALU_HISTORIC_API_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
-  ZUZALU_PARTICIPANTS_GROUP_URL,
-  DEVCONNECT_ORGANIZERS_GROUP_URL,
-  DEVCONNECT_PARTICIPANTS_GROUP_URL,
-  SemaphoreGroups,
+  ZUZALU_PARTICIPANTS_GROUP_URL
 } from "./auth";
-import { generateSnarkMessageHash } from "@pcd/util";
 
 const residentRootCache = new Set<string>();
 const organizerRootCache = new Set<string>();
 const pcdpassUserRootCache = new Set<string>();
+const genericIssuanceRootCache = new Set<string>();
 
 // Returns nullfier or throws error.
 export async function verifyGroupProof(
@@ -146,9 +147,20 @@ export async function verifyGroupProof(
       }
     }
   } else {
-    throw new Error(
-      "No allowed roots specified and group is neither the organizer or resident group."
-    );
+    if (!genericIssuanceRootCache.has(pcd.claim.merkleRoot)) {
+      const validRoot = await verifyGenericIssuanceRootValidity(
+        semaphoreGroupUrl,
+        pcd.claim.merkleRoot
+      );
+
+      if (validRoot) {
+        genericIssuanceRootCache.add(pcd.claim.merkleRoot);
+      } else {
+        throw new Error(
+          "No allowed roots specified and group is neither the organizer or resident group."
+        );
+      }
+    }
   }
 
   return pcd.claim.nullifierHash;
@@ -199,6 +211,16 @@ async function verifyRootValidity(
   historicAPI: string
 ): Promise<boolean> {
   const url = historicAPI + groupId + "/" + root;
+  const response = await fetch(url);
+  const result = await response.json();
+  return result.valid;
+}
+
+async function verifyGenericIssuanceRootValidity(
+  baseUrl: string,
+  root: string
+): Promise<boolean> {
+  const url = baseUrl + "/valid/" + root;
   const response = await fetch(url);
   const result = await response.json();
   return result.valid;

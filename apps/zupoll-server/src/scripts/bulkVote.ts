@@ -1,9 +1,9 @@
 /* eslint-disable */
 import { PrismaClient, UserType, Vote } from "@prisma/client";
+import fs from "fs";
 import { LoginRequest } from "src/routing/routes/authedRoutes";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import fs from "fs";
 
 interface Login {
   proof: { pcd: string };
@@ -25,7 +25,7 @@ export interface LoginConfig {
 }
 
 const prisma = new PrismaClient({
-  datasources: { db: { url: process.env.STAGING_DATABASE_URL } },
+  datasources: { db: { url: process.env.STAGING_DATABASE_URL } }
 });
 
 const ZUPOLL_SERVER_URL = "https://api-staging.zupoll.org/";
@@ -39,7 +39,7 @@ const loadLoginFile = () => {
   if (data) {
     const login: LoginRequest = {
       semaphoreGroupUrl: data.config.groupUrl,
-      proof: data.proof.pcd,
+      proof: data.proof.pcd
     };
     return login;
   } else {
@@ -53,7 +53,7 @@ const loadVoteFile = () => {
   if (data) {
     const vote = {
       polls: data.vote.polls,
-      pollToVote: new Map(data.vote.pollToVoteJSON),
+      pollToVote: new Map(data.vote.pollToVoteJSON)
     };
     return { vote, pcd: data.proof.pcd };
   } else {
@@ -71,7 +71,7 @@ const vote = async (ballotURL: string, accessToken: string) => {
     votes: [],
     ballotURL: ballotURL,
     voterSemaphoreGroupUrl: ballotVoterSemaphoreGroupUrl,
-    proof: pcd,
+    proof: pcd
   };
   vote.polls.forEach((poll: any) => {
     const voteIdx = vote.pollToVote.get(poll.id);
@@ -87,7 +87,7 @@ const vote = async (ballotURL: string, accessToken: string) => {
         voterCommitment: null,
         // @ts-expect-error number type
         voteIdx: voteIdx,
-        proof: pcd,
+        proof: pcd
       };
       request.votes.push(vote);
     }
@@ -99,8 +99,8 @@ const vote = async (ballotURL: string, accessToken: string) => {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
+      Authorization: `Bearer ${accessToken}`
+    }
   });
   console.log(`vote res`, res.status);
   return res;
@@ -116,8 +116,8 @@ const login = async () => {
     body: JSON.stringify(loginReq),
     headers: {
       "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+      Accept: "application/json"
+    }
   });
   const data = await res.json();
   const token = data.accessToken as string;
@@ -185,7 +185,7 @@ yargs(hideBin(process.argv))
 
       const ballotURL = parseInt(argv.url as string);
       const ballot = await prisma.ballot.findFirst({
-        where: { ballotURL },
+        where: { ballotURL }
       });
       if (ballot) {
         console.log(`[GOT BALLOT]`, ballot.ballotTitle);

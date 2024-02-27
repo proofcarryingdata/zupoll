@@ -4,9 +4,10 @@ import {
   MessageType,
   Poll,
   UserType,
-  Vote,
+  Vote
 } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
+import { InlineKeyboard } from "grammy";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
 import { ApplicationContext } from "../../types";
@@ -14,21 +15,22 @@ import {
   authenticateJWT,
   DEVCONNECT_ORGANIZERS_GROUP_URL,
   DEVCONNECT_PARTICIPANTS_GROUP_URL,
+  EDGE_CITY_ORGANIZERS_GROUP_URL,
+  EDGE_CITY_RESIDENTS_GROUP_URL,
   getVisibleBallotTypesForUser,
   PCDPASS_USERS_GROUP_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
-  ZUZALU_PARTICIPANTS_GROUP_URL,
+  ZUZALU_PARTICIPANTS_GROUP_URL
 } from "../../util/auth";
 import {
   formatPollCreated,
   generatePollHTML,
   PollWithVotes,
-  sendMessageV2,
+  sendMessageV2
 } from "../../util/bot";
 import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
-import { InlineKeyboard } from "grammy";
 
 /**
  * The endpoints in this function accepts proof (PCD) in the request. It verifies
@@ -47,8 +49,8 @@ export function initPCDRoutes(
 
       const prevBallot = await prisma.ballot.findUnique({
         where: {
-          ballotURL: request.ballot.ballotURL,
-        },
+          ballotURL: request.ballot.ballotURL
+        }
       });
 
       if (prevBallot !== null) {
@@ -86,13 +88,13 @@ export function initPCDRoutes(
         ballotType: request.ballot.ballotType,
         expiry: request.ballot.expiry,
         voterSemaphoreGroupUrls: request.ballot.voterSemaphoreGroupUrls,
-        voterSemaphoreGroupRoots: request.ballot.voterSemaphoreGroupRoots,
+        voterSemaphoreGroupRoots: request.ballot.voterSemaphoreGroupRoots
       };
 
       request.polls.forEach((poll: Poll) => {
         const pollSignal: PollSignal = {
           body: poll.body,
-          options: poll.options,
+          options: poll.options
         };
         ballotSignal.pollSignals.push(pollSignal);
       });
@@ -103,22 +105,30 @@ export function initPCDRoutes(
       try {
         if (request.ballot.pollsterType == UserType.ANON) {
           let groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
-          if (request.ballot.ballotType === BallotType.ADVISORYVOTE) {
-            groupUrl = ZUZALU_ORGANIZERS_GROUP_URL;
-          } else if (request.ballot.ballotType === BallotType.ORGANIZERONLY) {
-            groupUrl = ZUZALU_ORGANIZERS_GROUP_URL;
-          } else if (request.ballot.ballotType === BallotType.STRAWPOLL) {
-            groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
-          } else if (request.ballot.ballotType === BallotType.PCDPASSUSER) {
-            groupUrl = PCDPASS_USERS_GROUP_URL;
-          } else if (
-            request.ballot.ballotType === BallotType.DEVCONNECT_STRAWPOLL
-          ) {
-            groupUrl = DEVCONNECT_PARTICIPANTS_GROUP_URL;
-          } else if (
-            request.ballot.ballotType === BallotType.DEVCONNECT_FEEDBACK
-          ) {
-            groupUrl = DEVCONNECT_ORGANIZERS_GROUP_URL;
+
+          switch (request.ballot.ballotType) {
+            case BallotType.ADVISORYVOTE:
+            case BallotType.ORGANIZERONLY:
+              groupUrl = ZUZALU_ORGANIZERS_GROUP_URL;
+              break;
+            case BallotType.STRAWPOLL:
+              groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
+              break;
+            case BallotType.PCDPASSUSER:
+              groupUrl = PCDPASS_USERS_GROUP_URL;
+              break;
+            case BallotType.DEVCONNECT_STRAWPOLL:
+              groupUrl = DEVCONNECT_PARTICIPANTS_GROUP_URL;
+              break;
+            case BallotType.DEVCONNECT_FEEDBACK:
+              groupUrl = DEVCONNECT_ORGANIZERS_GROUP_URL;
+              break;
+            case BallotType.EDGE_CITY_STRAWPOLL:
+              groupUrl = EDGE_CITY_RESIDENTS_GROUP_URL;
+              break;
+            case BallotType.EDGE_CITY_FEEDBACK:
+              groupUrl = EDGE_CITY_ORGANIZERS_GROUP_URL;
+              break;
           }
 
           // pollsterSemaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
@@ -129,7 +139,7 @@ export function initPCDRoutes(
             {
               signal: signalHash,
               allowedGroups: [groupUrl!],
-              claimedExtNullifier: signalHash,
+              claimedExtNullifier: signalHash
             }
           );
 
@@ -147,8 +157,8 @@ export function initPCDRoutes(
                 request.ballot.pollsterSemaphoreGroupUrl,
               voterSemaphoreGroupRoots: request.ballot.voterSemaphoreGroupRoots,
               voterSemaphoreGroupUrls: request.ballot.voterSemaphoreGroupUrls,
-              ballotType: request.ballot.ballotType,
-            },
+              ballotType: request.ballot.ballotType
+            }
           });
 
           await Promise.all(
@@ -162,8 +172,8 @@ export function initPCDRoutes(
                   body: poll.body,
                   options: poll.options,
                   ballotURL: newBallot.ballotURL,
-                  expiry: request.ballot.expiry,
-                },
+                  expiry: request.ballot.expiry
+                }
               });
             })
           );
@@ -188,15 +198,15 @@ export function initPCDRoutes(
                     chatId: msg.chat.id,
                     topicId: msg.message_thread_id,
                     ballotId: newBallot.ballotId,
-                    messageType: MessageType.CREATE,
-                  },
+                    messageType: MessageType.CREATE
+                  }
                 });
               }
             }
           }
 
           res.json({
-            url: newBallot.ballotURL,
+            url: newBallot.ballotURL
           });
         } else {
           throw new Error("Unknown pollster type.");
@@ -216,7 +226,7 @@ export function initPCDRoutes(
 
       const votePollIds = new Set<string>();
       const multiVoteSignal: MultiVoteSignal = {
-        voteSignals: [],
+        voteSignals: []
       };
       for (const vote of request.votes) {
         // To confirm there is at most one vote per poll
@@ -228,7 +238,7 @@ export function initPCDRoutes(
 
         const voteSignal: VoteSignal = {
           pollId: vote.pollId,
-          voteIdx: vote.voteIdx,
+          voteIdx: vote.voteIdx
         };
         multiVoteSignal.voteSignals.push(voteSignal);
       }
@@ -240,8 +250,8 @@ export function initPCDRoutes(
         for (const vote of request.votes) {
           const poll = await prisma.poll.findUnique({
             where: {
-              id: vote.pollId,
-            },
+              id: vote.pollId
+            }
           });
 
           if (poll === null) {
@@ -269,9 +279,9 @@ export function initPCDRoutes(
           where: {
             ballotURL: ballotURL,
             ballotType: {
-              in: getVisibleBallotTypesForUser(req.authUserType),
-            },
-          },
+              in: getVisibleBallotTypesForUser(req.authUserType)
+            }
+          }
         });
 
         if (ballot === null) {
@@ -288,14 +298,14 @@ export function initPCDRoutes(
             signal: signalHash,
             allowedGroups: ballot.voterSemaphoreGroupUrls,
             allowedRoots: ballot.voterSemaphoreGroupRoots,
-            claimedExtNullifier: ballot.ballotId.toString(),
+            claimedExtNullifier: ballot.ballotId.toString()
           }
         );
 
         const previousBallotVote = await prisma.vote.findFirst({
           where: {
-            voterNullifier: nullifier,
-          },
+            voterNullifier: nullifier
+          }
         });
         if (previousBallotVote !== null) {
           // This error string is used in the frontend to determine whether to
@@ -313,34 +323,34 @@ export function initPCDRoutes(
               voterNullifier: nullifier,
               voterSemaphoreGroupUrl: request.voterSemaphoreGroupUrl,
               voteIdx: vote.voteIdx,
-              proof: request.proof,
-            },
+              proof: request.proof
+            }
           });
 
           const poll = await prisma.poll.findUnique({
             where: {
-              id: vote.pollId,
+              id: vote.pollId
             },
-            include: { votes: true },
+            include: { votes: true }
           });
           if (poll) allVotes.push(poll);
         }
 
         const multiVoteResponse: MultiVoteResponse = {
-          userVotes: multiVoteSignal.voteSignals,
+          userVotes: multiVoteSignal.voteSignals
         };
 
         const originalBallotMsg = await prisma.tGMessage.findMany({
           where: {
             ballotId: ballot.ballotId,
-            messageType: MessageType.CREATE,
-          },
+            messageType: MessageType.CREATE
+          }
         });
         const voteBallotMsg = await prisma.tGMessage.findMany({
           where: {
             ballotId: ballot.ballotId,
-            messageType: MessageType.RESULTS,
-          },
+            messageType: MessageType.RESULTS
+          }
         });
         if (voteBallotMsg?.length > 0) {
           for (const voteMsg of voteBallotMsg) {
@@ -355,7 +365,7 @@ export function initPCDRoutes(
                   reply_markup: new InlineKeyboard().url(
                     `See more / Vote`,
                     `${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}`
-                  ),
+                  )
                 }
               );
               if (msg) console.log(`Edited vote msg`);
@@ -378,7 +388,7 @@ export function initPCDRoutes(
                 reply_markup: new InlineKeyboard().url(
                   `See more / Vote`,
                   `${process.env.BOT_ZUPOLL_LINK}?startapp=${ballot.ballotURL}`
-                ),
+                )
               }
             );
             if (msg) {
@@ -388,8 +398,8 @@ export function initPCDRoutes(
                 data: {
                   ...resultsMsg,
                   messageId: msg.message_id,
-                  messageType: MessageType.RESULTS,
-                },
+                  messageType: MessageType.RESULTS
+                }
               });
               console.log(`Updated DB with RESULTS`);
             }

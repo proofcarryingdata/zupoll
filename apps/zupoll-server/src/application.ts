@@ -7,7 +7,7 @@ const services: ServiceInitializer[] = [startServer];
 
 export async function startApplication() {
   const context: ApplicationContext = {
-    bot: undefined,
+    bot: undefined
   };
 
   startBot(context).catch((e) => {

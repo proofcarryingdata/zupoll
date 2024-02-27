@@ -7,17 +7,17 @@ import { BallotResponse } from "../../src/requestTypes";
 import {
   LoginConfigurationName,
   LoginState,
-  ZupollError,
+  ZupollError
 } from "../../src/types";
 import { Center } from "../core";
 import { MainScreenHeader } from "../core/Headers";
 import { RippleLoader } from "../core/RippleLoader";
-import { ErrorOverlay } from "./ErrorOverlay";
 import { BallotList } from "./BallotList";
+import { ErrorOverlay } from "./ErrorOverlay";
 
 export function MainScreen({
   loginState,
-  logout,
+  logout
 }: {
   loginState: LoginState;
   logout: () => void;
@@ -35,7 +35,7 @@ export function MainScreen({
       if (res === undefined) {
         const serverDownError: ZupollError = {
           title: "Retrieving polls failed",
-          message: "Server is down. Contact passport@0xparc.org.",
+          message: "Server is down. Contact passport@0xparc.org."
         };
         setError(serverDownError);
         return;
@@ -51,7 +51,7 @@ export function MainScreen({
         console.error("error posting vote to the server: ", resErr);
         const err: ZupollError = {
           title: "Voting failed",
-          message: `Server Error: ${resErr}`,
+          message: `Server Error: ${resErr}`
         };
         setError(err);
         return;
@@ -182,6 +182,46 @@ export function MainScreen({
             <BallotList
               ballots={ballots}
               filter={BallotType.DEVCONNECT_STRAW}
+            />
+          )}
+        </BallotListContainer>
+      )}
+
+      {(loginState.config.name === LoginConfigurationName.EDGE_CITY_ORGANIZER ||
+        loginState.config.name ===
+          LoginConfigurationName.EDGE_CITY_RESIDENT) && (
+        <BallotListContainer>
+          <TitleContainer>
+            <H1>Community Polls</H1>
+            <p>Ballots created by Edge City attendees.</p>
+          </TitleContainer>
+
+          {loadingBallots || ballots === undefined ? (
+            <RippleLoader />
+          ) : (
+            <BallotList
+              ballots={ballots}
+              filter={BallotType.EDGE_CITY_RESIDENT}
+            />
+          )}
+        </BallotListContainer>
+      )}
+
+      {(loginState.config.name === LoginConfigurationName.EDGE_CITY_ORGANIZER ||
+        loginState.config.name ===
+          LoginConfigurationName.EDGE_CITY_RESIDENT) && (
+        <BallotListContainer>
+          <TitleContainer>
+            <H1>Organizer Feedback</H1>
+            <p>Ballots created by Edge City organizers.</p>
+          </TitleContainer>
+
+          {loadingBallots || ballots === undefined ? (
+            <RippleLoader />
+          ) : (
+            <BallotList
+              ballots={ballots}
+              filter={BallotType.EDGE_CITY_ORGANIZER}
             />
           )}
         </BallotListContainer>
