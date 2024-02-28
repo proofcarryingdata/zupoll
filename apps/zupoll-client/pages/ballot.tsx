@@ -12,9 +12,9 @@ export default function BallotPage() {
 
   useEffect(() => {
     if (definitelyNotLoggedIn) {
-      logout();
+      logout(ballotURL ?? undefined);
     }
-  }, [definitelyNotLoggedIn, logout]);
+  }, [ballotURL, definitelyNotLoggedIn, logout]);
 
   useEffect(() => {
     if (router.isReady) {

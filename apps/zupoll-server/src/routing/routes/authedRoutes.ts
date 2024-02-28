@@ -1,3 +1,4 @@
+import { BallotType } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import { ApplicationContext } from "../../types";
@@ -176,6 +177,37 @@ export function initAuthedRoutes(
         console.error(e);
         next(e);
       }
+    }
+  );
+
+  /**
+   * When the client app wants to log the user (back) in, it has to redirect
+   * the user to a login page. We want this to vary depending on the type of
+   * ballot the user was attempting to interact with. The client doesn't have
+   * enough information to do this, so here we have a route for the client to
+   * ask the server where to redirect to in order to log in.
+   */
+  app.get(
+    "/login-redirect",
+    async (req: Request, res: Response, next: NextFunction) => {
+      const ballotURL = req.query.ballotURL?.toString();
+      console.log(ballotURL);
+      if (ballotURL) {
+        const ballot = await prisma.ballot.findFirst({
+          where: {
+            ballotURL: parseInt(ballotURL)
+          }
+        });
+        if (
+          ballot?.ballotType === BallotType.EDGE_CITY_FEEDBACK ||
+          ballot?.ballotType === BallotType.EDGE_CITY_STRAWPOLL
+        ) {
+          res.status(200).json({ url: "/denver" });
+          return;
+        }
+      }
+
+      res.status(200).json({ url: "/" });
     }
   );
 }

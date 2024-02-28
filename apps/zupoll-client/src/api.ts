@@ -167,3 +167,16 @@ export function getHistoricGroupUrl(
 ): string {
   return `${serverUrl}semaphore/historic/${groupId}/${rootHash}`;
 }
+
+export async function getLoginRedirectUrl(ballotURL: string): Promise<string> {
+  const url = `${ZUPOLL_SERVER_URL}login-redirect?ballotURL=${ballotURL}`;
+
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+    return json.url ?? "/";
+  } catch (e) {
+    console.log(e);
+    return "/";
+  }
+}
