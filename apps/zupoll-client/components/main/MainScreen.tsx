@@ -210,21 +210,28 @@ export function MainScreen({
       {(loginState.config.name === LoginConfigurationName.EDGE_CITY_ORGANIZER ||
         loginState.config.name ===
           LoginConfigurationName.EDGE_CITY_RESIDENT) && (
-        <BallotListContainer>
-          <TitleContainer>
-            <H1>Organizer Feedback</H1>
-            <p>Ballots created by Edge City organizers.</p>
-          </TitleContainer>
-
+        <>
           {loadingBallots || ballots === undefined ? (
             <RippleLoader />
           ) : (
-            <BallotList
-              ballots={ballots}
-              filter={BallotType.EDGE_CITY_ORGANIZER}
-            />
+            <>
+              {ballots.filter(
+                (ballot) => ballot.ballotType === BallotType.EDGE_CITY_ORGANIZER
+              ).length > 0 && (
+                <BallotListContainer>
+                  <TitleContainer>
+                    <H1>Organizer Feedback</H1>
+                    <p>Ballots created by Edge City organizers.</p>
+                  </TitleContainer>
+                  <BallotList
+                    ballots={ballots}
+                    filter={BallotType.EDGE_CITY_ORGANIZER}
+                  />
+                </BallotListContainer>
+              )}
+            </>
           )}
-        </BallotListContainer>
+        </>
       )}
 
       {error && (
