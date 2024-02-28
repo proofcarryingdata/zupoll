@@ -168,6 +168,13 @@ export function getHistoricGroupUrl(
   return `${serverUrl}semaphore/historic/${groupId}/${rootHash}`;
 }
 
+/**
+ * When attempting to interact with a ballot, the user may be in an invalid
+ * login state. In that case, they need to be redirected to a login landing
+ * page. This page varies depending on the ballot type, which might not be
+ * known to the client. In this case, we can request that the server tell us
+ * which URL to direct the user to.
+ */
 export async function getLoginRedirectUrl(ballotURL: string): Promise<string> {
   const url = `${ZUPOLL_SERVER_URL}login-redirect?ballotURL=${ballotURL}`;
 

@@ -68,9 +68,11 @@ export function useSavedLoginState(router: NextRouter): SavedLoginState {
     (ballotURL?: string) => {
       replaceLoginState(undefined);
       (async () => {
+        // If we have a ballot URL, try to find the ballot-specific redirect
         const redirectUrl = ballotURL
           ? await getLoginRedirectUrl(ballotURL)
-          : "/";
+          : // Otherwise redirect to the regular login page
+            "/";
         router.push(redirectUrl);
       })();
       delete localStorage.preLoginRoute;
