@@ -187,29 +187,26 @@ export function initAuthedRoutes(
    * enough information to do this, so here we have a route for the client to
    * ask the server where to redirect to in order to log in.
    */
-  app.get(
-    "/login-redirect",
-    async (req: Request, res: Response, next: NextFunction) => {
-      const ballotURL = req.query.ballotURL?.toString();
-      console.log(ballotURL);
-      if (ballotURL) {
-        const ballot = await prisma.ballot.findFirst({
-          where: {
-            ballotURL: parseInt(ballotURL)
-          }
-        });
-        if (
-          ballot?.ballotType === BallotType.EDGE_CITY_FEEDBACK ||
-          ballot?.ballotType === BallotType.EDGE_CITY_STRAWPOLL
-        ) {
-          res.status(200).json({ url: "/denver" });
-          return;
+  app.get("/login-redirect", async (req: Request, res: Response) => {
+    const ballotURL = req.query.ballotURL?.toString();
+    console.log(ballotURL);
+    if (ballotURL) {
+      const ballot = await prisma.ballot.findFirst({
+        where: {
+          ballotURL: parseInt(ballotURL)
         }
+      });
+      if (
+        ballot?.ballotType === BallotType.EDGE_CITY_FEEDBACK ||
+        ballot?.ballotType === BallotType.EDGE_CITY_STRAWPOLL
+      ) {
+        res.status(200).json({ url: "/denver" });
+        return;
       }
-
-      res.status(200).json({ url: "/" });
     }
-  );
+
+    res.status(200).json({ url: "/" });
+  });
 }
 
 export type BotPostRequest = {
