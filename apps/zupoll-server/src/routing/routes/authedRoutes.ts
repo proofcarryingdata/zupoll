@@ -189,7 +189,6 @@ export function initAuthedRoutes(
    */
   app.get("/login-redirect", async (req: Request, res: Response) => {
     const ballotURL = req.query.ballotURL?.toString();
-    console.log(ballotURL);
     if (ballotURL) {
       const ballot = await prisma.ballot.findFirst({
         where: {
