@@ -1,5 +1,6 @@
 import { NextRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { getLoginRedirectUrl } from "./api";
 import { LoginConfig, LoginState } from "./types";
 
 const ACCESS_TOKEN_KEY = "access_token";
@@ -63,11 +64,21 @@ export function useSavedLoginState(router: NextRouter): SavedLoginState {
     saveLoginStateToLocalStorage(state);
   }, []);
 
-  const logout = useCallback(() => {
-    replaceLoginState(undefined);
-    router.push("/");
-    delete localStorage.preLoginRoute;
-  }, [replaceLoginState, router]);
+  const logout = useCallback(
+    (ballotURL?: string) => {
+      replaceLoginState(undefined);
+      (async () => {
+        // If we have a ballot URL, try to find the ballot-specific redirect
+        const redirectUrl = ballotURL
+          ? await getLoginRedirectUrl(ballotURL)
+          : // Otherwise redirect to the regular login page
+            "/";
+        router.push(redirectUrl);
+      })();
+      delete localStorage.preLoginRoute;
+    },
+    [replaceLoginState, router]
+  );
 
   const definitelyNotLoggedIn = useMemo(() => {
     return !loginState && !isLoading;
@@ -87,5 +98,5 @@ export interface SavedLoginState {
   isLoading: boolean;
   definitelyNotLoggedIn: boolean;
   replaceLoginState: (state: LoginState | undefined) => void;
-  logout: () => void;
+  logout: (ballotURL?: string) => void;
 }

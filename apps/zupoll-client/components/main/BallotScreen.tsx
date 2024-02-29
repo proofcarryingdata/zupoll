@@ -27,7 +27,7 @@ export function BallotScreen({
 }: {
   ballotURL: string;
   loginState: LoginState;
-  logout: () => void;
+  logout: (ballotURL?: string) => void;
 }) {
   const router = useRouter();
   const [error, setError] = useState<ZupollError>();
@@ -67,7 +67,7 @@ export function BallotScreen({
       }
 
       if (res.status === 403) {
-        logout();
+        logout(ballotURL);
         return;
       }
 
