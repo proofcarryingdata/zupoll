@@ -12,7 +12,9 @@ import {
 } from "./env";
 import {
   EDGE_CITY_ORGANIZER_CONFIG,
-  EDGE_CITY_RESIDENT_CONFIG
+  EDGE_CITY_RESIDENT_CONFIG,
+  ETH_LATAM_ATTENDEE_CONFIG,
+  ETH_LATAM_ORGANIZER_CONFIG
 } from "./loginConfig";
 import { BallotType } from "./prismaTypes";
 import { BallotConfig } from "./types";
@@ -103,6 +105,32 @@ export const EDGE_CITY_ORGANIZER_BALLOT_CONFIG: BallotConfig = {
     EDGE_CITY_ORGANIZER_CONFIG.groupUrl + "/" + hash
 };
 
+export const ETH_LATAM_STRAWPOLL_BALLOT_CONFIG: BallotConfig = {
+  voterGroupId: ETH_LATAM_ATTENDEE_CONFIG.groupId,
+  voterGroupUrl: ETH_LATAM_ATTENDEE_CONFIG.groupUrl,
+  creatorGroupId: ETH_LATAM_ATTENDEE_CONFIG.groupId,
+  creatorGroupUrl: ETH_LATAM_ATTENDEE_CONFIG.groupUrl,
+  passportServerUrl: ZUPASS_SERVER_URL,
+  passportAppUrl: ZUPASS_URL,
+  ballotType: BallotType.ETH_LATAM_STRAWPOLL,
+  latestGroupHashUrl: ETH_LATAM_ATTENDEE_CONFIG.groupUrl + "/latest-root",
+  makeHistoricalGroupUrl: (hash) =>
+    ETH_LATAM_ATTENDEE_CONFIG.groupUrl + "/" + hash
+};
+
+export const ETH_LATAM_FEEDBACK_BALLOT_CONFIG: BallotConfig = {
+  voterGroupId: ETH_LATAM_ORGANIZER_CONFIG.groupId,
+  voterGroupUrl: ETH_LATAM_ORGANIZER_CONFIG.groupUrl,
+  creatorGroupId: ETH_LATAM_ORGANIZER_CONFIG.groupId,
+  creatorGroupUrl: ETH_LATAM_ORGANIZER_CONFIG.groupUrl,
+  passportServerUrl: ZUPASS_SERVER_URL,
+  passportAppUrl: ZUPASS_URL,
+  ballotType: BallotType.ETH_LATAM_FEEDBACK,
+  latestGroupHashUrl: ETH_LATAM_ORGANIZER_CONFIG.groupUrl + "/latest-root",
+  makeHistoricalGroupUrl: (hash) =>
+    ETH_LATAM_ORGANIZER_CONFIG.groupUrl + "/" + hash
+};
+
 export const BALLOT_CONFIGS = {
   [BallotType.ADVISORYVOTE]: ADVISORY_VOTE_BALLOT_CONFIG,
   [BallotType.ORGANIZERONLY]: ORGANIZER_ONLY_BALLOT_CONFIG,
@@ -111,5 +139,7 @@ export const BALLOT_CONFIGS = {
   [BallotType.DEVCONNECT_STRAW]: DEVCONNECT_ATTENDEE_BALLOT_CONFIG,
   [BallotType.DEVCONNECT_ORGANIZER]: DEVCONNECT_ORGANIZER_BALLOT_CONFIG,
   [BallotType.EDGE_CITY_RESIDENT]: EDGE_CITY_RESIDENT_BALLOT_CONFIG,
-  [BallotType.EDGE_CITY_ORGANIZER]: EDGE_CITY_ORGANIZER_BALLOT_CONFIG
+  [BallotType.EDGE_CITY_ORGANIZER]: EDGE_CITY_ORGANIZER_BALLOT_CONFIG,
+  [BallotType.ETH_LATAM_STRAWPOLL]: ETH_LATAM_STRAWPOLL_BALLOT_CONFIG,
+  [BallotType.ETH_LATAM_FEEDBACK]: ETH_LATAM_FEEDBACK_BALLOT_CONFIG
 };

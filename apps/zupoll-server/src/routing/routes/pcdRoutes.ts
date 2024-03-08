@@ -17,6 +17,8 @@ import {
   DEVCONNECT_PARTICIPANTS_GROUP_URL,
   EDGE_CITY_ORGANIZERS_GROUP_URL,
   EDGE_CITY_RESIDENTS_GROUP_URL,
+  ETH_LATAM_ATTENDEES_GROUP_URL,
+  ETH_LATAM_ORGANIZERS_GROUP_URL,
   getVisibleBallotTypesForUser,
   PCDPASS_USERS_GROUP_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
@@ -128,6 +130,12 @@ export function initPCDRoutes(
               break;
             case BallotType.EDGE_CITY_FEEDBACK:
               groupUrl = EDGE_CITY_ORGANIZERS_GROUP_URL;
+              break;
+            case BallotType.ETH_LATAM_STRAWPOLL:
+              groupUrl = ETH_LATAM_ATTENDEES_GROUP_URL;
+              break;
+            case BallotType.ETH_LATAM_FEEDBACK:
+              groupUrl = ETH_LATAM_ORGANIZERS_GROUP_URL;
               break;
           }
 
