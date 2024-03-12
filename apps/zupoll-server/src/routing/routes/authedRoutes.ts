@@ -76,7 +76,9 @@ export function initAuthedRoutes(
         AuthType.DEVCONNECT_ORGANIZER,
         AuthType.DEVCONNECT_PARTICIPANT,
         AuthType.EDGE_CITY_RESIDENT,
-        AuthType.EDGE_CITY_ORGANIZER
+        AuthType.EDGE_CITY_ORGANIZER,
+        AuthType.ETH_LATAM_ATTENDEE,
+        AuthType.ETH_LATAM_ORGANIZER
       ].includes(req.authUserType as any)
     ) {
       res.sendStatus(403);
@@ -114,7 +116,9 @@ export function initAuthedRoutes(
           AuthType.DEVCONNECT_ORGANIZER,
           AuthType.DEVCONNECT_PARTICIPANT,
           AuthType.EDGE_CITY_RESIDENT,
-          AuthType.EDGE_CITY_ORGANIZER
+          AuthType.EDGE_CITY_ORGANIZER,
+          AuthType.ETH_LATAM_ATTENDEE,
+          AuthType.ETH_LATAM_ORGANIZER
         ].includes(req.authUserType as any)
       ) {
         res.sendStatus(403);
@@ -200,6 +204,12 @@ export function initAuthedRoutes(
         ballot?.ballotType === BallotType.EDGE_CITY_STRAWPOLL
       ) {
         res.status(200).json({ url: "/denver" });
+        return;
+      } else if (
+        ballot?.ballotType === BallotType.ETH_LATAM_FEEDBACK ||
+        ballot?.ballotType === BallotType.ETH_LATAM_STRAWPOLL
+      ) {
+        res.status(200).json({ url: "/eth-latam" });
         return;
       }
     }

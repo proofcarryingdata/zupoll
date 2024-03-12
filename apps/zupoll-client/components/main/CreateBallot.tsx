@@ -250,6 +250,25 @@ export function CreateBallot({
                   </option>
                 </>
               )}
+              {loginState.config.name ===
+                LoginConfigurationName.ETH_LATAM_ATTENDEE && (
+                <>
+                  <option value={BallotType.ETH_LATAM_STRAWPOLL}>
+                    ETH LatAm Straw Poll
+                  </option>
+                </>
+              )}
+              {loginState.config.name ===
+                LoginConfigurationName.ETH_LATAM_ORGANIZER && (
+                <>
+                  <option value={BallotType.ETH_LATAM_STRAWPOLL}>
+                    ETH LatAm Straw Poll
+                  </option>
+                  <option value={BallotType.ETH_LATAM_FEEDBACK}>
+                    ETH LatAm Feedback
+                  </option>
+                </>
+              )}
             </StyledSelect>
           </StyledLabel>
         </StyledForm>

@@ -60,6 +60,9 @@ export const PCDPASS_HISTORIC_API_URL = IS_DEPLOYED
 export const EDGE_CITY_RESIDENTS_GROUP_URL = `${process.env.EDGE_CITY_PIPELINE_URL}/${process.env.EDGE_CITY_RESIDENTS_GROUP_ID}`;
 export const EDGE_CITY_ORGANIZERS_GROUP_URL = `${process.env.EDGE_CITY_PIPELINE_URL}/${process.env.EDGE_CITY_ORGANIZERS_GROUP_ID}`;
 
+export const ETH_LATAM_ATTENDEES_GROUP_URL = `${process.env.ETH_LATAM_PIPELINE_URL}/${process.env.ETH_LATAM_ATTENDEES_GROUP_ID}`;
+export const ETH_LATAM_ORGANIZERS_GROUP_URL = `${process.env.ETH_LATAM_PIPELINE_URL}/${process.env.ETH_LATAM_ORGANIZERS_GROUP_ID}`;
+
 export interface GroupJwtPayload extends JwtPayload {
   groupUrl: string;
 }
@@ -129,6 +132,20 @@ export const authenticateJWT = (
         req.authUserType = AuthType.EDGE_CITY_ORGANIZER;
         next();
         return;
+      } else if (
+        ETH_LATAM_ATTENDEES_GROUP_URL &&
+        payload.groupUrl.includes(ETH_LATAM_ATTENDEES_GROUP_URL)
+      ) {
+        req.authUserType = AuthType.ETH_LATAM_ATTENDEE;
+        next();
+        return;
+      } else if (
+        ETH_LATAM_ORGANIZERS_GROUP_URL &&
+        payload.groupUrl.includes(ETH_LATAM_ORGANIZERS_GROUP_URL)
+      ) {
+        req.authUserType = AuthType.ETH_LATAM_ORGANIZER;
+        next();
+        return;
       }
 
       return res.sendStatus(403);
@@ -172,6 +189,16 @@ export function getVisibleBallotTypesForUser(
     relevantBallots = [
       BallotType.EDGE_CITY_STRAWPOLL,
       BallotType.EDGE_CITY_FEEDBACK
+    ];
+  } else if (userAuth === AuthType.ETH_LATAM_ATTENDEE) {
+    relevantBallots = [
+      BallotType.ETH_LATAM_STRAWPOLL,
+      BallotType.ETH_LATAM_FEEDBACK
+    ];
+  } else if (userAuth === AuthType.ETH_LATAM_ORGANIZER) {
+    relevantBallots = [
+      BallotType.ETH_LATAM_STRAWPOLL,
+      BallotType.ETH_LATAM_FEEDBACK
     ];
   }
 

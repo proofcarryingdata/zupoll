@@ -6,10 +6,13 @@ import {
   DEVCONNECT_USER_CONFIG,
   EDGE_CITY_ORGANIZER_CONFIG,
   EDGE_CITY_RESIDENT_CONFIG,
+  ETH_LATAM_ATTENDEE_CONFIG,
+  ETH_LATAM_ORGANIZER_CONFIG,
   ZUZALU_ORGANIZER_LOGIN_CONFIG,
   ZUZALU_PARTICIPANT_LOGIN_CONFIG
 } from "../../src/loginConfig";
 import {
+  LoginConfig,
   LoginConfigurationName,
   LoginState,
   ZupollError
@@ -20,7 +23,9 @@ import { RippleLoader } from "../core/RippleLoader";
 import { ErrorOverlay } from "../main/ErrorOverlay";
 import { Login } from "./Login";
 
-const allLoginConfigs = [
+const allLoginConfigs: LoginConfig[] = [
+  ETH_LATAM_ATTENDEE_CONFIG,
+  ETH_LATAM_ORGANIZER_CONFIG,
   EDGE_CITY_RESIDENT_CONFIG,
   EDGE_CITY_ORGANIZER_CONFIG,
   ZUZALU_PARTICIPANT_LOGIN_CONFIG,

@@ -234,6 +234,53 @@ export function MainScreen({
         </>
       )}
 
+      {(loginState.config.name === LoginConfigurationName.ETH_LATAM_ORGANIZER ||
+        loginState.config.name ===
+          LoginConfigurationName.ETH_LATAM_ATTENDEE) && (
+        <BallotListContainer>
+          <TitleContainer>
+            <H1>Community Polls</H1>
+            <p>Ballots created by ETH LatAm attendees.</p>
+          </TitleContainer>
+
+          {loadingBallots || ballots === undefined ? (
+            <RippleLoader />
+          ) : (
+            <BallotList
+              ballots={ballots}
+              filter={BallotType.ETH_LATAM_STRAWPOLL}
+            />
+          )}
+        </BallotListContainer>
+      )}
+
+      {(loginState.config.name === LoginConfigurationName.ETH_LATAM_ORGANIZER ||
+        loginState.config.name ===
+          LoginConfigurationName.ETH_LATAM_ATTENDEE) && (
+        <>
+          {loadingBallots || ballots === undefined ? (
+            <RippleLoader />
+          ) : (
+            <>
+              {ballots.filter(
+                (ballot) => ballot.ballotType === BallotType.ETH_LATAM_FEEDBACK
+              ).length > 0 && (
+                <BallotListContainer>
+                  <TitleContainer>
+                    <H1>Organizer Feedback</H1>
+                    <p>Ballots created by ETH LatAm organizers.</p>
+                  </TitleContainer>
+                  <BallotList
+                    ballots={ballots}
+                    filter={BallotType.ETH_LATAM_FEEDBACK}
+                  />
+                </BallotListContainer>
+              )}
+            </>
+          )}
+        </>
+      )}
+
       {error && (
         <ErrorOverlay
           error={error}

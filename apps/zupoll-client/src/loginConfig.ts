@@ -5,6 +5,10 @@ import {
   EDGE_CITY_ORGANIZERS_GROUP_URL,
   EDGE_CITY_RESIDENTS_GROUP_ID,
   EDGE_CITY_RESIDENTS_GROUP_URL,
+  ETH_LATAM_ATTENDEES_GROUP_ID,
+  ETH_LATAM_ATTENDEES_GROUP_URL,
+  ETH_LATAM_ORGANIZERS_GROUP_ID,
+  ETH_LATAM_ORGANIZERS_GROUP_URL,
   PCDPASS_SERVER_URL,
   PCDPASS_URL,
   PCDPASS_USERS_GROUP_URL,
@@ -79,4 +83,22 @@ export const DEVCONNECT_ORGANIZER_CONFIG: LoginConfig = {
   passportAppUrl: ZUPASS_URL,
   name: LoginConfigurationName.DEVCONNECT_ORGANIZER,
   prompt: "Devconnect Organizer"
+};
+
+export const ETH_LATAM_ATTENDEE_CONFIG: LoginConfig = {
+  groupId: ETH_LATAM_ATTENDEES_GROUP_ID,
+  groupUrl: ETH_LATAM_ATTENDEES_GROUP_URL,
+  passportServerUrl: ZUPASS_SERVER_URL,
+  passportAppUrl: ZUPASS_URL,
+  name: LoginConfigurationName.ETH_LATAM_ATTENDEE,
+  prompt: "ETH LatAm Attendee"
+};
+
+export const ETH_LATAM_ORGANIZER_CONFIG: LoginConfig = {
+  groupId: ETH_LATAM_ORGANIZERS_GROUP_ID,
+  groupUrl: ETH_LATAM_ORGANIZERS_GROUP_URL,
+  passportServerUrl: ZUPASS_SERVER_URL,
+  passportAppUrl: ZUPASS_URL,
+  name: LoginConfigurationName.ETH_LATAM_ORGANIZER,
+  prompt: "ETH LatAm Organizer"
 };
