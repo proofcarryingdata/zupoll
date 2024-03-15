@@ -29,8 +29,22 @@ export default function ETHLatAm() {
   useEffect(() => {
     if (definitelyNotLoggedIn) {
       replaceLoginState(undefined);
+    } else if (
+      loginState &&
+      ![
+        LoginConfigurationName.ETH_LATAM_ATTENDEE,
+        LoginConfigurationName.ETH_LATAM_ORGANIZER
+      ].includes(loginState?.config.name)
+    ) {
+      replaceLoginState(undefined);
     }
-  }, [definitelyNotLoggedIn, logout, replaceLoginState]);
+  }, [
+    definitelyNotLoggedIn,
+    loginState,
+    loginState?.config.name,
+    logout,
+    replaceLoginState
+  ]);
 
   let content = <></>;
 
