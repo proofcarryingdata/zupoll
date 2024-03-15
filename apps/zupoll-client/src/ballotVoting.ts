@@ -235,10 +235,12 @@ export function useBallotVoting({
       // We know that ?ballotId=1 is the first query param
       returnUrl
         ? returnUrl +
-            `&vote=${stableStringify({
-              pollToVoteJSON: polltoVoteList,
-              polls
-            })}`
+            `&vote=${window.encodeURIComponent(
+              stableStringify({
+                pollToVoteJSON: polltoVoteList,
+                polls
+              })
+            )}`
         : undefined
     );
   }, [
