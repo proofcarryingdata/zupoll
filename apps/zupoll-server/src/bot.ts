@@ -25,7 +25,7 @@ const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
     where: {
       NOT: {
         ballotType: {
-          in: [BallotType.PCDPASSUSER, BallotType.ORGANIZERONLY]
+          in: [BallotType.ORGANIZERONLY]
         }
       }
     }

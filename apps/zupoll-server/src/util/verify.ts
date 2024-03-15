@@ -9,9 +9,6 @@ import {
   DEVCONNECT_ORGANIZERS_GROUP_URL,
   DEVCONNECT_PARTICIPANTS_GROUP_URL,
   PARTICIPANTS_GROUP_ID,
-  PCDPASS_GROUP_ID,
-  PCDPASS_HISTORIC_API_URL,
-  PCDPASS_USERS_GROUP_URL,
   SemaphoreGroups,
   ZUZALU_HISTORIC_API_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
@@ -20,7 +17,6 @@ import {
 
 const residentRootCache = new Set<string>();
 const organizerRootCache = new Set<string>();
-const pcdpassUserRootCache = new Set<string>();
 const genericIssuanceRootCache = new Set<string>();
 
 // Returns nullfier or throws error.
@@ -131,19 +127,6 @@ export async function verifyGroupProof(
         organizerRootCache.add(pcd.claim.merkleRoot);
       } else {
         throw new Error("Claim root isn't a valid organizer root.");
-      }
-    }
-  } else if (semaphoreGroupUrl === PCDPASS_USERS_GROUP_URL) {
-    if (!pcdpassUserRootCache.has(pcd.claim.merkleRoot)) {
-      const validPcdpassRoot = await verifyRootValidity(
-        PCDPASS_GROUP_ID,
-        pcd.claim.merkleRoot,
-        PCDPASS_HISTORIC_API_URL!
-      );
-      if (validPcdpassRoot) {
-        pcdpassUserRootCache.add(pcd.claim.merkleRoot);
-      } else {
-        throw new Error("Claim root isn't a valid pcdpass root.");
       }
     }
   } else {

@@ -24,7 +24,7 @@ export function initAuthedRoutes(
       console.log(`req.params / query`, req.params, req.query);
       try {
         // request.semaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
-        // SEMAPHORE_ADMIN_GROUP_URL or PCDPASS_USERS_GROUP_URL
+        // SEMAPHORE_ADMIN_GROUP_URL
         console.log(
           `[POST LOGIN] url ${request.semaphoreGroupUrl}`,
           `proof:\n`,
@@ -72,7 +72,6 @@ export function initAuthedRoutes(
       ![
         AuthType.ZUZALU_ORGANIZER,
         AuthType.ZUZALU_PARTICIPANT,
-        AuthType.PCDPASS,
         AuthType.DEVCONNECT_ORGANIZER,
         AuthType.DEVCONNECT_PARTICIPANT,
         AuthType.EDGE_CITY_RESIDENT,
@@ -112,7 +111,6 @@ export function initAuthedRoutes(
         ![
           AuthType.ZUZALU_ORGANIZER,
           AuthType.ZUZALU_PARTICIPANT,
-          AuthType.PCDPASS,
           AuthType.DEVCONNECT_ORGANIZER,
           AuthType.DEVCONNECT_PARTICIPANT,
           AuthType.EDGE_CITY_RESIDENT,

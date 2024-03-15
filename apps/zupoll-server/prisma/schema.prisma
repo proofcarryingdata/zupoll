@@ -94,6 +94,7 @@ enum UserType {
 enum BallotType {
   ADVISORYVOTE
   STRAWPOLL
+  // PCDPASSUSER is no longer used for new ballots, but exists in old ballots
   PCDPASSUSER
   ORGANIZERONLY
   DEVCONNECT_STRAWPOLL

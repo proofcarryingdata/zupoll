@@ -127,24 +127,6 @@ export function MainScreen({
         </BallotListContainer>
       )}
 
-      {loginState.config.name === LoginConfigurationName.PCDPASS_USER && (
-        <BallotListContainer>
-          <TitleContainer>
-            <H1>PCDPass Polls</H1>
-            <p>
-              Ballots created by users of PCDPass. These are not visible to
-              Zuzalu participants.
-            </p>
-          </TitleContainer>
-
-          {loadingBallots || ballots === undefined ? (
-            <RippleLoader />
-          ) : (
-            <BallotList ballots={ballots} filter={BallotType.PCDPASSUSER} />
-          )}
-        </BallotListContainer>
-      )}
-
       {(loginState.config.name ===
         LoginConfigurationName.DEVCONNECT_PARTICIPANT ||
         loginState.config.name ===

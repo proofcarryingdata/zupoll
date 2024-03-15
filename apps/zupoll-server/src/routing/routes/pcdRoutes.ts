@@ -20,7 +20,6 @@ import {
   ETH_LATAM_ATTENDEES_GROUP_URL,
   ETH_LATAM_ORGANIZERS_GROUP_URL,
   getVisibleBallotTypesForUser,
-  PCDPASS_USERS_GROUP_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL
 } from "../../util/auth";
@@ -59,24 +58,11 @@ export function initPCDRoutes(
         throw new Error("Ballot already exists with this URL.");
       }
 
-      if (req.authUserType === AuthType.PCDPASS) {
-        if (request.ballot.ballotType !== BallotType.PCDPASSUSER) {
-          throw new Error(
-            `${req.authUserType} user can't create this ballot type`
-          );
-        }
-      } else if (req.authUserType === AuthType.ZUZALU_PARTICIPANT) {
+      if (req.authUserType === AuthType.ZUZALU_PARTICIPANT) {
         if (
-          request.ballot.ballotType === BallotType.PCDPASSUSER ||
           request.ballot.ballotType === BallotType.ADVISORYVOTE ||
           request.ballot.ballotType === BallotType.ORGANIZERONLY
         ) {
-          throw new Error(
-            `${req.authUserType} user can't create this ballot type`
-          );
-        }
-      } else if (req.authUserType === AuthType.ZUZALU_ORGANIZER) {
-        if (request.ballot.ballotType === BallotType.PCDPASSUSER) {
           throw new Error(
             `${req.authUserType} user can't create this ballot type`
           );
@@ -116,9 +102,6 @@ export function initPCDRoutes(
             case BallotType.STRAWPOLL:
               groupUrl = ZUZALU_PARTICIPANTS_GROUP_URL;
               break;
-            case BallotType.PCDPASSUSER:
-              groupUrl = PCDPASS_USERS_GROUP_URL;
-              break;
             case BallotType.DEVCONNECT_STRAWPOLL:
               groupUrl = DEVCONNECT_PARTICIPANTS_GROUP_URL;
               break;
@@ -140,7 +123,7 @@ export function initPCDRoutes(
           }
 
           // pollsterSemaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
-          // SEMAPHORE_ADMIN_GROUP_URL or PCDPASS_USERS_GROUP_URL
+          // SEMAPHORE_ADMIN_GROUP_URL
           const nullifier = await verifyGroupProof(
             request.ballot.pollsterSemaphoreGroupUrl!,
             request.proof,
@@ -187,10 +170,7 @@ export function initPCDRoutes(
           );
 
           // Send MSG first, so if it fails, we don't add poll to DB.
-          if (
-            request.ballot.ballotType !== BallotType.PCDPASSUSER &&
-            request.ballot.ballotType !== BallotType.ORGANIZERONLY
-          ) {
+          if (request.ballot.ballotType !== BallotType.ORGANIZERONLY) {
             // send message on TG channel, if bot is setup
             const post = formatPollCreated(newBallot, request.polls);
             const msgs = await sendMessageV2(
