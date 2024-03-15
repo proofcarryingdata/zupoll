@@ -2,12 +2,13 @@ module.exports = {
   reactStrictMode: false,
   transpilePackages: [],
   compiler: {
-    styledComponents: true,
+    styledComponents: true
   },
+  productionBrowserSourceMaps: true,
   webpack: (config) => {
     config.resolve.fallback = {
-      fs: false,
+      fs: false
     };
     return config;
-  },
+  }
 };
