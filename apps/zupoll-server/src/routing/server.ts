@@ -6,7 +6,7 @@ import morgan from "morgan";
 import { ApplicationContext } from "../types";
 import { initAuthedRoutes } from "./routes/authedRoutes";
 import { initHealthcheckRoutes } from "./routes/healthCheckRoutes";
-import { initPCDRoutes } from "./routes/pcdRoutes";
+import { initPCDRoutes } from "./routes/pollRoutes";
 
 export interface RouteInitializer {
   (app: express.Application, context: ApplicationContext): void;

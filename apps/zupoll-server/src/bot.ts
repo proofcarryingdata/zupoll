@@ -11,7 +11,7 @@ import {
 } from "./util/bot";
 import { prisma } from "./util/prisma";
 
-const findBallots = async (bot: Bot<Context, Api<RawApi>>) => {
+const telegramAlertRegardingBallots = async (bot: Bot<Context, Api<RawApi>>) => {
   console.log(`Running find ballots: ${Date.now()}`);
   const ballots = await prisma.ballot.findMany({
     select: {
@@ -242,7 +242,7 @@ export async function startBot(context: ApplicationContext): Promise<void> {
     "0,15,30,45 * * * *", // every 15 minutes, check if any ballots are expiring soon
     async () => {
       if (context.bot) {
-        await findBallots(context.bot);
+        await telegramAlertRegardingBallots(context.bot);
       }
     }
   );
