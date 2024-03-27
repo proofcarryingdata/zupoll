@@ -25,6 +25,9 @@ export async function startServer(
     const port = process.env.PORT;
     const app = express();
 
+    console.log(`starting zupoll webserver on port ${port}`);
+    console.log(`the server is accessible at http://localhost:${port}`);
+
     app.use(morgan("tiny"));
     app.use(express.json());
     app.use(cors());
