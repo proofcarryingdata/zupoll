@@ -2,7 +2,7 @@ import { sleep } from "@pcd/util";
 import { BallotType } from "@prisma/client";
 import { CronJob } from "cron";
 import { Api, Bot, Context, InlineKeyboard, RawApi } from "grammy";
-import { getAllBallotsForAlerts } from "./persistence";
+import { getAllBallotsForAlerts, updateBallotExpiryNotif } from "./persistence";
 import { ApplicationContext } from "./types";
 import {
   cleanString,
@@ -30,15 +30,7 @@ const telegramAlertRegardingBallots = async (
       : undefined;
 
     if (days === 7 && ballot.expiryNotif === "NONE") {
-      await prisma.ballot.update({
-        where: {
-          ballotURL: ballot.ballotURL
-        },
-        data: {
-          expiryNotif: "WEEK"
-        }
-      });
-
+      await updateBallotExpiryNotif(ballot.ballotURL, "WEEK");
       const expiryMessage = `<b>${cleanString(
         ballot.ballotTitle
       )}</b> will expire in less than 1 week.\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;
@@ -47,15 +39,7 @@ const telegramAlertRegardingBallots = async (
       hours === 24 &&
       (ballot.expiryNotif === "WEEK" || ballot.expiryNotif === "NONE")
     ) {
-      await prisma.ballot.update({
-        where: {
-          ballotURL: ballot.ballotURL
-        },
-        data: {
-          expiryNotif: "DAY"
-        }
-      });
-
+      await updateBallotExpiryNotif(ballot.ballotURL, "DAY");
       const expiryMessage = `<b>${cleanString(
         ballot.ballotTitle
       )}</b> will expire in less than 24 hours.\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;
@@ -64,15 +48,7 @@ const telegramAlertRegardingBallots = async (
       hours === 1 &&
       (ballot.expiryNotif === "DAY" || ballot.expiryNotif === "NONE")
     ) {
-      await prisma.ballot.update({
-        where: {
-          ballotURL: ballot.ballotURL
-        },
-        data: {
-          expiryNotif: "HOUR"
-        }
-      });
-
+      await updateBallotExpiryNotif(ballot.ballotURL, "HOUR");
       const expiryMessage = `<b>${cleanString(
         ballot.ballotTitle
       )}</b> will expire in less than 1 hour!\n\nVote <a href="${tgPollUrl}">here</a> or in <a href="${pollUrl}">browser</a>`;

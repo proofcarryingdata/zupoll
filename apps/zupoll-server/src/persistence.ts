@@ -1,4 +1,4 @@
-import { BallotType } from "@prisma/client";
+import { BallotType, ExpiryNotifStatus } from "@prisma/client";
 import { prisma } from "./util/prisma";
 
 export async function getAllBallotsForAlerts() {
@@ -23,4 +23,20 @@ export async function getAllBallotsForAlerts() {
   });
 
   return ballots;
+}
+
+export async function updateBallotExpiryNotif(
+  ballotURL: number,
+  expiryNotif: ExpiryNotifStatus
+) {
+  console.log(`Running updateBallotExpiryNotif: ${Date.now()}`);
+
+  await prisma.ballot.update({
+    where: {
+      ballotURL
+    },
+    data: {
+      expiryNotif
+    }
+  });
 }
