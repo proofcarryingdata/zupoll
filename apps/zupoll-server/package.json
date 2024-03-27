@@ -10,8 +10,7 @@
     "lint": "eslint \"**/*.ts{,x}\"",
     "test": "ts-mocha --exit test/**/*.spec.ts",
     "db:generate": "prisma generate",
-    "db:push": "prisma db push --skip-generate --force-reset",
-    "vote": "yarn ts-node src/scripts/bulkVote.ts vote"
+    "db:push": "prisma db push --skip-generate --force-reset"
   },
   "dependencies": {
     "@honeycombio/opentelemetry-node": "^0.3.2",
