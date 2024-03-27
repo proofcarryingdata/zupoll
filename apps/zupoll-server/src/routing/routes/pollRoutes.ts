@@ -10,6 +10,17 @@ import express, { NextFunction, Request, Response } from "express";
 import { InlineKeyboard } from "grammy";
 import { sha256 } from "js-sha256";
 import stableStringify from "json-stable-stringify";
+import {
+  createBallot,
+  createPoll,
+  createVote,
+  findTgMessages,
+  getBallotById,
+  getBallotByIdAndType,
+  getPollById,
+  getVoteByNullifier,
+  saveTgMessage
+} from "src/persistence";
 import { ApplicationContext } from "../../types";
 import {
   authenticateJWT,
@@ -19,7 +30,6 @@ import {
   EDGE_CITY_RESIDENTS_GROUP_URL,
   ETH_LATAM_ATTENDEES_GROUP_URL,
   ETH_LATAM_ORGANIZERS_GROUP_URL,
-  getVisibleBallotTypesForUser,
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL
 } from "../../util/auth";
@@ -47,12 +57,7 @@ export function initPCDRoutes(
     authenticateJWT,
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as CreateBallotRequest;
-
-      const prevBallot = await prisma.ballot.findUnique({
-        where: {
-          ballotURL: request.ballot.ballotURL
-        }
-      });
+      const prevBallot = await getBallotById(request.ballot.ballotURL);
 
       if (prevBallot !== null) {
         throw new Error("Ballot already exists with this URL.");
@@ -142,36 +147,14 @@ export function initPCDRoutes(
 
           console.log("Valid proof with nullifier", nullifier);
 
-          const newBallot = await prisma.ballot.create({
-            data: {
-              ballotTitle: request.ballot.ballotTitle,
-              ballotDescription: request.ballot.ballotDescription,
-              expiry: request.ballot.expiry,
-              proof: request.proof,
-              pollsterType: "ANON",
-              pollsterNullifier: nullifier,
-              pollsterSemaphoreGroupUrl:
-                request.ballot.pollsterSemaphoreGroupUrl,
-              voterSemaphoreGroupRoots: request.ballot.voterSemaphoreGroupRoots,
-              voterSemaphoreGroupUrls: request.ballot.voterSemaphoreGroupUrls,
-              ballotType: request.ballot.ballotType
-            }
-          });
+          const newBallot = await createBallot(request, nullifier);
 
           await Promise.all(
             request.polls.map(async (poll) => {
               // store poll order in options so we can maintain the same
               // database schema and maintain data
               poll.options.push("poll-order-" + poll.id);
-
-              return prisma.poll.create({
-                data: {
-                  body: poll.body,
-                  options: poll.options,
-                  ballotURL: newBallot.ballotURL,
-                  expiry: request.ballot.expiry
-                }
-              });
+              return createPoll(poll, newBallot);
             })
           );
 
@@ -190,15 +173,7 @@ export function initPCDRoutes(
               );
               if (msgs) {
                 for (const msg of msgs) {
-                  await prisma.tGMessage.create({
-                    data: {
-                      messageId: msg.message_id,
-                      chatId: msg.chat.id,
-                      topicId: msg.message_thread_id,
-                      ballotId: newBallot.ballotId,
-                      messageType: MessageType.CREATE
-                    }
-                  });
+                  await saveTgMessage(msg, newBallot);
                 }
               }
             }
@@ -249,11 +224,7 @@ export function initPCDRoutes(
 
       try {
         for (const vote of request.votes) {
-          const poll = await prisma.poll.findUnique({
-            where: {
-              id: vote.pollId
-            }
-          });
+          const poll = await getPollById(vote.pollId);
 
           if (poll === null) {
             throw new Error("Invalid poll id.");
@@ -276,15 +247,7 @@ export function initPCDRoutes(
         if (isNaN(ballotURL)) {
           throw new Error("Invalid ballot URL.");
         }
-        const ballot = await prisma.ballot.findFirst({
-          where: {
-            ballotURL: ballotURL,
-            ballotType: {
-              in: getVisibleBallotTypesForUser(req.authUserType)
-            }
-          }
-        });
-
+        const ballot = await getBallotByIdAndType(ballotURL, req.authUserType);
         if (ballot === null) {
           throw new Error("Can't find the given ballot.");
         }
@@ -303,11 +266,8 @@ export function initPCDRoutes(
           }
         );
 
-        const previousBallotVote = await prisma.vote.findFirst({
-          where: {
-            voterNullifier: nullifier
-          }
-        });
+        const previousBallotVote = await getVoteByNullifier(nullifier);
+
         if (previousBallotVote !== null) {
           // This error string is used in the frontend to determine whether to
           // show the "already voted" message and thus display the vote results.
@@ -317,23 +277,16 @@ export function initPCDRoutes(
         }
 
         for (const vote of request.votes) {
-          await prisma.vote.create({
-            data: {
-              pollId: vote.pollId,
-              voterType: "ANON",
-              voterNullifier: nullifier,
-              voterSemaphoreGroupUrl: request.voterSemaphoreGroupUrl,
-              voteIdx: vote.voteIdx,
-              proof: request.proof
-            }
-          });
+          await createVote(
+            vote,
+            UserType.ANON,
+            nullifier,
+            request.voterSemaphoreGroupUrl,
+            request.proof
+          );
 
-          const poll = await prisma.poll.findUnique({
-            where: {
-              id: vote.pollId
-            },
-            include: { votes: true }
-          });
+          const poll = await getPollById(vote.pollId);
+
           if (poll) allVotes.push(poll);
         }
 
@@ -341,18 +294,16 @@ export function initPCDRoutes(
           userVotes: multiVoteSignal.voteSignals
         };
 
-        const originalBallotMsg = await prisma.tGMessage.findMany({
-          where: {
-            ballotId: ballot.ballotId,
-            messageType: MessageType.CREATE
-          }
-        });
-        const voteBallotMsg = await prisma.tGMessage.findMany({
-          where: {
-            ballotId: ballot.ballotId,
-            messageType: MessageType.RESULTS
-          }
-        });
+        const originalBallotMsg = await findTgMessages(
+          ballot.ballotId,
+          MessageType.CREATE
+        );
+
+        const voteBallotMsg = await findTgMessages(
+          ballot.ballotId,
+          MessageType.RESULTS
+        );
+
         if (voteBallotMsg?.length > 0) {
           for (const voteMsg of voteBallotMsg) {
             try {

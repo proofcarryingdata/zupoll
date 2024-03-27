@@ -1,4 +1,14 @@
-import { BallotType, ExpiryNotifStatus } from "@prisma/client";
+import {
+  Ballot,
+  BallotType,
+  ExpiryNotifStatus,
+  MessageType,
+  Poll,
+  UserType,
+  Vote
+} from "@prisma/client";
+import { Message } from "grammy/types";
+import { CreateBallotRequest } from "./routing/routes/pollRoutes";
 import { getVisibleBallotTypesForUser } from "./util/auth";
 import { prisma } from "./util/prisma";
 import { AuthType } from "./util/types";
@@ -64,10 +74,60 @@ export async function getBallotsVisibleToUserType(
 }
 
 export async function getBallotById(ballotURL: number) {
-  return prisma.ballot.findFirst({
+  return prisma.ballot.findUnique({
     where: {
       ballotURL
     }
+  });
+}
+
+export async function getBallotByIdAndType(
+  ballotURL: number,
+  userType: AuthType | undefined
+) {
+  return prisma.ballot.findFirst({
+    where: {
+      ballotURL: ballotURL,
+      ballotType: {
+        in: getVisibleBallotTypesForUser(userType)
+      }
+    }
+  });
+}
+
+export async function getVoteByNullifier(nullifier: string) {
+  return prisma.vote.findFirst({
+    where: {
+      voterNullifier: nullifier
+    }
+  });
+}
+
+export async function createVote(
+  vote: Vote,
+  voterType: UserType,
+  nullifier: string,
+  semaphoreGroupUrl: string,
+  proof: string
+) {
+  return prisma.vote.create({
+    data: {
+      pollId: vote.pollId,
+      voterType,
+      voterNullifier: nullifier,
+      voterSemaphoreGroupUrl: semaphoreGroupUrl,
+      voteIdx: vote.voteIdx,
+      proof
+    }
+  });
+}
+
+export async function getPollById(pollId: string) {
+  return prisma.poll.findUnique({
+    where: {
+      id: pollId
+    },
+    include: { votes: true }
   });
 }
 
@@ -84,5 +144,63 @@ export async function getBallotPolls(ballotURL: number) {
       }
     },
     orderBy: { expiry: "asc" }
+  });
+}
+
+export async function createBallot(
+  request: CreateBallotRequest,
+  nullifier: string
+) {
+  return prisma.ballot.create({
+    data: {
+      ballotTitle: request.ballot.ballotTitle,
+      ballotDescription: request.ballot.ballotDescription,
+      expiry: request.ballot.expiry,
+      proof: request.proof,
+      pollsterType: "ANON",
+      pollsterNullifier: nullifier,
+      pollsterSemaphoreGroupUrl: request.ballot.pollsterSemaphoreGroupUrl,
+      voterSemaphoreGroupRoots: request.ballot.voterSemaphoreGroupRoots,
+      voterSemaphoreGroupUrls: request.ballot.voterSemaphoreGroupUrls,
+      ballotType: request.ballot.ballotType
+    }
+  });
+}
+
+export async function createPoll(poll: Poll, ballot: Ballot) {
+  return prisma.poll.create({
+    data: {
+      body: poll.body,
+      options: poll.options,
+      ballotURL: ballot.ballotURL,
+      expiry: ballot.expiry
+    }
+  });
+}
+
+export async function saveTgMessage(
+  msg: Message.TextMessage,
+  forBallot: Ballot
+) {
+  return prisma.tGMessage.create({
+    data: {
+      messageId: msg.message_id,
+      chatId: msg.chat.id,
+      topicId: msg.message_thread_id,
+      ballotId: forBallot.ballotId,
+      messageType: MessageType.CREATE
+    }
+  });
+}
+
+export async function findTgMessages(
+  ballotId: string,
+  messageType: MessageType
+) {
+  return prisma.tGMessage.findMany({
+    where: {
+      ballotId,
+      messageType
+    }
   });
 }
