@@ -1,7 +1,7 @@
 import { Ballot, BallotType, Poll, Vote } from "@prisma/client";
 import { Bot } from "grammy";
 import { InlineKeyboardMarkup, ReplyKeyboardMarkup } from "grammy/types";
-import { prisma } from "./prisma";
+import { getAllPollReceivers } from "src/persistence";
 import { BallotTypeNames } from "./types";
 
 export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
@@ -55,7 +55,7 @@ export async function sendMessageV2(
   // Look up recipients based on ballot
 
   async function findPollReceiversByBallotType(ballotType: BallotType) {
-    const pollReceivers = await prisma.pollReceiver.findMany();
+    const pollReceivers = await getAllPollReceivers();
     return pollReceivers.filter((receiver) =>
       receiver.ballotTypes.includes(ballotType)
     );

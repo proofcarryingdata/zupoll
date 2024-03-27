@@ -2,7 +2,14 @@ import { sleep } from "@pcd/util";
 import { BallotType } from "@prisma/client";
 import { CronJob } from "cron";
 import { Api, Bot, Context, InlineKeyboard, RawApi } from "grammy";
-import { getAllBallotsForAlerts, updateBallotExpiryNotif } from "./persistence";
+import {
+  deletePollReceiver,
+  findTgTopic,
+  getAllBallotsForAlerts,
+  updateBallotExpiryNotif,
+  upsertPollReceiver,
+  upsertTgTopic
+} from "./persistence";
 import { ApplicationContext } from "./types";
 import {
   cleanString,
@@ -10,7 +17,6 @@ import {
   sendMessageV2,
   SITE_URL
 } from "./util/bot";
-import { prisma } from "./util/prisma";
 
 const telegramAlertRegardingBallots = async (
   bot: Bot<Context, Api<RawApi>>
@@ -82,17 +88,8 @@ export async function startBot(context: ApplicationContext): Promise<void> {
 
   context.bot.command("latest", async (ctx) => {
     try {
-      const ballots = await prisma.ballot.findMany({
-        select: {
-          ballotTitle: true,
-          ballotURL: true,
-          expiry: true,
-          expiryNotif: true,
-          ballotDescription: true,
-          polls: true,
-          ballotType: true
-        }
-      });
+      const ballots = await getAllBallotsForAlerts();
+
       for (const ballot of ballots) {
         // @ts-expect-error prisma
         const post = formatPollCreated(ballot, ballot.polls);
@@ -117,24 +114,10 @@ export async function startBot(context: ApplicationContext): Promise<void> {
         if (!Object.values(BallotType).includes(p))
           throw new Error(`POLL TYPE INVALID`);
       });
-      const topicExists = await prisma.tGTopic.findFirst({
-        where: { id: tgTopicId }
-      });
+      const topicExists = await findTgTopic(tgTopicId);
       if (!topicExists)
         throw new Error(`Topic not found in DB. Edit it and try again`);
-      // Upsert in DB
-      await prisma.pollReceiver.upsert({
-        where: {
-          tgTopicId
-        },
-        update: {
-          ballotTypes
-        },
-        create: {
-          tgTopicId,
-          ballotTypes
-        }
-      });
+      await upsertPollReceiver(tgTopicId, ballotTypes);
       ctx.reply(`Listening to ${ballotTypes}`, {
         message_thread_id
       });
@@ -150,9 +133,9 @@ export async function startBot(context: ApplicationContext): Promise<void> {
     const chatId = ctx.chat.id;
     const topicId = ctx.update.message?.message_thread_id || 0;
     const tgTopicId = `${chatId}_${topicId}`;
-    try {
-      await prisma.pollReceiver.delete({ where: { tgTopicId } });
 
+    try {
+      await deletePollReceiver(tgTopicId);
       ctx.reply(`No longer listening to polls`, { message_thread_id });
     } catch (error) {
       ctx.reply(`${error}`, {
@@ -169,24 +152,12 @@ export async function startBot(context: ApplicationContext): Promise<void> {
       if (!topicName) throw new Error(`No topic name found`);
       console.log(`EDITED`, topicName);
       const id = `${chatId}_${topicId}`;
-      await prisma.tGTopic.upsert({
-        where: {
-          id
-        },
-        update: {
-          topicName
-        },
-        create: {
-          id,
-          topicId,
-          chatId,
-          topicName
-        }
-      });
+      await upsertTgTopic(id, chatId, topicId, topicName);
     } catch (error) {
       console.log(`[TOPIC EDITED ERROR]`, error);
     }
   });
+
   await sleep(5000);
 
   context.bot.start({

@@ -22,6 +22,8 @@ export async function getAllBallotsForAlerts() {
       ballotURL: true,
       expiry: true,
       expiryNotif: true,
+      ballotDescription: true,
+      polls: true,
       ballotType: true
     },
     orderBy: { expiry: "desc" },
@@ -202,6 +204,66 @@ export async function findTgMessages(
     where: {
       ballotId,
       messageType
+    }
+  });
+}
+
+export async function findTgTopic(tgTopicId: string) {
+  return prisma.tGTopic.findFirst({
+    where: {
+      id: tgTopicId
+    }
+  });
+}
+
+export async function upsertPollReceiver(
+  tgTopicId: string,
+  ballotTypes: BallotType[]
+) {
+  return prisma.pollReceiver.upsert({
+    where: {
+      tgTopicId
+    },
+    update: {
+      ballotTypes
+    },
+    create: {
+      tgTopicId,
+      ballotTypes
+    }
+  });
+}
+
+export async function getAllPollReceivers() {
+  return prisma.pollReceiver.findMany();
+}
+
+export async function deletePollReceiver(tgTopicId: string) {
+  return prisma.pollReceiver.delete({
+    where: {
+      tgTopicId
+    }
+  });
+}
+
+export async function upsertTgTopic(
+  id: string,
+  chatId: number,
+  topicId: number,
+  topicName: string
+) {
+  return prisma.tGTopic.upsert({
+    where: {
+      id
+    },
+    update: {
+      topicName
+    },
+    create: {
+      id,
+      topicId,
+      chatId,
+      topicName
     }
   });
 }
