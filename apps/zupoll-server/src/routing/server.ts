@@ -22,7 +22,7 @@ export async function startServer(
   context: ApplicationContext
 ): Promise<express.Application> {
   return new Promise<express.Application>((resolve, reject) => {
-    const port = process.env.PORT;
+    const port = process.env.ZUPOLL_SERVER_PORT;
     const app = express();
 
     console.log(`starting zupoll webserver on port ${port}`);
