@@ -2,6 +2,7 @@ import { sleep } from "@pcd/util";
 import { BallotType } from "@prisma/client";
 import { CronJob } from "cron";
 import { Api, Bot, Context, InlineKeyboard, RawApi } from "grammy";
+import { getAllBallotsForAlerts } from "./persistence";
 import { ApplicationContext } from "./types";
 import {
   cleanString,
@@ -14,24 +15,7 @@ import { prisma } from "./util/prisma";
 const telegramAlertRegardingBallots = async (
   bot: Bot<Context, Api<RawApi>>
 ) => {
-  console.log(`Running find ballots: ${Date.now()}`);
-  const ballots = await prisma.ballot.findMany({
-    select: {
-      ballotTitle: true,
-      ballotURL: true,
-      expiry: true,
-      expiryNotif: true,
-      ballotType: true
-    },
-    orderBy: { expiry: "desc" },
-    where: {
-      NOT: {
-        ballotType: {
-          in: [BallotType.PCDPASSUSER, BallotType.ORGANIZERONLY]
-        }
-      }
-    }
-  });
+  const ballots = await getAllBallotsForAlerts();
 
   for (const ballot of ballots) {
     const minutes = Math.ceil(
