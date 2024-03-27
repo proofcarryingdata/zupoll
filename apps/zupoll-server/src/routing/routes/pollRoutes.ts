@@ -175,31 +175,35 @@ export function initPCDRoutes(
             })
           );
 
-          // Send MSG first, so if it fails, we don't add poll to DB.
-          if (
-            request.ballot.ballotType !== BallotType.PCDPASSUSER &&
-            request.ballot.ballotType !== BallotType.ORGANIZERONLY
-          ) {
-            // send message on TG channel, if bot is setup
-            const post = formatPollCreated(newBallot, request.polls);
-            const msgs = await sendMessageV2(
-              post,
-              request.ballot.ballotType,
-              context.bot
-            );
-            if (msgs) {
-              for (const msg of msgs) {
-                await prisma.tGMessage.create({
-                  data: {
-                    messageId: msg.message_id,
-                    chatId: msg.chat.id,
-                    topicId: msg.message_thread_id,
-                    ballotId: newBallot.ballotId,
-                    messageType: MessageType.CREATE
-                  }
-                });
+          try {
+            // Send MSG first, so if it fails, we don't add poll to DB.
+            if (
+              request.ballot.ballotType !== BallotType.PCDPASSUSER &&
+              request.ballot.ballotType !== BallotType.ORGANIZERONLY
+            ) {
+              // send message on TG channel, if bot is setup
+              const post = formatPollCreated(newBallot, request.polls);
+              const msgs = await sendMessageV2(
+                post,
+                request.ballot.ballotType,
+                context.bot
+              );
+              if (msgs) {
+                for (const msg of msgs) {
+                  await prisma.tGMessage.create({
+                    data: {
+                      messageId: msg.message_id,
+                      chatId: msg.chat.id,
+                      topicId: msg.message_thread_id,
+                      ballotId: newBallot.ballotId,
+                      messageType: MessageType.CREATE
+                    }
+                  });
+                }
               }
             }
+          } catch (e) {
+            console.log(`error sending message`, e);
           }
 
           res.json({
