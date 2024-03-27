@@ -3,7 +3,7 @@ import { createServer } from "https";
 import next from "next";
 import { parse } from "url";
 
-const port = parseInt(process.env.PORT || "3004", 10);
+const port = parseInt(process.env.ZUPOLL_CLIENT_PORT ?? "3004", 10);
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
@@ -11,7 +11,7 @@ const handle = app.getRequestHandler();
 const localEndpoint = `https://dev.local:${port}`;
 const httpsOptions = {
   key: readFileSync("../certificates/dev.local-key.pem"),
-  cert: readFileSync("../certificates/dev.local.pem"),
+  cert: readFileSync("../certificates/dev.local.pem")
 };
 
 app.prepare().then(() => {
