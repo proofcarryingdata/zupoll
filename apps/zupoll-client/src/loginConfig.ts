@@ -9,9 +9,6 @@ import {
   ETH_LATAM_ATTENDEES_GROUP_URL,
   ETH_LATAM_ORGANIZERS_GROUP_ID,
   ETH_LATAM_ORGANIZERS_GROUP_URL,
-  PCDPASS_SERVER_URL,
-  PCDPASS_URL,
-  PCDPASS_USERS_GROUP_URL,
   SemaphoreGroups,
   ZUPASS_SERVER_URL,
   ZUPASS_URL,
@@ -56,15 +53,6 @@ export const ZUZALU_PARTICIPANT_LOGIN_CONFIG: LoginConfig = {
   passportAppUrl: ZUPASS_URL,
   name: LoginConfigurationName.ZUZALU_PARTICIPANT,
   prompt: "ZuConnect Resident"
-};
-
-export const PCDPASS_USER_CONFIG: LoginConfig = {
-  groupId: SemaphoreGroups.Everyone,
-  groupUrl: PCDPASS_USERS_GROUP_URL,
-  passportServerUrl: PCDPASS_SERVER_URL,
-  passportAppUrl: PCDPASS_URL,
-  name: LoginConfigurationName.PCDPASS_USER,
-  prompt: "PCDPass User"
 };
 
 export const DEVCONNECT_USER_CONFIG: LoginConfig = {

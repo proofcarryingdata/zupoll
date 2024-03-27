@@ -22,20 +22,6 @@ const zuzaluPassportServerURL: Record<DEPLOYMENT_TYPE, string> = {
   [DEPLOYMENT_TYPE.LOCAL_HTTPS]: "https://dev.local:3002/"
 };
 
-const pcdpassUrl: Record<DEPLOYMENT_TYPE, string> = {
-  [DEPLOYMENT_TYPE.PROD]: "https://pcdpass.xyz/",
-  [DEPLOYMENT_TYPE.STAGING]: "https://staging.pcdpass.xyz/",
-  [DEPLOYMENT_TYPE.LOCAL]: "http://localhost:3000/",
-  [DEPLOYMENT_TYPE.LOCAL_HTTPS]: "https://dev.local:3000/"
-};
-
-const pcdpassServerUrl: Record<DEPLOYMENT_TYPE, string> = {
-  [DEPLOYMENT_TYPE.PROD]: "https://api.pcdpass.xyz/",
-  [DEPLOYMENT_TYPE.STAGING]: "https://api-staging.pcdpass.xyz/",
-  [DEPLOYMENT_TYPE.LOCAL]: "http://localhost:3002/",
-  [DEPLOYMENT_TYPE.LOCAL_HTTPS]: "https://dev.local:3002/"
-};
-
 const zupollServerURL: Record<DEPLOYMENT_TYPE, string> = {
   [DEPLOYMENT_TYPE.PROD]: "https://api.zupoll.org/",
   [DEPLOYMENT_TYPE.STAGING]: "https://api-staging.zupoll.org/",
@@ -67,7 +53,6 @@ export const BALLOT_TYPE_FROM_LOGIN_CONFIG: Record<
   LoginConfigurationName,
   BallotType
 > = {
-  [LoginConfigurationName.PCDPASS_USER]: BallotType.PCDPASSUSER,
   [LoginConfigurationName.ZUZALU_PARTICIPANT]: BallotType.STRAWPOLL,
   [LoginConfigurationName.ZUZALU_ORGANIZER]: BallotType.ADVISORYVOTE,
   [LoginConfigurationName.DEVCONNECT_ORGANIZER]:
@@ -81,12 +66,10 @@ export const BALLOT_TYPE_FROM_LOGIN_CONFIG: Record<
 
 export const ZUPASS_URL =
   process.env.NEXT_PUBLIC_ZUPASS_URL ?? zupassUrl[DEPLOYMENT];
-export const PCDPASS_URL = pcdpassUrl[DEPLOYMENT];
 
 export const ZUPASS_SERVER_URL =
   process.env.NEXT_PUBLIC_ZUPASS_SERVER_URL ??
   zuzaluPassportServerURL[DEPLOYMENT];
-export const PCDPASS_SERVER_URL = pcdpassServerUrl[DEPLOYMENT];
 export const ZUPOLL_SERVER_URL =
   process.env.NEXT_PUBLIC_ZUPOLL_SERVER_URL ?? zupollServerURL[DEPLOYMENT];
 
@@ -94,7 +77,6 @@ export const ZUZALU_PARTICIPANTS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${Se
 export const ZUZALU_ADMINS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${SemaphoreGroups.ZuzaluOrganizers}`;
 export const DEVCONNECT_ADMINS_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${SemaphoreGroups.DevconnectOrganizers}`;
 export const DEVCONNECT_ATTENDEES_GROUP_URL = `${ZUPASS_SERVER_URL}semaphore/${SemaphoreGroups.DevconnectAttendees}`;
-export const PCDPASS_USERS_GROUP_URL = `${PCDPASS_SERVER_URL}semaphore/${SemaphoreGroups.Everyone}`;
 
 export const EDGE_CITY_PIPELINE_URL = `${process.env.NEXT_PUBLIC_EDGE_CITY_PIPELINE_URL}`;
 export const EDGE_CITY_RESIDENTS_GROUP_ID = `${process.env.NEXT_PUBLIC_EDGE_CITY_RESIDENTS_GROUP_ID}`;

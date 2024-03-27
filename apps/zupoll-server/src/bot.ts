@@ -11,7 +11,9 @@ import {
 } from "./util/bot";
 import { prisma } from "./util/prisma";
 
-const telegramAlertRegardingBallots = async (bot: Bot<Context, Api<RawApi>>) => {
+const telegramAlertRegardingBallots = async (
+  bot: Bot<Context, Api<RawApi>>
+) => {
   console.log(`Running find ballots: ${Date.now()}`);
   const ballots = await prisma.ballot.findMany({
     select: {

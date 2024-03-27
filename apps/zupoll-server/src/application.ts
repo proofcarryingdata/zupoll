@@ -2,11 +2,9 @@ import { startBot } from "./bot";
 import { startServer } from "./routing/server";
 import { ApplicationContext } from "./types";
 
-
 export interface ServiceInitializer {
   (context: ApplicationContext): void;
 }
-
 
 const services: ServiceInitializer[] = [startServer];
 

@@ -1,9 +1,6 @@
 import {
   DEVCONNECT_ADMINS_GROUP_URL,
   DEVCONNECT_ATTENDEES_GROUP_URL,
-  PCDPASS_SERVER_URL,
-  PCDPASS_URL,
-  PCDPASS_USERS_GROUP_URL,
   SemaphoreGroups,
   ZUPASS_SERVER_URL,
   ZUPASS_URL,
@@ -47,16 +44,6 @@ export const ORGANIZER_ONLY_BALLOT_CONFIG: BallotConfig = {
   passportServerUrl: ZUPASS_SERVER_URL,
   passportAppUrl: ZUPASS_URL,
   ballotType: BallotType.ORGANIZERONLY
-};
-
-export const PCDPASS_BALLOT_CONFIG: BallotConfig = {
-  voterGroupId: SemaphoreGroups.Everyone,
-  voterGroupUrl: PCDPASS_USERS_GROUP_URL,
-  creatorGroupId: SemaphoreGroups.Everyone,
-  creatorGroupUrl: PCDPASS_USERS_GROUP_URL,
-  passportServerUrl: PCDPASS_SERVER_URL,
-  passportAppUrl: PCDPASS_URL,
-  ballotType: BallotType.PCDPASSUSER
 };
 
 export const DEVCONNECT_ATTENDEE_BALLOT_CONFIG: BallotConfig = {
@@ -134,7 +121,6 @@ export const ETH_LATAM_FEEDBACK_BALLOT_CONFIG: BallotConfig = {
 export const BALLOT_CONFIGS = {
   [BallotType.ADVISORYVOTE]: ADVISORY_VOTE_BALLOT_CONFIG,
   [BallotType.ORGANIZERONLY]: ORGANIZER_ONLY_BALLOT_CONFIG,
-  [BallotType.PCDPASSUSER]: PCDPASS_BALLOT_CONFIG,
   [BallotType.STRAWPOLL]: STRAWPOLL_BALLOT_CONFIG,
   [BallotType.DEVCONNECT_STRAW]: DEVCONNECT_ATTENDEE_BALLOT_CONFIG,
   [BallotType.DEVCONNECT_ORGANIZER]: DEVCONNECT_ORGANIZER_BALLOT_CONFIG,
