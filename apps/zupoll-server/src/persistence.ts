@@ -180,15 +180,16 @@ export async function createPoll(poll: Poll, ballot: Ballot) {
 
 export async function saveTgMessage(
   msg: Message.TextMessage,
-  forBallot: Ballot
+  forBallotId: string,
+  messageType: MessageType
 ) {
   return prisma.tGMessage.create({
     data: {
       messageId: msg.message_id,
       chatId: msg.chat.id,
       topicId: msg.message_thread_id,
-      ballotId: forBallot.ballotId,
-      messageType: MessageType.CREATE
+      ballotId: forBallotId,
+      messageType
     }
   });
 }

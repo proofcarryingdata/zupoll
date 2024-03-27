@@ -39,7 +39,6 @@ import {
   PollWithVotes,
   sendMessageV2
 } from "../../util/bot";
-import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
 
@@ -173,7 +172,11 @@ export function initPCDRoutes(
               );
               if (msgs) {
                 for (const msg of msgs) {
-                  await saveTgMessage(msg, newBallot);
+                  await saveTgMessage(
+                    msg,
+                    newBallot.ballotId,
+                    MessageType.CREATE
+                  );
                 }
               }
             }
@@ -346,13 +349,11 @@ export function initPCDRoutes(
             if (msg) {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { id, messageId, ...resultsMsg } = voteMsg;
-              await prisma.tGMessage.create({
-                data: {
-                  ...resultsMsg,
-                  messageId: msg.message_id,
-                  messageType: MessageType.RESULTS
-                }
-              });
+              await saveTgMessage(
+                msg,
+                resultsMsg.ballotId,
+                MessageType.RESULTS
+              );
               console.log(`Updated DB with RESULTS`);
             }
           }
