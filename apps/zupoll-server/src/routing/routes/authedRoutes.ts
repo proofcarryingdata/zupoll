@@ -6,6 +6,7 @@ import {
   getBallotPolls,
   getBallotsVisibleToUserType
 } from "src/persistence";
+import { logger } from "src/util/log";
 import { ApplicationContext } from "../../types";
 import {
   ACCESS_TOKEN_SECRET,
@@ -24,12 +25,12 @@ export function initAuthedRoutes(
     "/login",
     async (req: Request, res: Response, next: NextFunction) => {
       const request = req.body as LoginRequest;
-      console.log(`req.body`, request);
-      console.log(`req.params / query`, req.params, req.query);
+      logger.info(`req.body`, request);
+      logger.info(`req.params / query`, req.params, req.query);
       try {
         // request.semaphoreGroupUrl is always either SEMAPHORE_GROUP_URL or
         // SEMAPHORE_ADMIN_GROUP_URL
-        console.log(
+        logger.info(
           `[POST LOGIN] url ${request.semaphoreGroupUrl}`,
           `proof:\n`,
           request.proof

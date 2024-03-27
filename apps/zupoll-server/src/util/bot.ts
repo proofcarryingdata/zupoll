@@ -2,6 +2,7 @@ import { Ballot, BallotType, Poll, Vote } from "@prisma/client";
 import { Bot } from "grammy";
 import { InlineKeyboardMarkup, ReplyKeyboardMarkup } from "grammy/types";
 import { getAllPollReceivers } from "src/persistence";
+import { logger } from "./log";
 import { BallotTypeNames } from "./types";
 
 export const SITE_URL = process.env.SITE_URL ?? "https://zupoll.org/";
@@ -13,7 +14,7 @@ export function cleanString(str: string) {
 }
 
 export async function sendMessage(message: string, bot?: Bot) {
-  console.log(message);
+  logger.info("sending telegram message", message);
 
   if (bot !== undefined) {
     const supergroup_id = process.env.BOT_SUPERGROUP_ID;
@@ -41,7 +42,7 @@ export async function sendMessageV2(
     userId?: number;
   }
 ) {
-  console.log(`[MESSAGE]`, message);
+  logger.info(`sending message`, message);
   if (!bot) throw new Error(`Bot not found`);
   if (!ballotType) throw new Error(`No ballot type found`);
   if (opts?.userId) {
@@ -71,7 +72,7 @@ export async function sendMessageV2(
   });
 
   const finished = await Promise.all(res);
-  console.log(`Sent poll created msg to ${res.length} chats`);
+  logger.info(`Sent poll created msg to ${res.length} chats`);
   return finished;
 }
 

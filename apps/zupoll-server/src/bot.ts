@@ -17,6 +17,7 @@ import {
   sendMessageV2,
   SITE_URL
 } from "./util/bot";
+import { logger } from "./util/log";
 
 const telegramAlertRegardingBallots = async (
   bot: Bot<Context, Api<RawApi>>
@@ -66,7 +67,7 @@ const telegramAlertRegardingBallots = async (
 export async function startBot(context: ApplicationContext): Promise<void> {
   const botToken = process.env.BOT_TOKEN;
   if (!botToken) {
-    console.log(`missing botToken, not starting bot`);
+    logger.warn(`missing botToken, not starting bot`);
     return;
   }
 
@@ -150,11 +151,11 @@ export async function startBot(context: ApplicationContext): Promise<void> {
       const chatId = ctx.chat.id;
       const topicId = ctx.update.message?.message_thread_id || 0;
       if (!topicName) throw new Error(`No topic name found`);
-      console.log(`EDITED`, topicName);
+      logger.info(`edited topic`, topicName);
       const id = `${chatId}_${topicId}`;
       await upsertTgTopic(id, chatId, topicId, topicName);
-    } catch (error) {
-      console.log(`[TOPIC EDITED ERROR]`, error);
+    } catch (e) {
+      logger.error(`[TOPIC EDITED ERROR]`, e);
     }
   });
 
@@ -163,11 +164,11 @@ export async function startBot(context: ApplicationContext): Promise<void> {
   context.bot.start({
     allowed_updates: ["message"],
     onStart(info) {
-      console.log(`[TELEGRAM] Started bot '${info.username}' successfully!`);
+      logger.info(`[TELEGRAM] Started bot '${info.username}' successfully!`);
     }
   });
 
-  context.bot.catch((error) => console.log(`[TELEGRAM] Bot error`, error));
+  context.bot.catch((error) => logger.error(`[TELEGRAM] Bot error`, error));
 
   // start up cron jobs
   const cronJob = new CronJob(
@@ -182,5 +183,5 @@ export async function startBot(context: ApplicationContext): Promise<void> {
 
   cronJob.start();
 
-  console.log("started bot");
+  logger.info("started telegram bot background process");
 }

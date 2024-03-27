@@ -21,6 +21,7 @@ import {
   getVoteByNullifier,
   saveTgMessage
 } from "src/persistence";
+import { logger } from "src/util/log";
 import { ApplicationContext } from "../../types";
 import {
   authenticateJWT,
@@ -98,7 +99,7 @@ export function initPCDRoutes(
       });
 
       const signalHash = sha256(stableStringify(ballotSignal));
-      console.log(`[SERVER BALLOT SIGNAL]`, ballotSignal);
+      logger.info(`[SERVER BALLOT SIGNAL]`, ballotSignal);
 
       try {
         if (request.ballot.pollsterType == UserType.ANON) {
@@ -144,7 +145,7 @@ export function initPCDRoutes(
             }
           );
 
-          console.log("Valid proof with nullifier", nullifier);
+          logger.info("Valid proof with nullifier", nullifier);
 
           const newBallot = await createBallot(request, nullifier);
 
@@ -181,7 +182,7 @@ export function initPCDRoutes(
               }
             }
           } catch (e) {
-            console.log(`error sending message`, e);
+            logger.error(`error sending message`, e);
           }
 
           res.json({
@@ -323,16 +324,15 @@ export function initPCDRoutes(
                   )
                 }
               );
-              if (msg) console.log(`Edited vote msg`);
+              if (msg) {
+                logger.info(`Edited vote msg`, msg);
+              }
             } catch (error) {
-              console.log(`GRAMMY ERROR`, error);
+              logger.error(`GRAMMY ERROR`, error);
             }
           }
         } else if (originalBallotMsg?.length > 0) {
           for (const voteMsg of originalBallotMsg) {
-            console.log(`No vote msg found`);
-            // TODO: Include "Vote Here"
-
             const msg = await context.bot?.api.sendMessage(
               voteMsg.chatId.toString(),
               generatePollHTML(ballot, allVotes),
@@ -354,7 +354,7 @@ export function initPCDRoutes(
                 resultsMsg.ballotId,
                 MessageType.RESULTS
               );
-              console.log(`Updated DB with RESULTS`);
+              logger.info(`Updated DB with RESULTS`);
             }
           }
         }

@@ -14,9 +14,7 @@ import { prisma } from "./util/prisma";
 import { AuthType } from "./util/types";
 
 export async function getAllBallotsForAlerts() {
-  console.log(`Running getAllBallotsForAlerts: ${Date.now()}`);
-
-  const ballots = await prisma.ballot.findMany({
+  return prisma.ballot.findMany({
     select: {
       ballotTitle: true,
       ballotURL: true,
@@ -35,16 +33,12 @@ export async function getAllBallotsForAlerts() {
       }
     }
   });
-
-  return ballots;
 }
 
 export async function updateBallotExpiryNotif(
   ballotURL: number,
   expiryNotif: ExpiryNotifStatus
 ) {
-  console.log(`Running updateBallotExpiryNotif: ${Date.now()}`);
-
   await prisma.ballot.update({
     where: {
       ballotURL

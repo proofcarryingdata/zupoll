@@ -2,6 +2,7 @@ import { BallotType } from ".prisma/client";
 import { NextFunction, Request, Response } from "express";
 import { JwtPayload, verify } from "jsonwebtoken";
 import { IS_DEPLOYED } from "./deployment";
+import { logger } from "./log";
 import { AuthType } from "./types";
 
 export const enum SemaphoreGroups {
@@ -21,7 +22,7 @@ export const ACCESS_TOKEN_SECRET = IS_DEPLOYED
 export const PARTICIPANTS_GROUP_ID = "1";
 export const ADMIN_GROUP_ID = "4";
 
-console.log(`IS DEPLOYED`, IS_DEPLOYED);
+logger.info(`NODE_ENV`, process.env.NODE_ENV);
 
 const BASE_URL =
   process.env.IS_LOCAL_HTTPS === "true"

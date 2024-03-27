@@ -14,6 +14,7 @@ import {
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL
 } from "./auth";
+import { logger } from "./log";
 
 const residentRootCache = new Set<string>();
 const organizerRootCache = new Set<string>();
@@ -30,7 +31,7 @@ export async function verifyGroupProof(
     claimedExtNullifier?: string;
   }
 ): Promise<string> {
-  console.log(`VERIFY`, semaphoreGroupUrl, options);
+  logger.info(`VERIFY`, semaphoreGroupUrl, options);
   if (
     options.allowedGroups &&
     !options.allowedGroups.includes(semaphoreGroupUrl)
@@ -72,9 +73,8 @@ export async function verifyGroupProof(
     }
 
     if (!anyRootMatches) {
-      console.log("allowed roots", options.allowedRoots);
-      console.log("merkle root", pcd.claim.merkleRoot);
-
+      logger.info("allowed roots", options.allowedRoots);
+      logger.info("merkle root", pcd.claim.merkleRoot);
       throw new Error("Current root doesn't match any of the allowed roots");
     }
   } else if (semaphoreGroupUrl === ZUZALU_PARTICIPANTS_GROUP_URL) {

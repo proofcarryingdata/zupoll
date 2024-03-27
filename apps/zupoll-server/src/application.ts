@@ -1,6 +1,7 @@
 import { startBot } from "./bot";
 import { startServer } from "./routing/server";
 import { ApplicationContext } from "./types";
+import { logger } from "./util/log";
 
 export async function startApplication() {
   const context: ApplicationContext = {
@@ -8,7 +9,7 @@ export async function startApplication() {
   };
 
   startBot(context).catch((e) => {
-    console.log("failed to start bot", e);
+    logger.error("failed to start bot", e);
   });
 
   await startServer(context);
