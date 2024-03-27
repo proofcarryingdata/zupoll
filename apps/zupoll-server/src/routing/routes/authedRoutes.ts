@@ -1,6 +1,11 @@
 import { BallotType } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { sign } from "jsonwebtoken";
+import {
+  getBallotById,
+  getBallotPolls,
+  getBallotsVisibleToUserType
+} from "src/persistence";
 import { ApplicationContext } from "../../types";
 import {
   ACCESS_TOKEN_SECRET,
@@ -8,7 +13,6 @@ import {
   getVisibleBallotTypesForUser
 } from "../../util/auth";
 import { sendMessage } from "../../util/bot";
-import { prisma } from "../../util/prisma";
 import { AuthType } from "../../util/types";
 import { verifyGroupProof } from "../../util/verify";
 
@@ -83,23 +87,7 @@ export function initAuthedRoutes(
       res.sendStatus(403);
       return;
     }
-
-    const ballots = await prisma.ballot.findMany({
-      select: {
-        ballotTitle: true,
-        ballotURL: true,
-        expiry: true,
-        ballotType: true,
-        createdAt: true
-      },
-      orderBy: { expiry: "desc" },
-      where: {
-        ballotType: {
-          in: getVisibleBallotTypesForUser(req.authUserType)
-        }
-      }
-    });
-
+    const ballots = await getBallotsVisibleToUserType(req.authUserType);
     res.status(200).json({ ballots });
   });
 
@@ -130,11 +118,8 @@ export function initAuthedRoutes(
           throw new Error("Invalid ballot URL.");
         }
 
-        const ballot = await prisma.ballot.findFirst({
-          where: {
-            ballotURL: ballotURL
-          }
-        });
+        const ballot = await getBallotById(ballotURL);
+
         if (
           ballot &&
           !getVisibleBallotTypesForUser(req.authUserType).includes(
@@ -149,19 +134,8 @@ export function initAuthedRoutes(
           throw new Error("Ballot not found.");
         }
 
-        const polls = await prisma.poll.findMany({
-          where: {
-            ballotURL: ballotURL
-          },
-          include: {
-            votes: {
-              select: {
-                voteIdx: true
-              }
-            }
-          },
-          orderBy: { expiry: "asc" }
-        });
+        const polls = await getBallotPolls(ballotURL);
+
         if (polls === null) {
           throw new Error("Ballot has no polls.");
         }
@@ -192,11 +166,8 @@ export function initAuthedRoutes(
   app.get("/login-redirect", async (req: Request, res: Response) => {
     const ballotURL = req.query.ballotURL?.toString();
     if (ballotURL) {
-      const ballot = await prisma.ballot.findFirst({
-        where: {
-          ballotURL: parseInt(ballotURL)
-        }
-      });
+      const ballot = await getBallotById(parseInt(ballotURL));
+
       if (
         ballot?.ballotType === BallotType.EDGE_CITY_FEEDBACK ||
         ballot?.ballotType === BallotType.EDGE_CITY_STRAWPOLL
