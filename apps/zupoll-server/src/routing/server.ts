@@ -7,7 +7,10 @@ import { ApplicationContext } from "../types";
 import { initAuthedRoutes } from "./routes/authedRoutes";
 import { initHealthcheckRoutes } from "./routes/healthCheckRoutes";
 import { initPCDRoutes } from "./routes/pcdRoutes";
-import { RouteInitializer } from "./types";
+
+export interface RouteInitializer {
+  (app: express.Application, context: ApplicationContext): void;
+}
 
 const routes: RouteInitializer[] = [
   initHealthcheckRoutes,
