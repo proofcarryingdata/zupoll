@@ -1,5 +1,11 @@
 import Document, { Head, Html, Main, NextScript } from "next/document";
 import { ServerStyleSheet } from "styled-components";
+import { cn } from "../@/lib/utils";
+
+// const fontSans = FontSans({
+//   subsets: ["latin"],
+//   variable: "--font-sans"
+// });
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: any) {
@@ -28,7 +34,12 @@ export default class MyDocument extends Document {
     return (
       <Html>
         <Head />
-        <body>
+        <body
+          className={cn(
+            "min-h-screen bg-background font-sans antialiased"
+            // fontSans.variable
+          )}
+        >
           <Main />
           <NextScript />
           <script

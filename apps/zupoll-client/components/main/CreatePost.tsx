@@ -1,9 +1,9 @@
 import { useState } from "react";
 import styled from "styled-components";
+import { Button } from "../../@/components/ui/button";
 import { botPost } from "../../src/api";
 import { BotPostRequest } from "../../src/requestTypes";
 import { LoginState, ZupollError } from "../../src/types";
-import { Button } from "../core/Button";
 
 /**
  * Page hosted on /create-post to directly post to the @zupoll_bot account.

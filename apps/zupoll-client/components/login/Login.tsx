@@ -1,13 +1,13 @@
 import { useZupassPopupMessages } from "@pcd/passport-interface";
 import stableStringify from "json-stable-stringify";
 import { useEffect, useState } from "react";
+import { Button } from "../../@/components/ui/button";
 import { login } from "../../src/api";
 import { LoginConfig, LoginState, ZupollError } from "../../src/types";
 import {
   openGroupMembershipPopup,
   removeQueryParameters
 } from "../../src/util";
-import { Button } from "../core/Button";
 
 /**
  * Login for the user who belongs to the specified semaphore group.
@@ -98,7 +98,7 @@ export function Login({
   return (
     <>
       <Button
-        deemph={deemphasized}
+        variant={"outline"}
         onClick={() => {
           setLoggingIn(true);
           openGroupMembershipPopup(

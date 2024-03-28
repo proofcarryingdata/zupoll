@@ -15,12 +15,13 @@
     "db:push": "turbo run db:push"
   },
   "devDependencies": {
-    "@pcd/eslint-config-custom": "0.4.0",
+    "@pcd/eslint-config-custom": "^0.10.0",
+    "eslint-config-next": "^14.1.4",
     "prettier": "latest",
     "prettier-plugin-organize-imports": "^3.2.2"
   },
   "engines": {
-    "node": "^18.0.0 || ^19.0.0 || ^21.0.0"
+    "node": "^20"
   },
   "dependencies": {
     "@changesets/cli": "^2.26.0",

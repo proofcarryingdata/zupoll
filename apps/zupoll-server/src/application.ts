@@ -1,9 +1,7 @@
 import { startBot } from "./bot";
 import { startServer } from "./routing/server";
-import { ServiceInitializer } from "./services/types";
 import { ApplicationContext } from "./types";
-
-const services: ServiceInitializer[] = [startServer];
+import { logger } from "./util/log";
 
 export async function startApplication() {
   const context: ApplicationContext = {
@@ -11,10 +9,8 @@ export async function startApplication() {
   };
 
   startBot(context).catch((e) => {
-    console.log("failed to start bot", e);
+    logger.error("failed to start bot", e);
   });
 
-  for (const service of services) {
-    await service(context);
-  }
+  await startServer(context);
 }

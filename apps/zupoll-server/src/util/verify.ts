@@ -9,18 +9,15 @@ import {
   DEVCONNECT_ORGANIZERS_GROUP_URL,
   DEVCONNECT_PARTICIPANTS_GROUP_URL,
   PARTICIPANTS_GROUP_ID,
-  PCDPASS_GROUP_ID,
-  PCDPASS_HISTORIC_API_URL,
-  PCDPASS_USERS_GROUP_URL,
   SemaphoreGroups,
   ZUZALU_HISTORIC_API_URL,
   ZUZALU_ORGANIZERS_GROUP_URL,
   ZUZALU_PARTICIPANTS_GROUP_URL
 } from "./auth";
+import { logger } from "./log";
 
 const residentRootCache = new Set<string>();
 const organizerRootCache = new Set<string>();
-const pcdpassUserRootCache = new Set<string>();
 const genericIssuanceRootCache = new Set<string>();
 
 // Returns nullfier or throws error.
@@ -34,7 +31,7 @@ export async function verifyGroupProof(
     claimedExtNullifier?: string;
   }
 ): Promise<string> {
-  console.log(`VERIFY`, semaphoreGroupUrl, options);
+  logger.info(`VERIFY`, semaphoreGroupUrl, options);
   if (
     options.allowedGroups &&
     !options.allowedGroups.includes(semaphoreGroupUrl)
@@ -76,9 +73,8 @@ export async function verifyGroupProof(
     }
 
     if (!anyRootMatches) {
-      console.log("allowed roots", options.allowedRoots);
-      console.log("merkle root", pcd.claim.merkleRoot);
-
+      logger.info("allowed roots", options.allowedRoots);
+      logger.info("merkle root", pcd.claim.merkleRoot);
       throw new Error("Current root doesn't match any of the allowed roots");
     }
   } else if (semaphoreGroupUrl === ZUZALU_PARTICIPANTS_GROUP_URL) {
@@ -131,19 +127,6 @@ export async function verifyGroupProof(
         organizerRootCache.add(pcd.claim.merkleRoot);
       } else {
         throw new Error("Claim root isn't a valid organizer root.");
-      }
-    }
-  } else if (semaphoreGroupUrl === PCDPASS_USERS_GROUP_URL) {
-    if (!pcdpassUserRootCache.has(pcd.claim.merkleRoot)) {
-      const validPcdpassRoot = await verifyRootValidity(
-        PCDPASS_GROUP_ID,
-        pcd.claim.merkleRoot,
-        PCDPASS_HISTORIC_API_URL!
-      );
-      if (validPcdpassRoot) {
-        pcdpassUserRootCache.add(pcd.claim.merkleRoot);
-      } else {
-        throw new Error("Claim root isn't a valid pcdpass root.");
       }
     }
   } else {

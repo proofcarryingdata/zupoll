@@ -2,6 +2,7 @@ import { BallotType } from ".prisma/client";
 import { NextFunction, Request, Response } from "express";
 import { JwtPayload, verify } from "jsonwebtoken";
 import { IS_DEPLOYED } from "./deployment";
+import { logger } from "./log";
 import { AuthType } from "./types";
 
 export const enum SemaphoreGroups {
@@ -20,9 +21,8 @@ export const ACCESS_TOKEN_SECRET = IS_DEPLOYED
 
 export const PARTICIPANTS_GROUP_ID = "1";
 export const ADMIN_GROUP_ID = "4";
-export const PCDPASS_GROUP_ID = "5";
 
-console.log(`IS DEPLOYED`, IS_DEPLOYED);
+logger.info(`NODE_ENV`, process.env.NODE_ENV);
 
 const BASE_URL =
   process.env.IS_LOCAL_HTTPS === "true"
@@ -45,16 +45,8 @@ export const ZUZALU_ORGANIZERS_GROUP_URL = IS_DEPLOYED
   ? process.env.ZUZALU_ORGANIZERS_GROUP_URL
   : `${BASE_URL}/semaphore/${ADMIN_GROUP_ID}`;
 
-export const PCDPASS_USERS_GROUP_URL = IS_DEPLOYED
-  ? process.env.PCDPASS_USERS_GROUP_URL
-  : `${BASE_URL}/semaphore/${PCDPASS_GROUP_ID}`;
-
 export const ZUZALU_HISTORIC_API_URL = IS_DEPLOYED
   ? process.env.SEMAPHORE_HISTORIC_URL
-  : `${BASE_URL}/semaphore/valid-historic/`;
-
-export const PCDPASS_HISTORIC_API_URL = IS_DEPLOYED
-  ? process.env.PCDPASS_HISTORIC_API_URL
   : `${BASE_URL}/semaphore/valid-historic/`;
 
 export const EDGE_CITY_RESIDENTS_GROUP_URL = `${process.env.EDGE_CITY_PIPELINE_URL}/${process.env.EDGE_CITY_RESIDENTS_GROUP_ID}`;
@@ -95,13 +87,6 @@ export const authenticateJWT = (
         payload.groupUrl.includes(ZUZALU_ORGANIZERS_GROUP_URL)
       ) {
         req.authUserType = AuthType.ZUZALU_ORGANIZER;
-        next();
-        return;
-      } else if (
-        PCDPASS_USERS_GROUP_URL &&
-        payload.groupUrl.includes(PCDPASS_USERS_GROUP_URL)
-      ) {
-        req.authUserType = AuthType.PCDPASS;
         next();
         return;
       } else if (
@@ -160,9 +145,7 @@ export function getVisibleBallotTypesForUser(
 ): BallotType[] {
   let relevantBallots: BallotType[] = [];
 
-  if (userAuth === AuthType.PCDPASS) {
-    relevantBallots = [BallotType.PCDPASSUSER];
-  } else if (userAuth === AuthType.ZUZALU_ORGANIZER) {
+  if (userAuth === AuthType.ZUZALU_ORGANIZER) {
     relevantBallots = [
       BallotType.ADVISORYVOTE,
       BallotType.STRAWPOLL,

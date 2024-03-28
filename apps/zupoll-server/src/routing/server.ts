@@ -3,11 +3,15 @@ import express, { NextFunction } from "express";
 import * as fs from "fs";
 import * as https from "https";
 import morgan from "morgan";
+import { logger } from "src/util/log";
 import { ApplicationContext } from "../types";
 import { initAuthedRoutes } from "./routes/authedRoutes";
 import { initHealthcheckRoutes } from "./routes/healthCheckRoutes";
-import { initPCDRoutes } from "./routes/pcdRoutes";
-import { RouteInitializer } from "./types";
+import { initPCDRoutes } from "./routes/pollRoutes";
+
+export interface RouteInitializer {
+  (app: express.Application, context: ApplicationContext): void;
+}
 
 const routes: RouteInitializer[] = [
   initHealthcheckRoutes,
@@ -19,8 +23,11 @@ export async function startServer(
   context: ApplicationContext
 ): Promise<express.Application> {
   return new Promise<express.Application>((resolve, reject) => {
-    const port = process.env.PORT;
+    const port = process.env.ZUPOLL_SERVER_PORT;
     const app = express();
+
+    logger.info(`starting zupoll webserver on port ${port}`);
+    logger.info(`the server is accessible at http://localhost:${port}`);
 
     app.use(morgan("tiny"));
     app.use(express.json());
@@ -55,7 +62,7 @@ export async function startServer(
       };
 
       const server = https.createServer(httpsOptions, app).listen(port, () => {
-        console.log(`[INIT] Local HTTPS server listening on ${localEndpoint}`);
+        logger.info(`[INIT] Local HTTPS server listening on ${localEndpoint}`);
         resolve(app);
       });
 

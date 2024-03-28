@@ -1,5 +1,5 @@
+import { Button } from "../../@/components/ui/button";
 import { ZupollError } from "../../src/types";
-import { Button } from "../core/Button";
 import { Overlay } from "./Overlay";
 
 export function ErrorOverlay({
