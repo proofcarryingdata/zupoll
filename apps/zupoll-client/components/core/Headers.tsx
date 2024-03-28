@@ -2,11 +2,11 @@ import { useRouter } from "next/router";
 import { useCallback } from "react";
 import styled from "styled-components";
 import { Logo } from ".";
-import { Button } from "./Button";
+import { Button } from "../../@/components/ui/button";
 
 export function MainScreenHeader({
   logout,
-  createBallot,
+  createBallot
 }: {
   logout: () => void;
   createBallot: () => Promise<boolean>;

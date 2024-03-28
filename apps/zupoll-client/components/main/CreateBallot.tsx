@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { Button } from "../../@/components/ui/button";
 import { BallotFromUrl, useCreateBallot } from "../../src/createBallot";
 import { BALLOT_TYPE_FROM_LOGIN_CONFIG } from "../../src/env";
 import { BallotType, Poll } from "../../src/prismaTypes";
@@ -11,7 +12,6 @@ import {
   ZupollError
 } from "../../src/types";
 import { USE_CREATE_BALLOT_REDIRECT } from "../../src/util";
-import { Button } from "../core/Button";
 import {
   FormButtonContainer,
   FormContainer,

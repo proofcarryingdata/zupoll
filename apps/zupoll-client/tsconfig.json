@@ -4,9 +4,11 @@
   "exclude": ["node_modules"],
   "compilerOptions": {
     "jsx": "preserve",
-    "target": "es6"
+    "target": "es6",
+    "paths": {
+      "@/*": ["./@/*"]
+    }
   },
-
   "ts-node": {
     "compilerOptions": {
       "module": "commonjs",
